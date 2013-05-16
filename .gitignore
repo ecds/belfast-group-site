@@ -1,3 +1,7 @@
+# local ignores
+localsettings.py
+
+# python default ignores from github
 *.py[cod]
 
 # C extensions
