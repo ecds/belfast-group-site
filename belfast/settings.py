@@ -118,10 +118,12 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.flatpages',
     'django.contrib.admin',
-    'tinymce',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
+    'tinymce',
+    'eulexistdb',
     'belfast.pages',
+    'belfast.groupsheets',
 )
 
 #TINYMCE_FILEBROWSER = True

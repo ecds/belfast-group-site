@@ -29,3 +29,20 @@ html, body {
     }
 }
 
+
+/* group sheet + poetry formatting */
+.poem {
+    border-top: 1px solid gray;
+}
+.epigraph {
+    font-style:italic;
+}
+.linegroup {
+   margin: 1em 0px;
+}
+.linegroup p {
+    margin: 0px;
+}
+.poem blockquote {
+    border-left: none;
+}

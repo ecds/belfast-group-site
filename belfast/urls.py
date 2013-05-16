@@ -7,6 +7,8 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^$', pages_views.site_index, name='site-index'),
+    url(r'^group-sheets/', include('belfast.groupsheets.urls',
+        namespace='groupsheets')),
     url(r'^', include('belfast.pages.urls')),
     # Examples:
     # url(r'^$', 'belfast.views.home', name='home'),
