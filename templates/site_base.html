@@ -7,9 +7,48 @@
     {#- Bootstrap #}
     <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" media="screen">
     <link href="{% static 'bootstrap/css/bootstrap-responsive.min.css' %}" rel="stylesheet" media="screen">
+    <link href="{% static 'css/local.css' %}" rel="stylesheet" media="screen">
   </head>
   <body>
+    <div id="wrap">
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="{% url 'site-index' %}">The Belfast Group</a>
+          <div class="nav-collapse collapse">
+            {# search may go here? <p class="navbar-text pull-right"> </p> #}
+            <ul class="nav">
+{#              <li class="active" ><a href="#">Home</a></li>  #}
+{# TODO: use request.path = site_index to check if url is active #}
+              <li><a href="#">Overview</a></li>
+              <li><a href="#">Workshop List</a></li>
+              <li><a href="#">Biographies</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
     {% block content %}{% endblock %}
+
+  <div id="push"></div>
+  </div> {# end wrap #}
+
+    <div id="footer">
+      <div class="container">
+        <ul class="inline muted credit">
+          <li><a href="http://beck.library.emory.edu/">Lewis H. Beck Center</a></li>
+          <li><a href="http://marbl.library.emory.edu">Manuscript, Archives, and Rare Book Library</a></li>
+          <li><a href="http://www.emory.edu/">Emory University</a></li>
+          {# TODO: include DiSC here maybe? #}
+        </p>
+      </div>
+    </div>
 
     <script src="http://code.jquery.com/jquery.js"></script>
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
