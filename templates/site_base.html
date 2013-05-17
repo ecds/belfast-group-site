@@ -24,8 +24,6 @@
           <div class="nav-collapse collapse">
             {# search may go here? <p class="navbar-text pull-right"> </p> #}
             <ul class="nav">
-{#              <li class="active" ><a href="#">Home</a></li>  #}
-{# TODO: use request.path = site_index to check if url is active #}
               {% url 'overview' as overview_url %}
               <li{% if request.path = overview_url %} class="active"{% endif %}>
                 <a href="{{ overview_url }}">Overview</a></li>

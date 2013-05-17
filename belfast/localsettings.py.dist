@@ -30,6 +30,7 @@ EXISTDB_SERVER_USER = 'user'
 EXISTDB_SERVER_PASSWORD = 'password'
 EXISTDB_SERVER_URL = "http://megaserver.example.com:8042/exist"
 EXISTDB_ROOT_COLLECTION = "/sample_collection"
+#EXISTDB_TEST_COLLECTION = "/test/sample"
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

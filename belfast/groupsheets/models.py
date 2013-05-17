@@ -5,12 +5,12 @@ from eulexistdb.manager import Manager
 from eulexistdb.models import XmlModel
 
 
-class GroupSheetContents(teimap._TeiBase):
+class Contents(teimap._TeiBase):
     title = xmlmap.StringField('tei:p')
     items = xmlmap.StringListField('tei:list/tei:item')
 
 
-class GroupSheetPoem(teimap._TeiBase):
+class Poem(teimap._TeiBase):
     id = xmlmap.StringField('@xml:id')    # is this the correct id to use?
     title = xmlmap.StringField('tei:front/tei:titlePage/tei:docTitle/tei:titlePart[@type="main"]')
     body = xmlmap.NodeField('tei:body', xmlmap.XmlObject)
@@ -27,9 +27,9 @@ class GroupSheet(XmlModel):
     title = xmlmap.StringField('tei:head')
     author = xmlmap.StringField('tei:docAuthor')
     date = xmlmap.StringField('tei:docDate')
-    toc = xmlmap.NodeField('tei:argument', GroupSheetContents)
+    toc = xmlmap.NodeField('tei:argument', Contents)
 
-    poems = xmlmap.NodeListField('tei:text', GroupSheetPoem)
+    poems = xmlmap.NodeListField('tei:text', Poem)
 
     # TODO: will need reference to the ARK in the header
 

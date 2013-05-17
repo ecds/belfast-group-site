@@ -110,7 +110,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'belfast.context_processors.version',
 )
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -125,7 +125,7 @@ INSTALLED_APPS = (
     'eulexistdb',
     'belfast.pages',
     'belfast.groupsheets',
-)
+]
 
 #TINYMCE_FILEBROWSER = True
 TINYMCE_DEFAULT_CONFIG = {
@@ -143,4 +143,25 @@ except ImportError:
         'stuff blows up, try copying localsettings.py.dist to ' + \
         'localsettings.py and setting appropriately for your environment.'
     pass
+
+
+# django_nose configurations  (optional - dev only)
+django_nose = None
+try:
+    # NOTE: errors if DATABASES is not configured (in some cases),
+    # so this must be done after importing localsettings
+    import django_nose
+except ImportError:
+    pass
+
+# - only if django_nose is installed, so it is only required for development
+if django_nose is not None:
+    INSTALLED_APPS.append('django_nose')
+    TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+    NOSE_PLUGINS = [
+        'eulexistdb.testutil.ExistDBSetUp',
+        # ...
+    ]
+    NOSE_ARGS = ['--with-existdbsetup']
+
 
