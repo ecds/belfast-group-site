@@ -15,7 +15,7 @@ register = template.Library()
 XLINK_NAMESPACE = 'http://www.w3.org/1999/xlink'
 EXIST_NAMESPACE = 'http://exist.sourceforge.net/NS/exist'
 
-# render attributes which can be converted to simple tags
+# rend attributes which can be converted to simple tags
 # - key is render attribute, value is tuple of start/end tag or
 #   other start/end wrapping strings
 rend_attributes = {
@@ -88,8 +88,8 @@ def format_node(node, escape):
         elif rend.startswith('indent'):
             # indent## - ## is number of spaces
             # for now, considering space ~= 1/2 em
-            start = '<span style="padding-left:%dem">' % \
-                    (int(rend[len('indent'):])/2)
+            start = '<span style="padding-left:%.1fem">' % \
+                    (float(rend[len('indent'):])/2)
             end = '</span>'
 
     # simple tags that can be converted to html markup
