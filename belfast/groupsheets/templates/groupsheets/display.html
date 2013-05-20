@@ -16,14 +16,17 @@
     <div class="contents">
       <p>{{ document.toc.title }}</p>
       <ul>
-      {% for item in document.toc.items %}
-         <li>{{ item }}</li>  {# FIXME: these don't actually have ids ? #}
-      {% endfor %}
+{# NOTE: there is a table of contents item list, but it does not include ids #}
+{# generating toc from the actual poems instead #}
+        {% for poem in document.poems %}
+        <li><a href="#{{ poem.id }}">{{ poem.title|default:'[untitled]' }}</a></li>
+        {% endfor %}
       </ul>
     </div>
 
     {% for poem in document.poems %}
       <div class="poem">
+        <a name="{{ poem.id }}"> </a>
         {% if poem.title %}
           <h2>{{ poem.title }}</h2>
         {% endif %}
