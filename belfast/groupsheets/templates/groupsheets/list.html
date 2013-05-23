@@ -1,0 +1,33 @@
+{% extends 'site_base.html' %}
+{% load tei %}
+
+{% block page-subtitle %} | Group Sheets{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+<ul>
+{# {% for doc in documents|dictsort:'author' %} #}
+{% for doc in documents %}
+    <li>
+        {% if doc.author %} <b>{{ doc.author.fullname }}</b> {% endif %}
+        {% for t in doc.titles %}
+        "{{ t }},"
+        {% empty %}
+          Untitled{{ ' '|add:doc.genre|default:'' }},
+        {% endfor %}
+        {% if doc.date %}{{ doc.date }}{% else %}no date{% endif %}.  {# TODO: format date for readability #}
+        {# perhaps simply omit the no date since the majority are undated? #}
+        {% if doc.num_pages %}({{ doc.num_pages }} page{{ doc.num_pages|pluralize }}){% endif %}
+        {# TODO: source archives #}
+        <p>Source:
+        {% for s in doc.sources %}
+          {{ s }}{% if forloop.last %}. {% else %}, {% endif %}
+        {% endfor %}</p>
+    </li>
+{% endfor %}
+</ul>
+
+</div>
+{% endblock %}
