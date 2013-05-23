@@ -32,6 +32,8 @@ EXISTDB_SERVER_URL = "http://megaserver.example.com:8042/exist"
 EXISTDB_ROOT_COLLECTION = "/sample_collection"
 #EXISTDB_TEST_COLLECTION = "/test/sample"
 
+RDF_DATA_DIR = '/path/to/github/belfast-group-data/data/'
+
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
 # the site admins on every HTTP 500 error when DEBUG=False.

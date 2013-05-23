@@ -20,3 +20,8 @@ Initial setup
 * Load fixtures for initial required flat pages::
 
   python manage.py loaddata belfast/pages/fixtures/initial_flatpages.json
+
+* Check out a copy of the Belfast Group RDF data from
+  https://github.com/emory-libraries-disc/belfast-group-data
+  and configure the location of the ``data`` directory
+  in ``localsettings.py`` as **RDF_DATA_DIR**.
