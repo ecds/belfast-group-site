@@ -149,6 +149,7 @@ def get_rdf_groupsheets():
     res = g.query('''
         PREFIX schema: <%s>
         PREFIX rdf: <%s>
+        PREFIX bibo: <%s>
         SELECT ?ms ?author
         WHERE {
             ?doc schema:about <%s> .
@@ -157,7 +158,7 @@ def get_rdf_groupsheets():
             ?ms schema:author ?author .
             ?author schema:name ?name
         } ORDER BY ?name
-        ''' % (rdflib.XSD, rdflib.RDF, BELFAST_GROUP_URI)
+        ''' % (rdflib.XSD, rdflib.RDF, BIBO, BELFAST_GROUP_URI)
     )
         #         ?author schema:familyName ?authorLast
         # } ORDER BY ?authorLast
