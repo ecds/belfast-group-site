@@ -142,12 +142,14 @@ class RdfGroupSheet(rdflib.resource.Resource):
         return sources
 
 
-
 def get_rdf_groupsheets():
     g = rdflib.Graph()
     for infile in glob.iglob(path.join(settings.RDF_DATA_DIR, '*.xml')):
         g.parse(infile)
-    res = g.query('''SELECT ?ms ?author
+    res = g.query('''
+        PREFIX schema: <%s>
+        PREFIX rdf: <%s>
+        SELECT ?ms ?author
         WHERE {
             ?doc schema:about <%s> .
             ?doc schema:mentions ?ms .
@@ -155,7 +157,8 @@ def get_rdf_groupsheets():
             ?ms schema:author ?author .
             ?author schema:name ?name
         } ORDER BY ?name
-        ''' % BELFAST_GROUP_URI)
+        ''' % (rdflib.XSD, rdflib.RDF, BELFAST_GROUP_URI)
+    )
         #         ?author schema:familyName ?authorLast
         # } ORDER BY ?authorLast
     # FIXME:  only QUB has schema:familyName so that query restricts to them
