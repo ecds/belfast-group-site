@@ -108,6 +108,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.contrib.messages.context_processors.messages',
     'belfast.context_processors.version',
+    'belfast.groupsheets.context_processors.searchform',  # search form on every page
 )
 
 INSTALLED_APPS = [
@@ -134,6 +135,8 @@ TINYMCE_DEFAULT_CONFIG = {
     'cleanup_on_startup': True,
     'custom_undo_redo_levels': 10,
 }
+
+EXISTDB_INDEX_CONFIGFILE = os.path.join(BASE_DIR, "exist_index.xconf")
 
 try:
     from localsettings import *

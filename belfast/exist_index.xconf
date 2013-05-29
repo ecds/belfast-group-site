@@ -1,0 +1,14 @@
+<collection xmlns="http://exist-db.org/collection-config/1.0">
+    <validation mode="yes" />  <!-- configure exist to validate at load time -->
+    <index xmlns:tei="http://www.tei-c.org/ns/1.0">
+	    <!-- Disable the standard full text index -->
+        <fulltext default="none" attributes="false"/>
+	    <!-- configure Lucene index -->
+        <lucene>
+            <analyzer class="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+            <!-- index everything for full-text keyword search at groupsheet level  -->
+            <text path="//tei:text/tei:group/tei:group"/>
+            <text qname="tei:group"/>
+        </lucene>
+    </index>
+</collection>

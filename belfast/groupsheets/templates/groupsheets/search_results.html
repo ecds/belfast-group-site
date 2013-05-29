@@ -1,0 +1,27 @@
+{% extends 'site_base.html' %}
+{% load tei %}
+
+{% block page-subtitle %} | Search Results{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1>Search Results</h1>
+
+    <p>Found {{ documents.count }} results for <strong>{{ keywords }}</strong>.</p>
+
+{% for document in documents %}
+    <li>
+        <a href="{% url 'groupsheets:view' id=document.id %}">{{ document.title }}</a>
+        {# TODO: might be nice if groupsheet list and search result list were closer... #}
+        {# what should be displayed here?  link to individual poems? indicate which ones had matches? #}
+        {% for poem in document.poems %}
+         "{{ poem.title }},"  {# based on groupsheet list, may not be appropriate here #}
+        {% endfor %} {{ document.date }}.
+    </li>
+{% endfor %}
+</ul>
+
+
+</div>
+{% endblock %}
+
