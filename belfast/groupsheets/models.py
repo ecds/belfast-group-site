@@ -20,6 +20,13 @@ class Poem(teimap._TeiBase):
     byline = xmlmap.StringField('tei:back/tei:byline')
 
 
+class IdNumber(teimap._TeiBase):
+    # xmlobject for idno element, to provide access to ARK urls
+    type = xmlmap.StringField('@type')
+    id = xmlmap.StringField('@n')
+    value = xmlmap.StringField('./text()')
+
+
 class GroupSheet(XmlModel):
     ROOT_NS = teimap.TEI_NAMESPACE
     ROOT_NAMESPACES = {
@@ -34,8 +41,6 @@ class GroupSheet(XmlModel):
 
     poems = xmlmap.NodeListField('tei:text', Poem)
 
-    # TODO: will need reference to the ARK in the header
-
     objects = Manager('//tei:text/tei:group/tei:group')
     """:class:`eulexistdb.manager.Manager` - similar to an object manager
         for django db objects, used for finding and retrieving GroupSheet objects
@@ -43,6 +48,24 @@ class GroupSheet(XmlModel):
 
         Configured to use *//tei:text/tei:group/tei:group* as base search path.
     """
+
+    # ARK urls are stored in the header as idno elements with
+    # an `n` attribute referencing the group id
+    # Provide access to all of them so we can retrieve the appropiate one
+    ark_list = xmlmap.NodeListField('ancestor::tei:TEI//tei:idno[@type="ark"]',
+                                    IdNumber)
+
+    @property
+    def ark(self):
+        'ARK URL for this groupsheet'
+        for a in self.ark_list:
+            if a.id == self.id:
+                return a.value
+
+    # TODO: it would be nice if this were a little easier to access
+    # or generate; xmlmap dictfield might get part way there..
+    # Possible to generate xpaths based on current object properties?
+
 
 BELFAST_GROUP_URI = 'http://viaf.org/123393054/'
 
