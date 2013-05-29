@@ -7,7 +7,7 @@ from belfast.groupsheets.models import GroupSheet, get_rdf_groupsheets
 
 def view_sheet(request, id):
     try:
-        gs = GroupSheet.objects.get(id=id)
+        gs = GroupSheet.objects.also('ark_list').get(id=id)
     except DoesNotExist:
         raise Http404
     return render(request, 'groupsheets/display.html',

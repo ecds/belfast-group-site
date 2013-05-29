@@ -13,6 +13,7 @@ from belfast.groupsheets.templatetags.tei import format_tei
 
 FIXTURE_DIR = path.join(path.dirname(path.abspath(__file__)), 'fixtures')
 
+
 class GroupSheetTest(unittest.TestCase):
     # test xmlobject for TEI GroupSheet
 
@@ -26,6 +27,7 @@ class GroupSheetTest(unittest.TestCase):
         groups = self.tei.node.xpath('//t:text/t:group/t:group',
             namespaces={'t': teimap.TEI_NAMESPACE})
         self.groupsheet = GroupSheet(groups[0])
+        self.groupsheet2 = GroupSheet(groups[1])
 
     def test_fields(self):
         self.assertEqual('simmons1_1035', self.groupsheet.id)
@@ -48,28 +50,55 @@ class GroupSheetTest(unittest.TestCase):
         self.assertEqual('''DRINKER'S BLUES''', poem.title)
         self.assertEqual('James Simmons', poem.byline)
 
+        # ark url in the header
+        self.assertEqual('http://pid.emory.edu/ark:/25593/17md1',
+                         self.groupsheet.ark)
+        self.assertEqual('http://pid.emory.edu/ark:/25593/17mf5',
+                         self.groupsheet2.ark)
+
 
 class GroupsheetViewsTest(testutil.TestCase):
     # for now, load all files in the fixture dir to eXist for testing
     exist_fixtures = {'directory': FIXTURE_DIR}
 
+    simmons_xml = path.join(FIXTURE_DIR, 'simmons1.xml')
+
+    def setUp(self):
+        # load the fixture file as a generic tei document
+        self.tei = xmlmap.load_xmlobject_from_file(self.simmons_xml,
+                                                   teimap.Tei)
+        # find the first groupsheet via xpath and load
+        groups = self.tei.node.xpath('//t:text/t:group/t:group',
+                                     namespaces={'t': teimap.TEI_NAMESPACE})
+        self.groupsheet = GroupSheet(groups[0])
+
     def test_view_sheet(self):
         response = self.client.get(reverse('groupsheets:view',
                                            kwargs={'id': 'bogus-id'}))
         self.assertEqual(404, response.status_code,
-            'view sheet should return 404 for non-existent document id')
+                         'view sheet should return 404 for non-existent document id')
 
         response = self.client.get(reverse('groupsheets:view',
-                                           kwargs={'id': 'simmons1_1035'}))
+                                           kwargs={'id': self.groupsheet.id}))
 
         # basic investigation that view logic is functional
-        # not testing template display here
+        # not testing template display here at the moment (TODO?)
         self.assertEqual(200, response.status_code,
-            'view should should not 404 for id that is loaded in eXist')
+                         'view should should not 404 for id that is loaded in eXist')
         self.assert_('document' in response.context,
-            'document should be included in template context')
+                     'document should be included in template context')
         self.assert_(isinstance(response.context['document'], GroupSheet),
-            'document in template context should be a group sheet')
+                     'document in template context should be a group sheet')
+
+        # test that ARK is retrieved & displayed
+        permalink = '<a href="%(url)s" rel="bookmark">%(url)s</a>' % \
+            {'url': self.groupsheet.ark}
+        self.assertContains(response, permalink, html=True,
+                            msg_prefix='groupsheet should include ARK link with rel=bookmark')
+        self.assertContains(response,
+                            '<link rel="bookmark" href="%s">' % self.groupsheet.ark,
+                            html=True,
+                            msg_prefix='groupsheet should include ARK link in header')
 
 
 class FormatTeiTestCase(unittest.TestCase):

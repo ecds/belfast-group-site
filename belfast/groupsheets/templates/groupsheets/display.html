@@ -3,14 +3,23 @@
 
 {% block page-subtitle %} | {{ document.title }}{% endblock %}
 
+{% block head-extras %}
+  {% if document.ark %}
+    <link href="{{ document.ark }}" rel="bookmark">
+  {% endif %}
+{% endblock %}
+
 {% block content %}
 
 <div class="container-fluid">
     <h1>{{ document.title }}</h1>
 
     <div>
-      <p><strong>Workshop date</strong>: {{ document.date }}</p>
+      <p><strong>Time period</strong>: {{ document.date }}</p>
       <p><strong>Poet</strong>: {{ document.author }}</p>
+      {% if document.ark %}
+      <p><strong>Permanent URL</strong>: <a href="{{ document.ark }}" rel="bookmark">{{ document.ark }}</a></p>
+      {% endif %}
     </div>
 
     <div class="contents">
