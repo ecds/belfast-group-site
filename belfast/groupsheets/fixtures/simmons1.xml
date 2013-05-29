@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="simmons1_1072">
+<?xml version="1.0" encoding="utf-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="simmons1_1072">
   <teiHeader><fileDesc>
       <titleStmt>
         <title> Simmons Workshops</title>
@@ -14,15 +15,21 @@
         </respStmt>
       </titleStmt>
       <extent>43 Kb</extent>
-      <publicationStmt><publisher>Lewis H. Beck Center</publisher><pubPlace>Emory University</pubPlace><address>
+      <publicationStmt>
+        <publisher>Lewis H. Beck Center</publisher>
+        <pubPlace>Emory University</pubPlace>
+        <address>
           <addrLine>Atlanta, Georgia</addrLine>
-        </address><idno type="ark" n="simmons1_1035">http://pid.emory.edu/ark:/25593/17md1</idno><idno type="ark" n="simmons1_1069">http://pid.emory.edu/ark:/25593/17mf5</idno><availability>
+        </address>
+        <idno type="ark" n="simmons1_1035">http://pid.emory.edu/ark:/25593/17md1</idno>
+        <idno type="ark" n="simmons1_1069">http://pid.emory.edu/ark:/25593/17mf5</idno>
+        <availability>
           <p xml:id="simmons1_101">1996 Emory University. Permission is granted to
 download, transmit, or otherwise reproduce, distribute or display the
 contributions to the work claimed by Emory University for non-profit
 educational purposes, provided this header is included in its
 entirety.  For inquiries about commercial uses, contact either:
-Electronic Poetry Project or Lewis H. Beck Center for Electronic 
+Electronic Poetry Project or Lewis H. Beck Center for Electronic
 collections and services, Emory University, Atlanta, Georgia 30322</p>
         </availability><date>1996</date></publicationStmt>
       <seriesStmt>
@@ -54,7 +61,7 @@ collections and services, Emory University, Atlanta, Georgia 30322</p>
             <item>The Ulster Soldier Boy</item>
           </list>
         </argument>
-        
+
         <text xml:id="simmons1_109">
           <front xml:id="simmons1_106">
             <titlePage xml:id="simmons1_105">
@@ -406,7 +413,7 @@ collections and services, Emory University, Atlanta, Georgia 30322</p>
             <item>Soliloquy for a Ghost</item>
           </list>
         </argument>
-        
+
         <text xml:id="simmons1_1041">
           <front xml:id="simmons1_1038">
             <titlePage xml:id="simmons1_1037">
