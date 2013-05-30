@@ -75,6 +75,13 @@ def format_node(node, escape):
     # check for supported rend attributes
     rend = node.get('rend', None)
 
+    # fall-back value for any unsupported tags that do not get converted
+    start, end = '', ''
+
+    # simple tags that can be converted to html markup
+    if node.tag in simple_tags.keys():
+        start, end = simple_tags[node.tag]
+
     # convert display/formatting
     if rend is not None:
 
@@ -88,22 +95,17 @@ def format_node(node, escape):
         elif rend.startswith('indent'):
             # indent## - ## is number of spaces
             # for now, considering space ~= 1/2 em
-            start = '<span style="padding-left:%.1fem">' % \
-                    (float(rend[len('indent'):])/2)
-            end = '</span>'
 
-    # simple tags that can be converted to html markup
-    elif node.tag in simple_tags.keys():
-        start, end = simple_tags[node.tag]
+            # in some cases, rend style may be combined with another tag,
+            # so simply nest the start and end tags
+            start += '<span style="padding-left:%.1fem">' % \
+                    (float(rend[len('indent'):])/2)
+            end = '</span>' + end
+
 
     # more complex tags
     # elif node.tag in other_tags.keys():
     #     start, end = other_tags[node.tag](node)
-
-    # unsupported tags that do not get converted
-    else:
-        start, end = '', ''
-
 
     # list of text contents to be compiled
     contents = [start]  # start tag

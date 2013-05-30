@@ -107,13 +107,13 @@ class FormatTeiTestCase(unittest.TestCase):
           <l>I will arise and go now, and go to Innisfree</l></lg>''' \
           % teimap.TEI_NAMESPACE
     HEAD = '''<head xmlns="%s">Lake Isle of Innisfree</head>''' \
-          % teimap.TEI_NAMESPACE
+        % teimap.TEI_NAMESPACE
     EPIGRAPH = '''<epigraph xmlns="%s">
        <p>Man to the hills, woman to the shore. (Gaelic proverb)</p>
        </epigraph>''' % teimap.TEI_NAMESPACE
     QUOTE = '''<q xmlns="%s">(For Eavan)</q>''' % teimap.TEI_NAMESPACE
     INDENT = '<l xmlns="%s" rend="indent5">All harbors wrecked</l>' % \
-       teimap.TEI_NAMESPACE
+        teimap.TEI_NAMESPACE
 
     # '{%s}q' % TEI_NAMESPACE: ('<blockquote>', '</blockquote>'),
     def setUp(self):
@@ -153,6 +153,6 @@ class FormatTeiTestCase(unittest.TestCase):
     def test_indent(self):
         self.content.node = etree.fromstring(self.INDENT)
         format = format_tei(self.content)
-        self.assert_(format.startswith('<span style="padding-left:2.5em">'))
-        self.assert_(format.endswith('</span>'))
-
+        # needs *both* line formatting and rend indent formatting
+        self.assert_(format.startswith('<p><span style="padding-left:2.5em">'))
+        self.assert_(format.endswith('</span></p>'))
