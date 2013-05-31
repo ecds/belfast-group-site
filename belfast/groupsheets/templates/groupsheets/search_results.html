@@ -7,20 +7,34 @@
 <div class="container-fluid">
     <h1>Search Results</h1>
 
-    <p>Found {{ documents.count }} results for <strong>{{ keywords }}</strong>.</p>
+    <div class="span7">
 
-{% for document in documents %}
-    <li>
-        <a href="{% url 'groupsheets:view' id=document.id %}">{{ document.title }}</a>
+    {% if form.errors %}
+      <p>No search terms were entered.</p>  {# wording? #}
+      {# NOTE: could use form.errors, but for now this seems simpler #}
+    {% else %}
+
+    <p>Found {{ documents.count }} result{{ documents.count|pluralize }}
+        for <strong>{{ keywords }}</strong>.
+        Results sorted by relevance.</p>
+
+    {% for document in documents %}
+      <div>
+        {# note: relevance score available as document.fulltext_score #}
+        {% url 'groupsheets:view' id=document.id as document_url %}
+        <p><a href="{{ document_url }}">{{ document.title }}</a></p>
         {# TODO: might be nice if groupsheet list and search result list were closer... #}
-        {# what should be displayed here?  link to individual poems? indicate which ones had matches? #}
-        {% for poem in document.poems %}
-         "{{ poem.title }},"  {# based on groupsheet list, may not be appropriate here #}
-        {% endfor %} {{ document.date }}.
-    </li>
-{% endfor %}
-</ul>
+        <ul>
+            {% for poem in document.poems %}
+            <li><a href="{{ document_url }}#{{ poem.id }}">{{ poem.title }}</a></li>
+            {% endfor %}
+        </ul>
+      </div>
+    {% endfor %}
 
+    {% endif %}  {# valid form #}
+
+    </div>
 
 </div>
 {% endblock %}
