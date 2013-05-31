@@ -14,6 +14,8 @@
 <div class="container-fluid">
     <h1>{{ document.title }}</h1>
 
+    <div class="span7">  {# NOTE: may want to shift into base site or a common template #}
+
     <div>
       <p><strong>Time period</strong>: {{ document.date }}</p>
       <p><strong>Poet</strong>: {{ document.author }}</p>
@@ -45,6 +47,8 @@
        <p class="byline">{{ poem.byline }}</p>
      {% endif %}
     {% endfor %}
+
+  </div>
 
 </div>
 {% endblock %}

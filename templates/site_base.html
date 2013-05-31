@@ -23,7 +23,15 @@
           </button>
           <a class="brand" href="{% url 'site-index' %}">The Belfast Group</a>
           <div class="nav-collapse collapse">
-            {# search may go here? <p class="navbar-text pull-right"> </p> #}
+
+            {# keyword search form #}
+            {% if kwsearch_form %}
+            <form class="form-search navbar-text pull-right" action="{% url 'groupsheets:search' %}">
+              {{ kwsearch_form.keywords }}
+              <button type="submit" class="btn btn-primary"><i class="icon-search icon-white"></i></button>
+            </form>
+            {% endif %}
+
             <ul class="nav">
               {% url 'overview' as overview_url %}
               <li{% if request.path = overview_url %} class="active"{% endif %}>

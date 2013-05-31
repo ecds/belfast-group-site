@@ -2,6 +2,7 @@ from os import path
 from eulxml import xmlmap
 from eulxml.xmlmap import teimap
 import unittest
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from eulexistdb import testutil
@@ -59,8 +60,10 @@ class GroupSheetTest(unittest.TestCase):
 
 class GroupsheetViewsTest(testutil.TestCase):
     # for now, load all files in the fixture dir to eXist for testing
-    exist_fixtures = {'directory': FIXTURE_DIR}
-
+    exist_fixtures = {
+        'directory': FIXTURE_DIR,
+        'index': settings.EXISTDB_INDEX_CONFIGFILE  # required for fulltext search
+    }
     simmons_xml = path.join(FIXTURE_DIR, 'simmons1.xml')
 
     def setUp(self):
@@ -100,6 +103,29 @@ class GroupsheetViewsTest(testutil.TestCase):
                             html=True,
                             msg_prefix='groupsheet should include ARK link in header')
 
+    def test_search(self):
+        search_url = reverse('groupsheets:search')
+        # no search term - should not error
+        response = self.client.get(search_url)
+        # basically checking for not 500 here; should it actually be a 400 or similar?
+        self.assertEqual(200, response.status_code,
+                         'search results should not error when keywords are not specified')
+        self.assertContains(response, 'No search terms')
+
+        kw = 'bullets'
+        response = self.client.get(search_url, {'keywords': kw})
+        self.assertContains(
+            response,
+            '<p>Found 1 result for <strong>%s</strong>. Results sorted by relevance.</p>' % kw,
+            html=True)
+        self.assertContains(
+            response,
+            reverse('groupsheets:view', kwargs={'id': self.groupsheet.id}),
+            msg_prefix='search results should include url for matching groupsheet')
+        self.assertContains(
+            response, self.groupsheet.title,
+            msg_prefix='search results should include title for matching groupsheet')
+
 
 class FormatTeiTestCase(unittest.TestCase):
     # test tei_format template tag explicitly
@@ -107,13 +133,13 @@ class FormatTeiTestCase(unittest.TestCase):
           <l>I will arise and go now, and go to Innisfree</l></lg>''' \
           % teimap.TEI_NAMESPACE
     HEAD = '''<head xmlns="%s">Lake Isle of Innisfree</head>''' \
-          % teimap.TEI_NAMESPACE
+        % teimap.TEI_NAMESPACE
     EPIGRAPH = '''<epigraph xmlns="%s">
        <p>Man to the hills, woman to the shore. (Gaelic proverb)</p>
        </epigraph>''' % teimap.TEI_NAMESPACE
     QUOTE = '''<q xmlns="%s">(For Eavan)</q>''' % teimap.TEI_NAMESPACE
     INDENT = '<l xmlns="%s" rend="indent5">All harbors wrecked</l>' % \
-       teimap.TEI_NAMESPACE
+        teimap.TEI_NAMESPACE
 
     # '{%s}q' % TEI_NAMESPACE: ('<blockquote>', '</blockquote>'),
     def setUp(self):
@@ -153,6 +179,6 @@ class FormatTeiTestCase(unittest.TestCase):
     def test_indent(self):
         self.content.node = etree.fromstring(self.INDENT)
         format = format_tei(self.content)
-        self.assert_(format.startswith('<span style="padding-left:2.5em">'))
-        self.assert_(format.endswith('</span>'))
-
+        # needs *both* line formatting and rend indent formatting
+        self.assert_(format.startswith('<p><span style="padding-left:2.5em">'))
+        self.assert_(format.endswith('</span></p>'))
