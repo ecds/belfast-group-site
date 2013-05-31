@@ -1,5 +1,7 @@
 <collection xmlns="http://exist-db.org/collection-config/1.0">
-    <validation mode="yes" />  <!-- configure exist to validate at load time -->
+    <!-- <validation mode="no" /> -->
+    <!-- NOTE: disabling validation for now; need schema reference to validate -->
+      <!-- configure exist to validate at load time -->
     <index xmlns:tei="http://www.tei-c.org/ns/1.0">
 	    <!-- Disable the standard full text index -->
         <fulltext default="none" attributes="false"/>
