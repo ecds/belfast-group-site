@@ -74,6 +74,7 @@ ARCH = rdflib.Namespace('http://purl.org/archival/vocab/arch#')
 SCHEMA_ORG = rdflib.Namespace('http://schema.org/')
 DC = rdflib.Namespace('http://purl.org/dc/terms/')
 BIBO = rdflib.Namespace('http://purl.org/ontology/bibo/')
+SKOS = rdflib.Namespace('http://www.w3.org/2004/02/skos/core#')
 
 #rdflib.resource.Resource - takes graph, subject
 
@@ -152,6 +153,7 @@ class RdfGroupSheet(rdflib.resource.Resource):
     @property
     def sources(self):
         sources = []
+        # TODO: convert into dict with name & access uri
         for coll in self.graph.subjects(SCHEMA_ORG.mentions, self.identifier):
             if (coll, rdflib.RDF.type, ARCH.Collection) in self.graph:
                 name = self.graph.value(coll, SCHEMA_ORG.name)
@@ -165,10 +167,12 @@ class RdfGroupSheet(rdflib.resource.Resource):
                     # but is not itself a collection
                     if (pcoll, rdflib.RDF.type, ARCH.Collection) in self.graph  \
                        or (pcoll, rdflib.RDF.type, SCHEMA_ORG.WebPage):
-                       # FIXME: need to check webpage that is ABOUT a collection
-                        name = self.graph.value(pcoll, SCHEMA_ORG.name)
+                        # FIXME: need to check webpage that is ABOUT a collection
+                        name = self.graph.value(pcoll, SCHEMA_ORG.name).strip()
                         sources.append(name)  # title/name ?
 
+                    # FIXME: getting two versions of longley with different
+                    # whitespace, one as bnode and one with ark url
         return sources
 
 
@@ -176,10 +180,14 @@ def get_rdf_groupsheets():
     g = rdflib.Graph()
     for infile in glob.iglob(path.join(settings.RDF_DATA_DIR, '*.xml')):
         g.parse(infile)
+    # load related info (viaf, dbpedia, geonames)
+    # for infile in glob.iglob(path.join(settings.RDF_DATA_DIR, 'viaf/*.rdf')):
+    #     g.parse(infile)
     res = g.query('''
         PREFIX schema: <%s>
         PREFIX rdf: <%s>
         PREFIX bibo: <%s>
+        PREFIX skos: <%s>
         SELECT DISTINCT ?ms ?author
         WHERE {
             ?doc schema:about <%s> .
@@ -188,12 +196,14 @@ def get_rdf_groupsheets():
             ?ms schema:author ?author .
             ?author schema:name ?name
         } ORDER BY ?name
-        ''' % (rdflib.XSD, rdflib.RDF, BIBO, BELFAST_GROUP_URI)
+        ''' % (rdflib.XSD, rdflib.RDF, BIBO, SKOS, BELFAST_GROUP_URI)
     )
-        #         ?author schema:familyName ?authorLast
-        # } ORDER BY ?authorLast
+
+    # } ORDER BY ?authorLast
     # FIXME:  only QUB has schema:familyName so that query restricts to them
     # TODO: clean up data so we have lastnames for all authors
+
+    # skos:prefLabel is in VIAF data but not directly related to viaf entity
 
     # FIXME: restricting to ms with author loses one anonymous sheet
     # how to filter out non-group sheet irish misc content?
