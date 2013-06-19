@@ -4,6 +4,7 @@ from eulexistdb.manager import Manager
 from eulexistdb.models import XmlModel
 import glob
 import rdflib
+from rdflib import collection as rdfcollection
 from django.conf import settings
 from os import path
 
@@ -67,7 +68,7 @@ class GroupSheet(XmlModel):
     # Possible to generate xpaths based on current object properties?
 
 
-BELFAST_GROUP_URI = 'http://viaf.org/123393054/'
+BELFAST_GROUP_URI = 'http://viaf.org/viaf/123393054/'
 
 ARCH = rdflib.Namespace('http://purl.org/archival/vocab/arch#')
 SCHEMA_ORG = rdflib.Namespace('http://schema.org/')
@@ -75,6 +76,7 @@ DC = rdflib.Namespace('http://purl.org/dc/terms/')
 BIBO = rdflib.Namespace('http://purl.org/ontology/bibo/')
 
 #rdflib.resource.Resource - takes graph, subject
+
 
 class RdfPerson(rdflib.resource.Resource):
 
@@ -130,16 +132,21 @@ class RdfGroupSheet(rdflib.resource.Resource):
     @property
     def titles(self):
         titles = []
-        # FIXME: current model *loses* title order;
-        # this is particularly bad for sequences, but generally bad
-
+        # title is either a single literal OR an rdf sequence
         if self.value(DC.title) is not None:
-            titles.append(self.value(DC.title))
+            title = self.value(DC.title)
+            # single literal
+            if isinstance(title, rdflib.Literal):
+                titles.append(title)
 
-        # objects returns another rdflib Resource
-        titles.extend([p.value(DC.title) for p in self.objects(DC.hasPart)
-          if p.value(DC.title) is not None])
-
+            # otherwise, assuming node is an rdf sequence
+            else:
+                # convert from resource to standard blank node
+                # since collection doesn't seem to handle resource
+                bnode = rdflib.BNode(title)
+                # create a collection to allow treating as a list
+                titles.extend(rdfcollection.Collection(self.graph,
+                                                       bnode))
         return titles
 
     @property
@@ -173,7 +180,7 @@ def get_rdf_groupsheets():
         PREFIX schema: <%s>
         PREFIX rdf: <%s>
         PREFIX bibo: <%s>
-        SELECT ?ms ?author
+        SELECT DISTINCT ?ms ?author
         WHERE {
             ?doc schema:about <%s> .
             ?doc schema:mentions ?ms .
