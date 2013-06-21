@@ -8,6 +8,8 @@ from rdflib import collection as rdfcollection
 from django.conf import settings
 from os import path
 
+from belfast.util import rdf_data
+
 
 class Contents(teimap._TeiBase):
     title = xmlmap.StringField('tei:p')
@@ -72,17 +74,36 @@ BELFAST_GROUP_URI = 'http://viaf.org/viaf/123393054/'
 
 ARCH = rdflib.Namespace('http://purl.org/archival/vocab/arch#')
 SCHEMA_ORG = rdflib.Namespace('http://schema.org/')
+DBPEDIA_OWL = rdflib.Namespace('http://dbpedia.org/ontology/')
 DC = rdflib.Namespace('http://purl.org/dc/terms/')
 BIBO = rdflib.Namespace('http://purl.org/ontology/bibo/')
 SKOS = rdflib.Namespace('http://www.w3.org/2004/02/skos/core#')
+GN = rdflib.Namespace('http://www.geonames.org/ontology#')
+DBPPROP = rdflib.Namespace('http://dbpedia.org/property/')
+FOAF = rdflib.Namespace('http://xmlns.com/foaf/0.1/')
 
 #rdflib.resource.Resource - takes graph, subject
+
+# TBD: how do groupsheet and people apps share rdf models?
+
+
+class RdfLocation(rdflib.resource.Resource):
+
+    @property
+    def name(self):
+        return self.value(SCHEMA_ORG.name)
+
+    def __unicode__(self):
+        return self.value(GN.name) or self.value(DBPPROP.name) \
+            or self.graph.preferredLabel(self) \
+            or self.name or self.identifier
 
 
 class RdfPerson(rdflib.resource.Resource):
 
     @property
     def name(self):
+#        print 'preferred label = ', self.graph.preferredLabel(self)
         return self.value(SCHEMA_ORG.name)
 
     @property
@@ -96,9 +117,74 @@ class RdfPerson(rdflib.resource.Resource):
     @property
     def fullname(self):
         if self.lastname and self.firstname:
-            return '%s, %s' % (self.lastname, self.firstname)
+            return '%s %s' % (self.firstname, self.lastname)
+        elif self.value(FOAF.name):
+            return self.value(FOAF.name)
         else:
             return self.name
+
+    @property
+    def birthdate(self):
+        # TODO: convert to date type
+        return self.value(SCHEMA_ORG.birthDate)
+
+    @property
+    def birthplace(self):
+        place = self.value(DBPEDIA_OWL.birthPlace)
+        if place:
+            return RdfLocation(self.graph, place.identifier)
+
+    @property
+    def occupation(self):
+        # FIXME: could be multiple
+        return list(self.objects(SCHEMA_ORG.jobTitle))
+        return self.value(SCHEMA_ORG.jobTitle)
+
+    @property
+    def locations(self):
+        place_uris = list(self.objects(SCHEMA_ORG.workLocation))
+        place_uris.extend(list(self.objects(SCHEMA_ORG.homeLocation)))
+        place_uris = set(p.identifier for p in place_uris)
+        return [RdfLocation(self.graph, p) for p in place_uris]
+
+    @property
+    def short_id(self):
+        uri = unicode(self)
+        baseid = uri.rstrip('/').split('/')[-1]
+        if 'viaf.org' in uri:
+            idtype = 'viaf'
+        elif 'dbpedia.org' in uri:
+            idtype = 'dbpedia'
+        return '%s:%s' % (idtype, baseid)
+
+    @property
+    def dbpedia_description(self):
+        # TODO: grab same-as URIs at init so we can query directly (?)
+        # FIXME: why are these not returning any matches?
+        # print 'same as rels = ', list(self.objects(rdflib.OWL.sameAs))
+        # print 'same as rels = ', list(self.graph.objects(self.identifier.rstrip('/'),
+        #     rdflib.OWL.sameAs))
+        res = self.graph.query('''
+            PREFIX rdf: <%s>
+            PREFIX owl: <%s>
+            PREFIX dbpedia-owl: <%s>
+            SELECT ?abstract
+            WHERE {
+                <%s> owl:sameAs ?dbp .
+                ?dbp dbpedia-owl:abstract ?abstract
+                FILTER langMatches( lang(?abstract), "EN" )
+            }
+        ''' % (rdflib.RDF, rdflib.OWL, DBPEDIA_OWL,
+               self.identifier.rstrip('/'))
+        )
+        # FIXME: discrepancy in VIAF uris - RDF has no trailing slash
+
+        # TODO: filter by language
+        for r in res:
+            return r['abstract']
+
+
+    # TODO: need access to groupsheets by this person
 
 
 class RdfGroupSheet(rdflib.resource.Resource):
@@ -177,9 +263,10 @@ class RdfGroupSheet(rdflib.resource.Resource):
 
 
 def get_rdf_groupsheets():
-    g = rdflib.Graph()
-    for infile in glob.iglob(path.join(settings.RDF_DATA_DIR, '*.xml')):
-        g.parse(infile)
+    g = rdf_data()
+    # g = rdflib.Graph()
+    # for infile in glob.iglob(path.join(settings.RDF_DATA_DIR, '*.xml')):
+    #     g.parse(infile)
     # load related info (viaf, dbpedia, geonames)
     # for infile in glob.iglob(path.join(settings.RDF_DATA_DIR, 'viaf/*.rdf')):
     #     g.parse(infile)

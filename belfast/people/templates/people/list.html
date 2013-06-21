@@ -1,0 +1,18 @@
+{% extends 'site_base.html' %}
+
+{% block page-subtitle %} | Members{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+<h1>People associated with the Belfast Group</h1>
+<ul>
+{% for person in people %}
+    <li><a href="{% url 'people:profile' person.short_id %}">{{ person.fullname }}</a>
+     {# {{ person.fullname|slugify }} {{ person.short_id }} #}
+   </li>
+{% endfor %}
+</ul>
+
+</div>
+{% endblock %}

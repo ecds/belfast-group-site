@@ -1,0 +1,42 @@
+{% extends 'site_base.html' %}
+
+{% block page-subtitle %} | Members | {{ person.fullname }}{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+<h1>{{ person.fullname }}</h1>
+
+{# name = {{ person.name }}<br/> #}
+{# fullname = {{ person.fullname }}<br/> #}
+{# lastname {{ person.lastname}}<br/> #}
+{# firstname {{ person.firstname}}<br/> #}
+{# short id {{ person.short_id }}<br/> #}
+
+{% if person.occupation %}
+<p><b>Occupation:</b> {{ person.occupation|join:', ' }}</p>
+{% endif %}
+
+{% if person.locations %}
+<p><b>Locations:</b>
+    {# for now, link to outside URI location; eventually may want in-site links #}
+  {% for loc in person.locations %}
+  <a href="{{ loc.identifier }}">{{ loc }}</a>{% if not forloop.last %}; {% else %}.{% endif %}
+  {% endfor %}
+  </p>
+{% endif %}
+
+{% if person.birthdate %}
+<p>Born {{ person.birthdate }}
+    {% if person.birthplace %}
+    in <a href="{{ person.birthplace.identifier }}">{{ person.birthplace }}</a>{% endif %}.</p>
+{% endif %}
+
+{% if person.dbpedia_description %}
+ <p>{{ person.dbpedia_description }}
+    <small><i>(DBpedia)</i></small></p>
+{% endif %}
+
+</div>
+{% endblock %}

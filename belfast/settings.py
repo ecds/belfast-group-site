@@ -126,6 +126,7 @@ INSTALLED_APPS = [
     'eulexistdb',
     'belfast.pages',
     'belfast.groupsheets',
+    'belfast.people',
 ]
 
 #TINYMCE_FILEBROWSER = True

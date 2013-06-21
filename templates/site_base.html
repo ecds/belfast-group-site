@@ -39,7 +39,10 @@
               {% url 'groupsheets:list' as workshop_list %}
               <li{% if request.path = overview_url %} class="active"{% endif %}>
                  <a href="{{ workshop_list }}">Workshop List</a></li>
-              {% url 'bios' as bios_url %}
+              {% url 'people:list' as people_list %}
+              <li{% if request.path = people_list %} class="active"{% endif %}>
+                 <a href="{{ people_list }}">People</a></li>
+               {% url 'bios' as bios_url %}
               <li{% if request.path = bios_url %} class="active"{% endif %}>
                  <a href="{{ bios_url }}">Biographies</a></li>
             </ul>
