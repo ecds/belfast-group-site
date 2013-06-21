@@ -37,6 +37,9 @@ EXISTDB_ROOT_COLLECTION = "/sample_collection"
 #EXISTDB_TEST_COLLECTION = "/test/sample"
 
 RDF_DATA_DIR = '/path/to/github/belfast-group-data/data/'
+# path to network file generated from rdf data via networkx (temporary?)
+GEXF_DATA = '/path/to/github/belfast-group-data/belfast-group-data.gexf'
+
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

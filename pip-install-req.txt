@@ -2,3 +2,4 @@ Django
 django-tinymce
 eulexistdb
 rdflib
+networkx
