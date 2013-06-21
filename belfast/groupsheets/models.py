@@ -3,13 +3,17 @@ from eulxml.xmlmap import teimap
 from eulexistdb.manager import Manager
 from eulexistdb.models import XmlModel
 import glob
+import logging
+import networkx as nx
 import rdflib
 from rdflib import collection as rdfcollection
+import time
 from django.conf import settings
 from os import path
 
-from belfast.util import rdf_data
+from belfast.util import rdf_data, network_data
 
+logger = logging.getLogger(__name__)
 
 class Contents(teimap._TeiBase):
     title = xmlmap.StringField('tei:p')
@@ -183,6 +187,51 @@ class RdfPerson(rdflib.resource.Resource):
         for r in res:
             return r['abstract']
 
+    _connections = None
+
+    def connected_people(self):
+        # generate a dictionary of connected people and list of
+        # how this person is related to them
+        if self._connections is None:
+            network = network_data()
+            graph = rdf_data()
+            node_id = unicode(self.identifier)
+            # also works
+            # neighbors = network.neighbors(node_id)
+            undnet = network.to_undirected()
+            # converted multidigraph to undirected
+            # to find all neighbors, not just outbound connections
+            # (should be a way to get from digraph?)
+
+            ego_graph = nx.ego_graph(undnet, node_id)
+            neighbors = ego_graph.nodes()
+            # print 'full graph has %d nodes' % network.number_of_nodes()
+            # print 'ego graph has %d nodes' % ego_graph.number_of_nodes()
+
+            self._connections = {}
+            for node in neighbors:
+                # don't include me in my connections
+                if node == node_id:
+                    continue
+
+                uriref = rdflib.URIRef(node)
+                # TODO: probably want something similar for organizations
+                if (uriref, rdflib.RDF.type, SCHEMA_ORG.Person) in graph:
+                    person = RdfPerson(graph, uriref)
+                    rels = set()
+                    # find any edges between this node and me
+                    # include data to simplify accessing edge label
+                    all_edges = network.out_edges(node, data=True) + \
+                        network.in_edges(node, data=True)
+
+                    for edge in all_edges:
+                        src, target, data = edge
+                        if node_id in edge and 'label' in data:
+                            rels.add(data['label'])
+
+                    self._connections[person] = rels
+
+        return self._connections
 
     # TODO: need access to groupsheets by this person
 
