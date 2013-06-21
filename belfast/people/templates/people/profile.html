@@ -38,5 +38,15 @@
     <small><i>(DBpedia)</i></small></p>
 {% endif %}
 
+<h3>Connections</h3>
+    <ul>
+    {% for conn, rel in person.connected_people.iteritems %}
+        <li>{{ conn.fullname }}
+            <small>&lt;{{ conn.identifier }}&gt;</small>
+            {% if rel %} - {{ rel|join:', '}}{% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+
 </div>
 {% endblock %}
