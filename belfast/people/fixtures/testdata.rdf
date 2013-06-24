@@ -43,7 +43,7 @@
 
   <rdf:Description rdf:about="http://viaf.org/viaf/123393054/">
     <rdf:type rdf:resource="http://schema.org/Organization"/>
-    <schema:name xml:lang="en">Belfast Group.</schema:name>
+    <schema:name xml:lang="en">Belfast Group</schema:name>
   </rdf:Description>
   <rdf:Description rdf:about="http://viaf.org/viaf/109956735/">
       <schema:name xml:lang="en">Edna Longley</schema:name>

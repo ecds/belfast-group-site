@@ -136,3 +136,16 @@ class RdfPersonTest(TestCase):
         self.assert_('spouse' in names['Edna Longley'])
         self.assert_('colleague' in names['Seamus Heaney'])
         self.assert_('knows' in names['Seamus Heaney'])
+
+    @patch('belfast.people.models.network_data')
+    @patch('belfast.people.models.rdf_data')
+    def test_connected_organizations(self, mockrdf, mocknx):
+        # test against fixture rdf/gexf data
+        mockrdf.return_value = self.graph
+        mocknx.return_value = self.nx_graph
+        orgs = self.person.connected_organizations
+        names = dict((unicode(o.name), rels) for o, rels in orgs.iteritems())
+        self.assert_('Belfast Group' in names)
+        self.assert_('Royal Society of Literature' in names)
+        self.assert_('Seamus Heaney' not in names)
+        self.assert_('affiliation' in names['Belfast Group'])

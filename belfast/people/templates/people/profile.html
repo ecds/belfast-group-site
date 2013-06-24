@@ -39,6 +39,7 @@
 {% endif %}
 
 <h3>Connections</h3>
+    <h4>People</h4>
     <ul>
     {% for conn, rel in person.connected_people.iteritems %}
         <li>{{ conn.fullname }}
@@ -48,5 +49,14 @@
     {% endfor %}
     </ul>
 
+    <h4>Organizations</h4>
+    <ul>
+    {% for conn, rel in person.connected_organizations.iteritems %}
+        <li>{{ conn.name }}
+            <small>&lt;{{ conn.identifier }}&gt;</small>
+            {% if rel %} - {{ rel|join:', '}}{% endif %}
+        </li>
+    {% endfor %}
+    </ul>
 </div>
 {% endblock %}
