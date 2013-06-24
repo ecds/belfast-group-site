@@ -11,8 +11,22 @@ FIXTURE_DIR = path.join(path.dirname(path.abspath(__file__)), 'fixtures')
 
 
 class PeopleViewsTest(TestCase):
+    graph = rdflib.Graph()
+    graph.parse(path.join(FIXTURE_DIR, 'testdata.rdf'))
 
-    def test_profile(self):
+    nx_graph = gexf.read_gexf(path.join(FIXTURE_DIR, 'testdata.gexf'))
+
+    def setUp(self):
+        self.person = RdfPerson(self.graph,
+                                rdflib.URIRef('http://viaf.org/viaf/39398205/'))
+
+    @patch('belfast.people.models.network_data')
+    @patch('belfast.people.models.rdf_data')
+    def test_profile(self, mockrdf, mocknx):
+        # test against fixture rdf/gexf data
+        mockrdf.return_value = self.graph
+        mocknx.return_value = self.nx_graph
+
         # currently, id format is viaf:####
         # - not in domain:id format
         response = self.client.get(reverse('people:profile',
@@ -30,6 +44,41 @@ class PeopleViewsTest(TestCase):
         self.assertEqual(404, response.status_code,
                          'profile should return 404 for non-person id')
 
+        # test person from fixture data
+        response = self.client.get(reverse('people:profile',
+                                           kwargs={'id': 'viaf:39398205'}))
+        self.assertEqual(200, response.status_code,
+                         'profile should return 200 for valid person id')
+        # spot-check profile info
+        self.assertContains(
+            response, '<h1>%s</h1>' % self.person.name, html=True,
+            msg_prefix='name should be used for profile page title')
+        self.assertContains(
+            response, 'Born %s' % self.person.birthdate,
+            msg_prefix='birthdate should be included if present')
+        self.assertContains(
+            response, self.person.dbpedia_description,
+            msg_prefix='dbpedia description should be included on profile')
+        self.assertContains(
+            response, '<p><b>Occupation:</b> %s</p>' % self.person.occupation[0],
+            msg_prefix='occupations should be listed')
+        # locations
+        for loc in self.person.locations:
+            # for some reason, dbpedia name isn't coming through in test data
+            # just skip it for now
+            if loc.name is None:
+                continue
+
+            self.assertContains(
+                response, loc.name,
+                msg_prefix='location %s should be listed on profile' % loc.name)
+
+        # connected people
+        for p in self.person.connected_people:
+            self.assertContains(
+                response, p.fullname,
+                msg_prefix='connected person name  %s should be listed on profile'
+                % p.fullname)
 
 class RdfPersonTest(TestCase):
     graph = rdflib.Graph()

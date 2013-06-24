@@ -6,6 +6,7 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:schema="http://schema.org/"
    xmlns:dbpedia-owl="http://dbpedia.org/ontology/"
+   xmlns:dbpprop="http://dbpedia.org/property/"
 >
  <!-- simplified data based on longley findingaid for unit tests -->
 
@@ -90,8 +91,12 @@
     <owl:sameAs rdf:resource="http://dbpedia.org/resource/Michael_Longley"/>
   </rdf:Description>
 
-  <!-- excerpt from dbpedia -->
+  <!-- excerpts from dbpedia -->
     <rdf:Description rdf:about="http://dbpedia.org/resource/Michael_Longley">
       <dbpedia-owl:abstract xml:lang="en">Michael Longley, CBE (born 27 July 1939) is a Northern Irish poet from Belfast.</dbpedia-owl:abstract>
+    </rdf:Description>
+
+    <rdf:Description rdf:about="http://dbpedia.org/resource/Blackrock,_Dublin">
+      <dbpprop:name xml:lang="en">Blackrock</dbpprop:name>
     </rdf:Description>
 </rdf:RDF>
