@@ -1,5 +1,7 @@
 from django.test import TestCase
 from django.core.urlresolvers import reverse
+from mock import patch
+from networkx.readwrite import gexf
 from os import path
 import rdflib
 
@@ -33,6 +35,8 @@ class RdfPersonTest(TestCase):
     graph = rdflib.Graph()
     graph.parse(path.join(FIXTURE_DIR, 'testdata.rdf'))
 
+    nx_graph = gexf.read_gexf(path.join(FIXTURE_DIR, 'testdata.gexf'))
+
     def setUp(self):
         self.person = RdfPerson(self.graph,
                                 rdflib.URIRef('http://viaf.org/viaf/39398205/'))
@@ -64,3 +68,22 @@ class RdfPersonTest(TestCase):
     def test_dbpedia_description(self):
         self.assertEqual('Michael Longley, CBE (born 27 July 1939) is a Northern Irish poet from Belfast.',
                          unicode(self.person.dbpedia_description))
+
+    @patch('belfast.people.models.network_data')
+    @patch('belfast.people.models.rdf_data')
+    def test_connected_people(self, mockrdf, mocknx):
+        # test against fixture rdf/gexf data
+        mockrdf.return_value = self.graph
+        mocknx.return_value = self.nx_graph
+        people = self.person.connected_people
+        # convert into dict of string, list for easier testing
+        names = dict((unicode(p.name), rels) for p, rels in people.iteritems())
+        self.assert_('Edna Longley' in names)
+        self.assert_('Seamus Heaney' in names)
+        self.assert_('Arthur Terry' in names)
+        # orgs should be filtered out
+        self.assert_('Belfast Group' not in names)
+        # relations:
+        self.assert_('spouse' in names['Edna Longley'])
+        self.assert_('colleague' in names['Seamus Heaney'])
+        self.assert_('knows' in names['Seamus Heaney'])

@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?><gexf version="1.1" xmlns="http://www.gexf.net/1.1draft" xmlns:viz="http://www.gexf.net/1.1draft/viz" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2001/XMLSchema-instance">
+  <graph defaultedgetype="directed" mode="static">
+    <attributes class="edge" mode="static">
+      <attribute id="7" title="networkx_key" type="integer" />
+      <attribute id="8" title="label" type="string" />
+    </attributes>
+    <attributes class="node" mode="static">
+      <attribute id="0" title="type" type="string" />
+      <attribute id="1" title="name" type="string" />
+      <attribute id="2" title="abstract" type="string" />
+      <attribute id="3" title="familyName" type="string" />
+      <attribute id="4" title="jobTitle" type="string" />
+      <attribute id="5" title="givenName" type="string" />
+      <attribute id="6" title="birthDate" type="string" />
+    </attributes>
+    <nodes>
+      <node id="http://viaf.org/viaf/127261399/" label="Royal Society of Literature">
+        <attvalues>
+          <attvalue for="0" value="Organization" />
+          <attvalue for="1" value="Royal Society of Literature" />
+        </attvalues>
+      </node>
+      <node id="http://sws.geonames.org/2655984/" label="Belfast">
+        <attvalues>
+          <attvalue for="0" value="Place" />
+          <attvalue for="1" value="Belfast" />
+        </attvalues>
+      </node>
+      <node id="http://viaf.org/viaf/91907300/" label="Hobsbaum, Philip.">
+        <attvalues>
+          <attvalue for="0" value="Person" />
+          <attvalue for="1" value="Hobsbaum, Philip." />
+        </attvalues>
+      </node>
+      <node id="http://viaf.org/viaf/109956735/" label="Edna Longley">
+        <attvalues>
+          <attvalue for="0" value="Person" />
+          <attvalue for="1" value="Edna Longley" />
+        </attvalues>
+      </node>
+      <node id="http://viaf.org/viaf/2490119/" label="Arthur Terry">
+        <attvalues>
+          <attvalue for="0" value="Person" />
+          <attvalue for="1" value="Arthur Terry" />
+        </attvalues>
+      </node>
+      <node id="http://dbpedia.org/resource/Michael_Longley" label="http://dbpedia.org/resource/Michael_Longley">
+        <attvalues>
+          <attvalue for="2" value="Michael Longley, CBE (born 27 July 1939) is a Northern Irish poet from Belfast." />
+        </attvalues>
+      </node>
+      <node id="http://viaf.org/viaf/39398205" label="http://viaf.org/viaf/39398205" />
+      <node id="http://viaf.org/viaf/39398205/" label="Michael Longley">
+        <attvalues>
+          <attvalue for="3" value="Longley" />
+          <attvalue for="1" value="Michael Longley" />
+          <attvalue for="4" value="Poet" />
+          <attvalue for="5" value="Michael" />
+          <attvalue for="0" value="Person" />
+          <attvalue for="6" value="1939-07-27" />
+        </attvalues>
+      </node>
+      <node id="http://viaf.org/viaf/123393054/" label="Belfast Group.">
+        <attvalues>
+          <attvalue for="0" value="Organization" />
+          <attvalue for="1" value="Belfast Group." />
+        </attvalues>
+      </node>
+      <node id="http://sws.geonames.org/2643743/" label="London">
+        <attvalues>
+          <attvalue for="0" value="Place" />
+          <attvalue for="1" value="London" />
+        </attvalues>
+      </node>
+      <node id="http://dbpedia.org/resource/Blackrock,_Dublin" label="http://dbpedia.org/resource/Blackrock,_Dublin" />
+      <node id="http://viaf.org/viaf/136293942/" label="Aosdána">
+        <attvalues>
+          <attvalue for="0" value="Organization" />
+          <attvalue for="1" value="Aosdána" />
+        </attvalues>
+      </node>
+      <node id="http://viaf.org/viaf/109557338/" label="Seamus Heaney">
+        <attvalues>
+          <attvalue for="0" value="Person" />
+          <attvalue for="1" value="Seamus Heaney" />
+        </attvalues>
+      </node>
+      <node id="http://sws.geonames.org/2964574/" label="Dublin">
+        <attvalues>
+          <attvalue for="0" value="Place" />
+          <attvalue for="1" value="Dublin" />
+        </attvalues>
+      </node>
+      <node id="http://viaf.org/viaf/60411648/" label="http://viaf.org/viaf/60411648/" />
+      <node id="http://sws.geonames.org/3333223/" label="Belfast, Northern Ireland">
+        <attvalues>
+          <attvalue for="0" value="Place" />
+          <attvalue for="1" value="Belfast, Northern Ireland" />
+        </attvalues>
+      </node>
+      <node id="http://dbpedia.org/resource/Trinity_College,_Dublin/" label="http://dbpedia.org/resource/Trinity_College,_Dublin/" />
+      <node id="http://dbpedia.org/resource/Royal_Belfast_Academical_Institution/" label="http://dbpedia.org/resource/Royal_Belfast_Academical_Institution/" />
+    </nodes>
+    <edges>
+      <edge id="0" source="http://viaf.org/viaf/39398205" target="http://dbpedia.org/resource/Michael_Longley">
+        <attvalues>
+          <attvalue for="7" value="0" />
+          <attvalue for="8" value="sameAs" />
+        </attvalues>
+      </edge>
+      <edge id="1" source="http://viaf.org/viaf/39398205/" target="http://viaf.org/viaf/109557338/">
+        <attvalues>
+          <attvalue for="7" value="0" />
+          <attvalue for="8" value="colleague" />
+        </attvalues>
+      </edge>
+      <edge id="2" source="http://viaf.org/viaf/39398205/" target="http://viaf.org/viaf/109557338/">
+        <attvalues>
+          <attvalue for="7" value="1" />
+          <attvalue for="8" value="knows" />
+        </attvalues>
+      </edge>
+      <edge id="3" source="http://viaf.org/viaf/39398205/" target="http://viaf.org/viaf/127261399/">
+        <attvalues>
+          <attvalue for="7" value="0" />
+          <attvalue for="8" value="memberOf" />
+        </attvalues>
+      </edge>
+      <edge id="4" source="http://viaf.org/viaf/39398205/" target="http://sws.geonames.org/2655984/">
+        <attvalues>
+          <attvalue for="7" value="0" />
+          <attvalue for="8" value="homeLocation" />
+        </attvalues>
+      </edge>
+      <edge id="5" source="http://viaf.org/viaf/39398205/" target="http://sws.geonames.org/2655984/">
+        <attvalues>
+          <attvalue for="7" value="1" />
+          <attvalue for="8" value="workLocation" />
+        </attvalues>
+      </edge>
+      <edge id="6" source="http://viaf.org/viaf/39398205/" target="http://viaf.org/viaf/91907300/">
+        <attvalues>
+          <attvalue for="7" value="0" />
+          <attvalue for="8" value="knows" />
+        </attvalues>
+      </edge>
+      <edge id="7" source="http://viaf.org/viaf/39398205/" target="http://viaf.org/viaf/109956735/">
+        <attvalues>
+          <attvalue for="7" value="0" />
+          <attvalue for="8" value="spouse" />
+        </attvalues>
+      </edge>
+      <edge id="8" source="http://viaf.org/viaf/39398205/" target="http://viaf.org/viaf/2490119/">
+        <attvalues>
+          <attvalue for="7" value="0" />
+          <attvalue for="8" value="knows" />
+        </attvalues>
+      </edge>
+      <edge id="9" source="http://viaf.org/viaf/39398205/" target="http://dbpedia.org/resource/Michael_Longley">
+        <attvalues>
+          <attvalue for="7" value="0" />
+          <attvalue for="8" value="sameAs" />
+        </attvalues>
+      </edge>
+      <edge id="10" source="http://viaf.org/viaf/39398205/" target="http://dbpedia.org/resource/Royal_Belfast_Academical_Institution/">
+        <attvalues>
+          <attvalue for="7" value="0" />
+          <attvalue for="8" value="alumniOf" />
+        </attvalues>
+      </edge>
+      <edge id="11" source="http://viaf.org/viaf/39398205/" target="http://viaf.org/viaf/123393054/">
+        <attvalues>
+          <attvalue for="7" value="0" />
+          <attvalue for="8" value="affiliation" />
+        </attvalues>
+      </edge>
+      <edge id="12" source="http://viaf.org/viaf/39398205/" target="http://dbpedia.org/resource/Blackrock,_Dublin">
+        <attvalues>
+          <attvalue for="7" value="0" />
+          <attvalue for="8" value="workLocation" />
+        </attvalues>
+      </edge>
+      <edge id="13" source="http://viaf.org/viaf/39398205/" target="http://viaf.org/viaf/136293942/">
+        <attvalues>
+          <attvalue for="7" value="0" />
+          <attvalue for="8" value="memberOf" />
+        </attvalues>
+      </edge>
+      <edge id="14" source="http://viaf.org/viaf/39398205/" target="http://viaf.org/viaf/60411648/">
+        <attvalues>
+          <attvalue for="7" value="0" />
+          <attvalue for="8" value="knows" />
+        </attvalues>
+      </edge>
+      <edge id="15" source="http://viaf.org/viaf/39398205/" target="http://sws.geonames.org/2964574/">
+        <attvalues>
+          <attvalue for="7" value="0" />
+          <attvalue for="8" value="workLocation" />
+        </attvalues>
+      </edge>
+      <edge id="16" source="http://viaf.org/viaf/39398205/" target="http://dbpedia.org/resource/Trinity_College,_Dublin/">
+        <attvalues>
+          <attvalue for="7" value="0" />
+          <attvalue for="8" value="alumniOf" />
+        </attvalues>
+      </edge>
+      <edge id="17" source="http://viaf.org/viaf/39398205/" target="http://sws.geonames.org/3333223/">
+        <attvalues>
+          <attvalue for="7" value="0" />
+          <attvalue for="8" value="birthPlace" />
+        </attvalues>
+      </edge>
+      <edge id="18" source="http://viaf.org/viaf/39398205/" target="http://sws.geonames.org/2643743/">
+        <attvalues>
+          <attvalue for="7" value="0" />
+          <attvalue for="8" value="workLocation" />
+        </attvalues>
+      </edge>
+    </edges>
+  </graph>
+</gexf>
