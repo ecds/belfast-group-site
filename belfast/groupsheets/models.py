@@ -11,9 +11,10 @@ import time
 from django.conf import settings
 from os import path
 
-from belfast.util import rdf_data, network_data
+from belfast.util import rdf_data, network_data, cached_property
 
 logger = logging.getLogger(__name__)
+
 
 class Contents(teimap._TeiBase):
     title = xmlmap.StringField('tei:p')
@@ -107,7 +108,7 @@ class RdfPerson(rdflib.resource.Resource):
 
     @property
     def name(self):
-#        print 'preferred label = ', self.graph.preferredLabel(self)
+        # NOTE: would be better if we could use preferredLabel somehown
         return self.value(SCHEMA_ORG.name)
 
     @property
@@ -140,18 +141,17 @@ class RdfPerson(rdflib.resource.Resource):
 
     @property
     def occupation(self):
-        # FIXME: could be multiple
+        'list of occupations via http://schema.org/jobTitle property'
         return list(self.objects(SCHEMA_ORG.jobTitle))
-        return self.value(SCHEMA_ORG.jobTitle)
 
-    @property
+    @cached_property
     def locations(self):
         place_uris = list(self.objects(SCHEMA_ORG.workLocation))
         place_uris.extend(list(self.objects(SCHEMA_ORG.homeLocation)))
         place_uris = set(p.identifier for p in place_uris)
         return [RdfLocation(self.graph, p) for p in place_uris]
 
-    @property
+    @cached_property
     def short_id(self):
         uri = unicode(self)
         baseid = uri.rstrip('/').split('/')[-1]
@@ -161,7 +161,7 @@ class RdfPerson(rdflib.resource.Resource):
             idtype = 'dbpedia'
         return '%s:%s' % (idtype, baseid)
 
-    @property
+    @cached_property
     def dbpedia_description(self):
         # TODO: grab same-as URIs at init so we can query directly (?)
         # FIXME: why are these not returning any matches?
@@ -187,51 +187,58 @@ class RdfPerson(rdflib.resource.Resource):
         for r in res:
             return r['abstract']
 
-    _connections = None
+    @property
+    def nx_node_id(self):
+        'node identifier for this person in network graphs'
+        return unicode(self.identifier)
 
+    def ego_graph(self):
+        'generate an indirected ego graph around the current person'
+        # TODO: options to specify distance
+        network = network_data()
+        undirected_net = network.to_undirected()
+        # converted multidigraph to undirected
+        # to make it possible to find all neighbors,
+        # not just outbound connections
+        # (should be a way to get this from a digraph...)
+        return nx.ego_graph(undirected_net, self.nx_node_id)
+
+    @cached_property
     def connected_people(self):
         # generate a dictionary of connected people and list of
         # how this person is related to them
-        if self._connections is None:
-            network = network_data()
-            graph = rdf_data()
-            node_id = unicode(self.identifier)
-            # also works
-            # neighbors = network.neighbors(node_id)
-            undnet = network.to_undirected()
-            # converted multidigraph to undirected
-            # to find all neighbors, not just outbound connections
-            # (should be a way to get from digraph?)
+        network = network_data()
+        graph = rdf_data()
+        # this also works...
+        # neighbors = network.neighbors(self.nx_node_id)
+        ego_graph = self.ego_graph()
+        neighbors = ego_graph.nodes()
 
-            ego_graph = nx.ego_graph(undnet, node_id)
-            neighbors = ego_graph.nodes()
-            # print 'full graph has %d nodes' % network.number_of_nodes()
-            # print 'ego graph has %d nodes' % ego_graph.number_of_nodes()
+        connections = {}
+        for node in neighbors:
+            # don't include the current person in their own connections
+            if node == self.nx_node_id:
+                continue
 
-            self._connections = {}
-            for node in neighbors:
-                # don't include me in my connections
-                if node == node_id:
-                    continue
+            uriref = rdflib.URIRef(node)
+            # TODO: probably want something similar for organizations
+            if (uriref, rdflib.RDF.type, SCHEMA_ORG.Person) in graph:
+                person = RdfPerson(graph, uriref)
+                rels = set()
+                # find any edges between this node and me
+                # include data to simplify accessing edge label
+                # use edges & labels from original multidigraph
+                all_edges = network.out_edges(node, data=True) + \
+                    network.in_edges(node, data=True)
 
-                uriref = rdflib.URIRef(node)
-                # TODO: probably want something similar for organizations
-                if (uriref, rdflib.RDF.type, SCHEMA_ORG.Person) in graph:
-                    person = RdfPerson(graph, uriref)
-                    rels = set()
-                    # find any edges between this node and me
-                    # include data to simplify accessing edge label
-                    all_edges = network.out_edges(node, data=True) + \
-                        network.in_edges(node, data=True)
+                for edge in all_edges:
+                    src, target, data = edge
+                    if node_id in edge and 'label' in data:
+                        rels.add(data['label'])
 
-                    for edge in all_edges:
-                        src, target, data = edge
-                        if node_id in edge and 'label' in data:
-                            rels.add(data['label'])
+                connections[person] = rels
 
-                    self._connections[person] = rels
-
-        return self._connections
+        return connections
 
     # TODO: need access to groupsheets by this person
 
@@ -313,12 +320,6 @@ class RdfGroupSheet(rdflib.resource.Resource):
 
 def get_rdf_groupsheets():
     g = rdf_data()
-    # g = rdflib.Graph()
-    # for infile in glob.iglob(path.join(settings.RDF_DATA_DIR, '*.xml')):
-    #     g.parse(infile)
-    # load related info (viaf, dbpedia, geonames)
-    # for infile in glob.iglob(path.join(settings.RDF_DATA_DIR, 'viaf/*.rdf')):
-    #     g.parse(infile)
     res = g.query('''
         PREFIX schema: <%s>
         PREFIX rdf: <%s>
