@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:dbp="http://dbpedia.org/ontology/"
+   xmlns:dc="http://purl.org/dc/terms/"
+   xmlns:owl="http://www.w3.org/2002/07/owl#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:schema="http://schema.org/"
+   xmlns:dbpedia-owl="http://dbpedia.org/ontology/"
+>
+ <!-- simplified data based on longley findingaid for unit tests -->
+
+  <rdf:Description rdf:about="http://viaf.org/viaf/39398205/">
+    <schema:name xml:lang="en">Michael Longley</schema:name>
+    <schema:givenName xml:lang="en">Michael</schema:givenName>
+    <schema:familyName xml:lang="en">Longley</schema:familyName>
+    <rdf:type rdf:resource="http://schema.org/Person"/>
+    <owl:sameAs rdf:resource="http://dbpedia.org/resource/Michael_Longley"/> <!-- from viaf -->
+
+    <schema:spouse rdf:resource="http://viaf.org/viaf/109956735/"/>
+
+    <schema:jobTitle xml:lang="en">Poet</schema:jobTitle>
+    <schema:alumniOf rdf:resource="http://dbpedia.org/resource/Royal_Belfast_Academical_Institution/"/>
+    <schema:workLocation rdf:resource="http://dbpedia.org/resource/Blackrock,_Dublin"/>
+    <schema:birthDate xml:lang="en">1939-07-27</schema:birthDate>
+    <schema:memberOf rdf:resource="http://viaf.org/viaf/127261399/"/>
+    <schema:workLocation rdf:resource="http://sws.geonames.org/2655984/"/>
+    <schema:affiliation rdf:resource="http://viaf.org/viaf/123393054/"/>
+    <schema:alumniOf rdf:resource="http://dbpedia.org/resource/Trinity_College,_Dublin/"/>
+    <schema:workLocation rdf:resource="http://sws.geonames.org/2964574/"/>
+    <schema:workLocation rdf:resource="http://sws.geonames.org/2643743/"/>
+    <schema:memberOf rdf:resource="http://viaf.org/viaf/136293942/"/>
+    <dbp:birthPlace rdf:resource="http://sws.geonames.org/3333223/"/>
+    <schema:homeLocation rdf:resource="http://sws.geonames.org/2655984/"/>
+    <schema:knows rdf:resource="http://viaf.org/viaf/91907300/"/>
+
+    <schema:colleague rdf:resource="http://viaf.org/viaf/109557338/"/>
+    <schema:knows rdf:resource="http://viaf.org/viaf/60411648/"/>
+
+    <schema:knows rdf:resource="http://viaf.org/viaf/2490119/"/>
+    <schema:knows rdf:resource="http://viaf.org/viaf/109557338/"/>
+  </rdf:Description>
+
+  <rdf:Description rdf:about="http://viaf.org/viaf/123393054/">
+    <rdf:type rdf:resource="http://schema.org/Organization"/>
+    <schema:name xml:lang="en">Belfast Group.</schema:name>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://viaf.org/viaf/109956735/">
+      <schema:name xml:lang="en">Edna Longley</schema:name>
+    <rdf:type rdf:resource="http://schema.org/Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://viaf.org/viaf/127261399/">
+    <schema:name xml:lang="en">Royal Society of Literature</schema:name>
+    <rdf:type rdf:resource="http://schema.org/Organization"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://sws.geonames.org/2655984/">
+    <schema:name xml:lang="en">Belfast</schema:name>
+    <rdf:type rdf:resource="http://schema.org/Place"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://sws.geonames.org/2964574/">
+    <rdf:type rdf:resource="http://schema.org/Place"/>
+    <schema:name xml:lang="en">Dublin</schema:name>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://sws.geonames.org/2643743/">
+    <schema:name xml:lang="en">London</schema:name>
+    <rdf:type rdf:resource="http://schema.org/Place"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://sws.geonames.org/3333223/">
+    <rdf:type rdf:resource="http://schema.org/Place"/>
+    <schema:name xml:lang="en">Belfast, Northern Ireland</schema:name>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://viaf.org/viaf/136293942/">
+    <rdf:type rdf:resource="http://schema.org/Organization"/>
+    <schema:name xml:lang="en">Aosdána</schema:name>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://viaf.org/viaf/91907300/">
+    <schema:name xml:lang="en">Hobsbaum, Philip.</schema:name>
+    <rdf:type rdf:resource="http://schema.org/Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://viaf.org/viaf/109557338/">
+    <rdf:type rdf:resource="http://schema.org/Person"/>
+    <schema:name xml:lang="en">Seamus Heaney</schema:name>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://viaf.org/viaf/2490119/">
+    <rdf:type rdf:resource="http://schema.org/Person"/>
+    <schema:name xml:lang="en">Arthur Terry</schema:name>
+  </rdf:Description>
+
+  <!-- excerpt from viaf -->
+  <rdf:Description rdf:about="http://viaf.org/viaf/39398205">
+    <owl:sameAs rdf:resource="http://dbpedia.org/resource/Michael_Longley"/>
+  </rdf:Description>
+
+  <!-- excerpt from dbpedia -->
+    <rdf:Description rdf:about="http://dbpedia.org/resource/Michael_Longley">
+      <dbpedia-owl:abstract xml:lang="en">Michael Longley, CBE (born 27 July 1939) is a Northern Irish poet from Belfast.</dbpedia-owl:abstract>
+    </rdf:Description>
+</rdf:RDF>
