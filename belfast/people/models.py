@@ -21,15 +21,105 @@ class RdfLocation(rdflib.resource.Resource):
             or self.name or self.identifier
 
 
-class RdfOrganization(rdflib.resource.Resource):
+class RdfEntity(rdflib.resource.Resource):
+    # base class with common functionality for person, org
+
+    _person_type = rdflib.resource.Resource
+    _org_type = rdflib.resource.Resource
 
     @property
     def name(self):
         # NOTE: would be better if we could use preferredLabel somehow
         return self.value(rdfns.SCHEMA_ORG.name)
 
+    @property
+    def nx_node_id(self):
+        'node identifier for this person in network graphs'
+        return unicode(self.identifier)
 
-class RdfPerson(rdflib.resource.Resource):
+    def ego_graph(self):
+        'generate an undirected ego graph around the current person'
+        # TODO: options to specify distance
+        network = network_data()
+        undirected_net = network.to_undirected()
+        # converted multidigraph to undirected
+        # to make it possible to find all neighbors,
+        # not just outbound connections
+        # (should be a way to get this from a digraph...)
+        return nx.ego_graph(undirected_net, self.nx_node_id)
+
+    def connections(self, rdftype=None, resource=rdflib.resource.Resource):
+        '''Generate a dictionary of connected entities (direct neighbors
+        in the network graph) with a list of relationship terms (edge labels).
+        Optionally, takes an RDF type to filter the entities (e.g., restrict
+        only to People or Organizations), and a subclass of
+        :class:`rdflib.resource.Resource` to initialize the entity as.'''
+        network = network_data()
+        graph = rdf_data()
+        # this also works...
+        # neighbors = network.neighbors(self.nx_node_id)
+        ego_graph = self.ego_graph()
+        neighbors = ego_graph.nodes()
+
+        connections = {}
+        for node in neighbors:
+            # don't include the current person in their own connections
+            if node == self.nx_node_id:
+                continue
+
+            uriref = rdflib.URIRef(node)
+            # if an rdf type was specified, filter out items that do not
+            # match that type.
+            if rdftype is not None and \
+               (uriref, rdflib.RDF.type, rdftype) not in graph:
+                continue
+
+            res = resource(graph, uriref)
+            rels = set()
+            # find any edges between this node and me
+            # include data to simplify accessing edge label
+            # use edges & labels from original multidigraph
+            all_edges = network.out_edges(node, data=True) + \
+                network.in_edges(node, data=True)
+
+            for edge in all_edges:
+                src, target, data = edge
+                if self.nx_node_id in edge and 'label' in data:
+                    rels.add(data['label'])
+
+            connections[res] = rels
+
+        return connections
+
+    @cached_property
+    def connected_people(self):
+        '''dictionary of people (as :class:`RdfPerson`) connected to
+        this person, with a list of relationship terms indicating
+        how they are connected.'''
+        start = time.time()
+        conn = self.connections(rdfns.SCHEMA_ORG.Person, self._person_type)
+        logger.debug('Found %d people in %.02f sec' % (len(conn),
+                     time.time() - start))
+        return conn
+
+    @cached_property
+    def connected_organizations(self):
+        '''dictionary of organizations (as :class:`RdfOrganization`)
+        this person is connected to, with a list of terms indicating
+        how they are connected.'''
+        start = time.time()
+        conn = self.connections(rdfns.SCHEMA_ORG.Organization, self._org_type)
+        logger.debug('Found %d organizations in %.02f sec' % (len(conn),
+                     time.time() - start))
+        return conn
+
+
+class RdfOrganization(RdfEntity):
+    pass
+
+
+class RdfPerson(RdfEntity):
+    _org_type = RdfOrganization
 
     @property
     def name(self):
@@ -112,82 +202,19 @@ class RdfPerson(rdflib.resource.Resource):
         for r in res:
             return r['abstract']
 
-    @property
-    def nx_node_id(self):
-        'node identifier for this person in network graphs'
-        return unicode(self.identifier)
-
-    def ego_graph(self):
-        'generate an undirected ego graph around the current person'
-        # TODO: options to specify distance
-        network = network_data()
-        undirected_net = network.to_undirected()
-        # converted multidigraph to undirected
-        # to make it possible to find all neighbors,
-        # not just outbound connections
-        # (should be a way to get this from a digraph...)
-        return nx.ego_graph(undirected_net, self.nx_node_id)
-
-    def connections(self, rdftype=None, resource=rdflib.resource.Resource):
-        '''Generate a dictionary of connected entities (direct neighbors
-        in the network graph) with a list of relationship terms (edge labels).
-        Optionally, takes an RDF type to filter the entities (e.g., restrict
-        only to People or Organizations), and a subclass of
-        :class:`rdflib.resource.Resource` to initialize the entity as.'''
-        network = network_data()
-        graph = rdf_data()
-        # this also works...
-        # neighbors = network.neighbors(self.nx_node_id)
-        ego_graph = self.ego_graph()
-        neighbors = ego_graph.nodes()
-
-        connections = {}
-        for node in neighbors:
-            # don't include the current person in their own connections
-            if node == self.nx_node_id:
-                continue
-
-            uriref = rdflib.URIRef(node)
-            # if an rdf type was specified, filter out items that do not
-            # match that type.
-            if rdftype is not None and \
-               (uriref, rdflib.RDF.type, rdftype) not in graph:
-                continue
-
-            res = resource(graph, uriref)
-            rels = set()
-            # find any edges between this node and me
-            # include data to simplify accessing edge label
-            # use edges & labels from original multidigraph
-            all_edges = network.out_edges(node, data=True) + \
-                network.in_edges(node, data=True)
-
-            for edge in all_edges:
-                src, target, data = edge
-                if self.nx_node_id in edge and 'label' in data:
-                    rels.add(data['label'])
-
-            connections[res] = rels
-
-        return connections
-
-    @cached_property
-    def connected_people(self):
-        '''dictionary of people (as :class:`RdfPerson`) connected to
-        this person, with a list of relationship terms indicating
-        how they are connected.'''
-        return self.connections(rdfns.SCHEMA_ORG.Person, RdfPerson)
-
-    @cached_property
-    def connected_organizations(self):
-        '''dictionary of organizations (as :class:`RdfOrganization`)
-        this person is connected to, with a list of terms indicating
-        how they are connected.'''
-        return self.connections(rdfns.SCHEMA_ORG.Organization, RdfOrganization)
-
     # TODO: need access to groupsheets by this person
 
 
+# FIXME! this is a hack; find a better way to do this...
+# patch in types to return for connected persons/orgs
+RdfOrganization._person_type = RdfPerson
+RdfOrganization._org_type = RdfOrganization
+RdfPerson._person_type = RdfPerson
+
+BelfastGroup = RdfOrganization(rdf_data(), rdfns.BELFAST_GROUP_URIREF)
+
+
+# deprecated; this is slow, use BelfastGroup.connected_people instead
 def get_belfast_people():
     g = rdf_data()
     # FIXME: possibly more efficient to use nx / ego graph?
@@ -212,7 +239,7 @@ def get_belfast_people():
             ?author schema:name ?name
         } ORDER BY ?name
         ''' % {'xsd': rdflib.XSD, 'rdf': rdflib.RDF,
-               'bg': rdfns.BELFAST_GROUP}
+               'bg': rdfns.BELFAST_GROUP_URI}
     )
     logger.debug('Found %d people in %.02f sec' % (len(res),
                  time.time() - start))

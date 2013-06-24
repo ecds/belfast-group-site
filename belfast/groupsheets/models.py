@@ -169,7 +169,7 @@ def get_rdf_groupsheets():
             ?author schema:name ?name
         } ORDER BY ?name
         ''' % (rdflib.XSD, rdflib.RDF, rdfns.BIBO, rdfns.SKOS,
-               rdfns.BELFAST_GROUP)
+               rdfns.BELFAST_GROUP_URI)
     )
 
     # } ORDER BY ?authorLast

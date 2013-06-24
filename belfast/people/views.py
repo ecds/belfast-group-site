@@ -4,13 +4,12 @@ import rdflib
 
 from belfast import rdfns
 from belfast.util import rdf_data
-from belfast.people.models import get_belfast_people, RdfPerson
-
+from belfast.people.models import RdfPerson, BelfastGroup
 
 
 def list(request):
-    # use rdf to generate a list of people one remove from belfast group
-    results = get_belfast_people()
+    # display a list of people one remove from belfast group
+    results = BelfastGroup.connected_people
     return render(request, 'people/list.html',
                   {'people': results})
 

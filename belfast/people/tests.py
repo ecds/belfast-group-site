@@ -5,7 +5,7 @@ from networkx.readwrite import gexf
 from os import path
 import rdflib
 
-from belfast.people.models import RdfPerson, RdfLocation
+from belfast.people.models import RdfPerson, RdfLocation, RdfOrganization
 
 FIXTURE_DIR = path.join(path.dirname(path.abspath(__file__)), 'fixtures')
 
@@ -133,6 +133,7 @@ class RdfPersonTest(TestCase):
         mockrdf.return_value = self.graph
         mocknx.return_value = self.nx_graph
         people = self.person.connected_people
+        self.assert_(isinstance(people.keys()[0], RdfPerson))
         # convert into dict of string, list for easier testing
         names = dict((unicode(p.name), rels) for p, rels in people.iteritems())
         self.assert_('Edna Longley' in names)
@@ -152,6 +153,7 @@ class RdfPersonTest(TestCase):
         mockrdf.return_value = self.graph
         mocknx.return_value = self.nx_graph
         orgs = self.person.connected_organizations
+        self.assert_(isinstance(orgs.keys()[0], RdfOrganization))
         names = dict((unicode(o.name), rels) for o, rels in orgs.iteritems())
         self.assert_('Belfast Group' in names)
         self.assert_('Royal Society of Literature' in names)
