@@ -37,16 +37,26 @@ class RdfEntity(rdflib.resource.Resource):
         'node identifier for this person in network graphs'
         return unicode(self.identifier)
 
-    def ego_graph(self):
+    def ego_graph(self, radius=1, types=None):
         'generate an undirected ego graph around the current person'
         # TODO: options to specify distance
         network = network_data()
         undirected_net = network.to_undirected()
+
+        # filter network *before* generating ego graph
+        # so we don't get disconnected nodes
+        if types is not None:
+            for n in undirected_net.nodes():
+                if 'type' not in undirected_net.node[n] or \
+                   undirected_net.node[n]['type'] not in types:
+                    undirected_net.remove_node(n)
+
         # converted multidigraph to undirected
         # to make it possible to find all neighbors,
         # not just outbound connections
         # (should be a way to get this from a digraph...)
-        return nx.ego_graph(undirected_net, self.nx_node_id)
+        return nx.ego_graph(undirected_net, self.nx_node_id,
+                            radius=radius)
 
     def connections(self, rdftype=None, resource=rdflib.resource.Resource):
         '''Generate a dictionary of connected entities (direct neighbors

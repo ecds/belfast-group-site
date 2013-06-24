@@ -45,12 +45,9 @@ def profile(request, id):
 
 def egograph_js(request, id):
     person = init_person(id)
-    graph = person.ego_graph()
-    types = ['Person', 'Organization', 'Place']
-
-    for n in graph.nodes():
-        if 'type' not in graph.node[n] or graph.node[n]['type'] not in types:
-            graph.remove_node(n)
+    # TODO: possibly make ego-graph radius a parameter in future
+    graph = person.ego_graph(radius=1,
+                             types=['Person', 'Organization', 'Place'])
 
     data = json_graph.node_link_data(graph)
     return HttpResponse(json.dumps(data), content_type='application/json')
