@@ -1,0 +1,26 @@
+{% extends 'site_base.html' %}
+{% load static %}
+
+{% block page-subtitle %} | Members | {{ person.fullname }} | Ego-graph{% endblock %}
+{% block head-extras %}
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <link type="text/css" href="{% static 'css/d3.force.css' %}" rel="stylesheet" media="screen"/>
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+<h1>{{ person.fullname }}</h1>
+
+ <div id="chart"></div>
+
+   <script type="text/javascript" src="{% static 'js/d3.force.js' %}"></script>
+   <script type="text/javascript">
+      ForceGraph({
+        url: "{% url 'people:egograph-js' id=person.short_id %}"
+      });
+   </script>
+
+
+{% endblock %}
