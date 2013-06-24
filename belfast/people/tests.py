@@ -77,8 +77,16 @@ class PeopleViewsTest(TestCase):
         for p in self.person.connected_people:
             self.assertContains(
                 response, p.fullname,
-                msg_prefix='connected person name  %s should be listed on profile'
+                msg_prefix='connected person name %s should be listed on profile'
                 % p.fullname)
+
+        # connected orgs
+        for o in self.person.connected_organizations:
+            self.assertContains(
+                response, o.name,
+                msg_prefix='connected organization %s should be listed on profile'
+                % o.name)
+
 
 class RdfPersonTest(TestCase):
     graph = rdflib.Graph()
