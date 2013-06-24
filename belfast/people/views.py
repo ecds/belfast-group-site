@@ -2,9 +2,10 @@ from django.shortcuts import render
 from django.http import Http404
 import rdflib
 
-from belfast.people.models import get_belfast_people
-from belfast.groupsheets.models import RdfPerson, SCHEMA_ORG
+from belfast import rdfns
 from belfast.util import rdf_data
+from belfast.people.models import get_belfast_people, RdfPerson
+
 
 
 def list(request):
@@ -24,7 +25,7 @@ def profile(request, id):
     if idtype == 'viaf':
         uri = 'http://viaf.org/viaf/%s/' % idnum
         graph = rdf_data()
-        if (rdflib.URIRef(uri), rdflib.RDF.type, SCHEMA_ORG.Person) in graph:
+        if (rdflib.URIRef(uri), rdflib.RDF.type, rdfns.SCHEMA_ORG.Person) in graph:
             person = RdfPerson(graph, rdflib.URIRef(uri))
 
     # anything else not found for now

@@ -4,17 +4,17 @@ from eulexistdb.manager import Manager
 from eulexistdb.models import XmlModel
 import glob
 import logging
-import networkx as nx
-import rdflib
-from rdflib import collection as rdfcollection
-import time
-from django.conf import settings
 from os import path
+import rdflib
+import time
 
+from django.conf import settings
+
+from belfast import rdfns
 from belfast.util import rdf_data, network_data, cached_property
+from belfast.people.models import RdfPerson
 
 logger = logging.getLogger(__name__)
-
 
 class Contents(teimap._TeiBase):
     title = xmlmap.StringField('tei:p')
@@ -75,173 +75,8 @@ class GroupSheet(XmlModel):
     # Possible to generate xpaths based on current object properties?
 
 
-BELFAST_GROUP_URI = 'http://viaf.org/viaf/123393054/'
-
-ARCH = rdflib.Namespace('http://purl.org/archival/vocab/arch#')
-SCHEMA_ORG = rdflib.Namespace('http://schema.org/')
-DBPEDIA_OWL = rdflib.Namespace('http://dbpedia.org/ontology/')
-DC = rdflib.Namespace('http://purl.org/dc/terms/')
-BIBO = rdflib.Namespace('http://purl.org/ontology/bibo/')
-SKOS = rdflib.Namespace('http://www.w3.org/2004/02/skos/core#')
-GN = rdflib.Namespace('http://www.geonames.org/ontology#')
-DBPPROP = rdflib.Namespace('http://dbpedia.org/property/')
-FOAF = rdflib.Namespace('http://xmlns.com/foaf/0.1/')
-
-#rdflib.resource.Resource - takes graph, subject
 
 # TBD: how do groupsheet and people apps share rdf models?
-
-
-class RdfLocation(rdflib.resource.Resource):
-
-    @property
-    def name(self):
-        return self.value(SCHEMA_ORG.name)
-
-    def __unicode__(self):
-        return self.value(GN.name) or self.value(DBPPROP.name) \
-            or self.graph.preferredLabel(self) \
-            or self.name or self.identifier
-
-
-class RdfPerson(rdflib.resource.Resource):
-
-    @property
-    def name(self):
-        # NOTE: would be better if we could use preferredLabel somehown
-        return self.value(SCHEMA_ORG.name)
-
-    @property
-    def lastname(self):
-        return self.value(SCHEMA_ORG.familyName)
-
-    @property
-    def firstname(self):
-        return self.value(SCHEMA_ORG.givenName)
-
-    @property
-    def fullname(self):
-        if self.lastname and self.firstname:
-            return '%s %s' % (self.firstname, self.lastname)
-        elif self.value(FOAF.name):
-            return self.value(FOAF.name)
-        else:
-            return self.name
-
-    @property
-    def birthdate(self):
-        # TODO: convert to date type
-        return self.value(SCHEMA_ORG.birthDate)
-
-    @property
-    def birthplace(self):
-        place = self.value(DBPEDIA_OWL.birthPlace)
-        if place:
-            return RdfLocation(self.graph, place.identifier)
-
-    @property
-    def occupation(self):
-        'list of occupations via http://schema.org/jobTitle property'
-        return list(self.objects(SCHEMA_ORG.jobTitle))
-
-    @cached_property
-    def locations(self):
-        place_uris = list(self.objects(SCHEMA_ORG.workLocation))
-        place_uris.extend(list(self.objects(SCHEMA_ORG.homeLocation)))
-        place_uris = set(p.identifier for p in place_uris)
-        return [RdfLocation(self.graph, p) for p in place_uris]
-
-    @cached_property
-    def short_id(self):
-        uri = unicode(self)
-        baseid = uri.rstrip('/').split('/')[-1]
-        if 'viaf.org' in uri:
-            idtype = 'viaf'
-        elif 'dbpedia.org' in uri:
-            idtype = 'dbpedia'
-        return '%s:%s' % (idtype, baseid)
-
-    @cached_property
-    def dbpedia_description(self):
-        # TODO: grab same-as URIs at init so we can query directly (?)
-        # FIXME: why are these not returning any matches?
-        # print 'same as rels = ', list(self.objects(rdflib.OWL.sameAs))
-        # print 'same as rels = ', list(self.graph.objects(self.identifier.rstrip('/'),
-        #     rdflib.OWL.sameAs))
-        res = self.graph.query('''
-            PREFIX rdf: <%s>
-            PREFIX owl: <%s>
-            PREFIX dbpedia-owl: <%s>
-            SELECT ?abstract
-            WHERE {
-                <%s> owl:sameAs ?dbp .
-                ?dbp dbpedia-owl:abstract ?abstract
-                FILTER langMatches( lang(?abstract), "EN" )
-            }
-        ''' % (rdflib.RDF, rdflib.OWL, DBPEDIA_OWL,
-               self.identifier.rstrip('/'))
-        )
-        # FIXME: discrepancy in VIAF uris - RDF has no trailing slash
-
-        # TODO: filter by language
-        for r in res:
-            return r['abstract']
-
-    @property
-    def nx_node_id(self):
-        'node identifier for this person in network graphs'
-        return unicode(self.identifier)
-
-    def ego_graph(self):
-        'generate an indirected ego graph around the current person'
-        # TODO: options to specify distance
-        network = network_data()
-        undirected_net = network.to_undirected()
-        # converted multidigraph to undirected
-        # to make it possible to find all neighbors,
-        # not just outbound connections
-        # (should be a way to get this from a digraph...)
-        return nx.ego_graph(undirected_net, self.nx_node_id)
-
-    @cached_property
-    def connected_people(self):
-        # generate a dictionary of connected people and list of
-        # how this person is related to them
-        network = network_data()
-        graph = rdf_data()
-        # this also works...
-        # neighbors = network.neighbors(self.nx_node_id)
-        ego_graph = self.ego_graph()
-        neighbors = ego_graph.nodes()
-
-        connections = {}
-        for node in neighbors:
-            # don't include the current person in their own connections
-            if node == self.nx_node_id:
-                continue
-
-            uriref = rdflib.URIRef(node)
-            # TODO: probably want something similar for organizations
-            if (uriref, rdflib.RDF.type, SCHEMA_ORG.Person) in graph:
-                person = RdfPerson(graph, uriref)
-                rels = set()
-                # find any edges between this node and me
-                # include data to simplify accessing edge label
-                # use edges & labels from original multidigraph
-                all_edges = network.out_edges(node, data=True) + \
-                    network.in_edges(node, data=True)
-
-                for edge in all_edges:
-                    src, target, data = edge
-                    if node_id in edge and 'label' in data:
-                        rels.add(data['label'])
-
-                connections[person] = rels
-
-        return connections
-
-    # TODO: need access to groupsheets by this person
-
 
 class RdfGroupSheet(rdflib.resource.Resource):
 
@@ -249,22 +84,22 @@ class RdfGroupSheet(rdflib.resource.Resource):
 
     @property
     def date(self):
-        return self.value(DC.date)
+        return self.value(rdfns.DC.date)
 
     @property
     def num_pages(self):
-        return self.value(BIBO.numPages)
+        return self.value(rdfns.BIBO.numPages)
 
     @property
     def genre(self):
-        return self.value(SCHEMA_ORG.genre)
+        return self.value(rdfns.SCHEMA_ORG.genre)
 
     # more complex properties: aggregate, other resources
 
     @property
     def author(self):
-        author_uri = self.value(DC.creator) or \
-            self.value(SCHEMA_ORG.author)
+        author_uri = self.value(rdfns.DC.creator) or \
+            self.value(rdfns.SCHEMA_ORG.author)
 
         if author_uri is not None:
             # returns an rdflib Resource, so use identifier to re-init
@@ -276,8 +111,8 @@ class RdfGroupSheet(rdflib.resource.Resource):
     def titles(self):
         titles = []
         # title is either a single literal OR an rdf sequence
-        if self.value(DC.title) is not None:
-            title = self.value(DC.title)
+        if self.value(rdfns.DC.title) is not None:
+            title = self.value(rdfns.DC.title)
             # single literal
             if isinstance(title, rdflib.Literal):
                 titles.append(title)
@@ -288,29 +123,29 @@ class RdfGroupSheet(rdflib.resource.Resource):
                 # since collection doesn't seem to handle resource
                 bnode = rdflib.BNode(title)
                 # create a collection to allow treating as a list
-                titles.extend(rdfcollection.Collection(self.graph,
-                                                       bnode))
+                titles.extend(rdflib.collection.Collection(self.graph,
+                                                           bnode))
         return titles
 
     @property
     def sources(self):
         sources = []
         # TODO: convert into dict with name & access uri
-        for coll in self.graph.subjects(SCHEMA_ORG.mentions, self.identifier):
-            if (coll, rdflib.RDF.type, ARCH.Collection) in self.graph:
-                name = self.graph.value(coll, SCHEMA_ORG.name)
+        for coll in self.graph.subjects(rdfns.SCHEMA_ORG.mentions, self.identifier):
+            if (coll, rdflib.RDF.type, rdfns.ARCH.Collection) in self.graph:
+                name = self.graph.value(coll, rdfns.SCHEMA_ORG.name)
                 sources.append(name)  # title/name ?
             else:
                 # NOTE: may want to use transitive subjects here (?)
                 # FIXME: https: vs http: uri may be an issue!
-                for pcoll in self.graph.subjects(DC.hasPart, coll):
+                for pcoll in self.graph.subjects(rdfns.DC.hasPart, coll):
                     # ugh, why so complicated!
                     # this is finding the *document* that describes the collection
                     # but is not itself a collection
-                    if (pcoll, rdflib.RDF.type, ARCH.Collection) in self.graph  \
-                       or (pcoll, rdflib.RDF.type, SCHEMA_ORG.WebPage):
+                    if (pcoll, rdflib.RDF.type, rdfns.ARCH.Collection) in self.graph  \
+                       or (pcoll, rdflib.RDF.type, rdfns.SCHEMA_ORG.WebPage):
                         # FIXME: need to check webpage that is ABOUT a collection
-                        name = self.graph.value(pcoll, SCHEMA_ORG.name).strip()
+                        name = self.graph.value(pcoll, rdfns.SCHEMA_ORG.name).strip()
                         sources.append(name)  # title/name ?
 
                     # FIXME: getting two versions of longley with different
@@ -333,7 +168,8 @@ def get_rdf_groupsheets():
             ?ms schema:author ?author .
             ?author schema:name ?name
         } ORDER BY ?name
-        ''' % (rdflib.XSD, rdflib.RDF, BIBO, SKOS, BELFAST_GROUP_URI)
+        ''' % (rdflib.XSD, rdflib.RDF, rdfns.BIBO, rdfns.SKOS,
+               rdfns.BELFAST_GROUP)
     )
 
     # } ORDER BY ?authorLast
