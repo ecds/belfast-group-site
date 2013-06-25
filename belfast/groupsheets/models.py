@@ -6,6 +6,7 @@ import glob
 import logging
 from os import path
 import rdflib
+from rdflib.collection import Collection as RdfCollection
 import time
 
 from django.conf import settings
@@ -123,8 +124,7 @@ class RdfGroupSheet(rdflib.resource.Resource):
                 # since collection doesn't seem to handle resource
                 bnode = rdflib.BNode(title)
                 # create a collection to allow treating as a list
-                titles.extend(rdflib.collection.Collection(self.graph,
-                                                           bnode))
+                titles.extend(RdfCollection(self.graph, bnode))
         return titles
 
     @property
