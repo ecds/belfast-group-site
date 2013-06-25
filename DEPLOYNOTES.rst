@@ -25,3 +25,19 @@ Initial setup
   https://github.com/emory-libraries-disc/belfast-group-data
   and configure the location of the ``data`` directory
   in ``localsettings.py`` as **RDF_DATA_DIR**.
+
+  * Run ``smush-rdf.py`` to de-dupe group sheets in the data::
+
+      ./scripts/smush-rdf.py data/*.xml
+
+  * Run ``rdf2gexf.py`` script on Belfast Group RDF data to
+    generate and save a Network Graph fle, e.g.::
+
+      ./scripts/rdf2gexf.py data/*.xml -o belfast-group-data.gexf
+
+    Configure the resulting file in the ``localsettings.py``
+    as **GEXF_DATA**.
+
+* Ensure that a cache is configured in ``localsettings.py``
+
+

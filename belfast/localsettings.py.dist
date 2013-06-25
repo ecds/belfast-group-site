@@ -41,6 +41,14 @@ RDF_DATA_DIR = '/path/to/github/belfast-group-data/data/'
 GEXF_DATA = '/path/to/github/belfast-group-data/belfast-group-data.gexf'
 
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/var/tmp/belfast_cache',
+    }
+}
+
+
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
 # the site admins on every HTTP 500 error when DEBUG=False.
