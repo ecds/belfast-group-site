@@ -12,6 +12,9 @@
     {% if form.errors %}
       <p>No search terms were entered.</p>  {# wording? #}
       {# NOTE: could use form.errors, but for now this seems simpler #}
+    {% elif query_error %}
+      {# TODO: more detail here would probably be useful (could be anything) #}
+      <p>There was an error processing your search. </p>
     {% else %}
 
     <p>Found {{ documents.count }} result{{ documents.count|pluralize }}

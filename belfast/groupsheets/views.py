@@ -1,10 +1,12 @@
 from django.shortcuts import render
 from django.http import Http404
-from eulexistdb.exceptions import DoesNotExist
+from eulexistdb.exceptions import DoesNotExist, ExistDBException
+import logging
 
 from belfast.groupsheets.forms import KeywordSearchForm
 from belfast.groupsheets.models import GroupSheet, get_rdf_groupsheets
 
+logger = logging.getLogger(__name__)
 
 def view_sheet(request, id):
     try:
@@ -31,13 +33,17 @@ def search(request):
         # pagination todo (?)
         # page = request.REQUEST.get('page', 1)
 
-        results = GroupSheet.objects \
-                            .filter(fulltext_terms=keywords) \
-                            .order_by('-fulltext_score') \
-                            .also('fulltext_score')
-        context.update({'documents': results, 'keywords': keywords})
-
-
+        try:
+            results = GroupSheet.objects \
+                                .filter(fulltext_terms=keywords) \
+                                .order_by('-fulltext_score') \
+                                .also('fulltext_score')
+            context.update({'documents': results, 'keywords': keywords})
+            # calculate total to trigger exist query so error can be caught
+            results.count()
+        except ExistDBException as err:
+            logger.error('eXist query error: %s' % err)
+            context['query_error'] = True
 
     return render(request, 'groupsheets/search_results.html',
                   context)

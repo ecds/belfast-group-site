@@ -10,6 +10,7 @@ from lxml import etree
 
 from belfast.groupsheets.models import GroupSheet, Contents, \
     Poem
+from belfast.groupsheets.forms import KeywordSearchForm
 from belfast.groupsheets.templatetags.tei import format_tei
 
 FIXTURE_DIR = path.join(path.dirname(path.abspath(__file__)), 'fixtures')
@@ -56,6 +57,33 @@ class GroupSheetTest(unittest.TestCase):
                          self.groupsheet.ark)
         self.assertEqual('http://pid.emory.edu/ark:/25593/17mf5',
                          self.groupsheet2.ark)
+
+
+class KeywordSearchFormTest(testutil.TestCase):
+
+    def test_keyword_clean(self):
+        term_phrase = 'term1 term2 "exact phrase"'
+        form = KeywordSearchForm({'keywords': term_phrase})
+        self.assertTrue(form.is_valid())
+        self.assertEqual(term_phrase, form.cleaned_data['keywords'])
+        # wildcards are fine
+        term_phrase = 'term?1 term* "exact phrase"'
+        form = KeywordSearchForm({'keywords': term_phrase})
+        self.assertTrue(form.is_valid())
+        self.assertEqual(term_phrase, form.cleaned_data['keywords'])
+
+        # for an incomplete exact phrase, the quote will be ignored
+        incomplete_phrase = 'term1 term2 "exact phrase'
+        form = KeywordSearchForm({'keywords': incomplete_phrase})
+        self.assertTrue(form.is_valid())
+        self.assertEqual(incomplete_phrase.replace('"', ''), form.cleaned_data['keywords'])
+        # works with multiple phrases or terms
+        incomplete_phrase = 'term1 term2 "exact phrase1" term3 "inexact phrase'
+        cleaned_incomplete_phrase = 'term1 term2 "exact phrase1" term3 inexact phrase'
+        form = KeywordSearchForm({'keywords': incomplete_phrase})
+        self.assertTrue(form.is_valid())
+        self.assertEqual(cleaned_incomplete_phrase,
+                         form.cleaned_data['keywords'])
 
 
 class GroupsheetViewsTest(testutil.TestCase):
