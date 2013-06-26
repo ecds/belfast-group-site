@@ -165,7 +165,7 @@ def get_rdf_groupsheets():
         PREFIX rdf: <%s>
         PREFIX bibo: <%s>
         PREFIX skos: <%s>
-        SELECT DISTINCT ?ms ?author
+        SELECT DISTINCT ?ms
         WHERE {
             ?doc schema:about <%s> .
             ?doc schema:mentions ?ms .
