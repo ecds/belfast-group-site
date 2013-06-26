@@ -21,17 +21,26 @@ def rdf_data():
 
         graph = rdflib.Graph()
         filecount = 0
+        errcount = 0
         # TODO: log time it takes to parse and load, totalnumber of files
         for infile in glob.iglob(path.join(settings.RDF_DATA_DIR, '*.xml')):
-            graph.parse(infile)
-            filecount += 1
+            try:
+                graph.parse(infile)
+                filecount += 1
+            except Exception as err:
+                logger.error('Failed to parse file %s: %s' % (infile, err))
+                errcount += 1
 
         for infile in glob.iglob(path.join(settings.RDF_DATA_DIR, '*', '*.rdf')):
-            graph.parse(infile)
-            filecount += 1
+            try:
+                graph.parse(infile)
+                filecount += 1
+            except Exception as err:
+                logger.error('Failed to parse file %s: %s' % (infile, err))
+                errcount += 1
 
-        logger.debug('Loaded %d RDF documents in %.02f sec' % (filecount,
-                     time.time() - start))
+        logger.debug('Loaded %d RDF documents in %.02f sec (%d errors)' % \
+                     (filecount, time.time() - start, errcount))
 
         cache.set(cache_key, graph, timeout)
 
