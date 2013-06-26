@@ -76,7 +76,6 @@ class GroupSheet(XmlModel):
     # Possible to generate xpaths based on current object properties?
 
 
-
 # TBD: how do groupsheet and people apps share rdf models?
 
 class RdfGroupSheet(rdflib.resource.Resource):
@@ -129,27 +128,33 @@ class RdfGroupSheet(rdflib.resource.Resource):
 
     @property
     def sources(self):
-        sources = []
+        ''''Dictionary of archival collections that hold copies of this groupsheet.
+        Key is URI,
+        '''
+        sources = {}
         # TODO: convert into dict with name & access uri
         for coll in self.graph.subjects(rdfns.SCHEMA_ORG.mentions, self.identifier):
             if (coll, rdflib.RDF.type, rdfns.ARCH.Collection) in self.graph:
                 name = self.graph.value(coll, rdfns.SCHEMA_ORG.name)
-                sources.append(name)  # title/name ?
+                sources[unicode(coll)] = name  # title/name ?
             else:
                 # NOTE: may want to use transitive subjects here (?)
                 # FIXME: https: vs http: uri may be an issue!
                 for pcoll in self.graph.subjects(rdfns.DC.hasPart, coll):
-                    # ugh, why so complicated!
-                    # this is finding the *document* that describes the collection
-                    # but is not itself a collection
-                    if (pcoll, rdflib.RDF.type, rdfns.ARCH.Collection) in self.graph  \
-                       or (pcoll, rdflib.RDF.type, rdfns.SCHEMA_ORG.WebPage):
-                        # FIXME: need to check webpage that is ABOUT a collection
-                        name = self.graph.value(pcoll, rdfns.SCHEMA_ORG.name).strip()
-                        sources.append(name)  # title/name ?
+                    # find the *document* that describes the collection
+                    # (but is not itself a collection), because the document
+                    # is the thing we can link to.
 
-                    # FIXME: getting two versions of longley with different
-                    # whitespace, one as bnode and one with ark url
+                    # NOTE: looking for ARCH.Collection seems to generate
+                    # redundant sources, one without a resolvable URI.
+                    # Ignore the collection for now and only use the webpage.
+
+                    # if (pcoll, rdflib.RDF.type, rdfns.ARCH.Collection) in self.graph \
+                    #    or (pcoll, rdflib.RDF.type, rdfns.SCHEMA_ORG.WebPage) in self.graph:
+                    if (pcoll, rdflib.RDF.type, rdfns.SCHEMA_ORG.WebPage) in self.graph:
+                        # do we need to check webpage that is ABOUT a collection?
+                        name = self.graph.value(pcoll, rdfns.SCHEMA_ORG.name).strip()
+                        sources[unicode(pcoll)] = name  # title/name ?
         return sources
 
 
@@ -182,4 +187,3 @@ def get_rdf_groupsheets():
     # how to filter out non-group sheet irish misc content?
     gs = [RdfGroupSheet(g, r['ms']) for r in res]
     return gs
-
