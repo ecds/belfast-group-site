@@ -30,6 +30,10 @@ Initial setup
 
       ./scripts/smush-rdf.py data/*.xml
 
+  * Run ``harvest-related.py`` to download related RDF (VIAf, DBpedia, etc)::
+
+      ./scripts/harvest-related.py data/*.xml -o data
+
   * Run ``rdf2gexf.py`` script on Belfast Group RDF data to
     generate and save a Network Graph fle, e.g.::
 
