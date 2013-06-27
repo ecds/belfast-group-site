@@ -2,20 +2,16 @@ from eulxml import xmlmap
 from eulxml.xmlmap import teimap
 from eulexistdb.manager import Manager
 from eulexistdb.models import XmlModel
-import glob
 import logging
-from os import path
 import rdflib
 from rdflib.collection import Collection as RdfCollection
-import time
-
-from django.conf import settings
 
 from belfast import rdfns
-from belfast.util import rdf_data, network_data, cached_property
+from belfast.util import rdf_data
 from belfast.people.models import RdfPerson
 
 logger = logging.getLogger(__name__)
+
 
 class Contents(teimap._TeiBase):
     title = xmlmap.StringField('tei:p')
@@ -34,6 +30,23 @@ class IdNumber(teimap._TeiBase):
     type = xmlmap.StringField('@type')
     id = xmlmap.StringField('@n')
     value = xmlmap.StringField('./text()')
+
+
+class ArkIdentifier(IdNumber, XmlModel):
+    ROOT_NS = teimap.TEI_NAMESPACE
+    ROOT_NAMESPACES = {
+        'tei': ROOT_NS,
+    }
+    objects = Manager('//tei:idno[@type="ark"]')
+
+
+def id_from_ark(ark):
+    # simple method to look up a TEI id based on the ARK url,
+    # to allow linking within the current site based on an ARK
+    try:
+        return ArkIdentifier.objects.get(value=ark).id
+    except Exception:
+        pass
 
 
 class GroupSheet(XmlModel):
@@ -97,6 +110,11 @@ class RdfGroupSheet(rdflib.resource.Resource):
     @property
     def url(self):
         return self.value(rdfns.SCHEMA_ORG.URL)
+
+    @property
+    def groupsheet_id(self):
+        if self.url:
+            return id_from_ark(str(self.url.identifier))
 
     # more complex properties: aggregate, other resources
 

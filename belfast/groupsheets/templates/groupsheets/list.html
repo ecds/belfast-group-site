@@ -20,8 +20,8 @@
         {% if doc.date %}{{ doc.date }}{% else %}no date{% endif %}.  {# TODO: format date for readability #}
         {# perhaps simply omit the no date since the majority are undated? #}
         {% if doc.num_pages %}({{ doc.num_pages }} page{{ doc.num_pages|pluralize }}){% endif %}
-        {% if doc.url %}
-           <a href="{{ doc.url }}">[view]</a>
+        {% if doc.url and doc.groupsheet_id %}
+           <a href="{% url 'groupsheets:view' doc.groupsheet_id %}">[view]</a>
         {% endif %}
         <p>Source:         {# source archives with a copy of this group sheet #}
         {% for uri, name in doc.sources.iteritems %}

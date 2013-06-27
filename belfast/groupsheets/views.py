@@ -8,6 +8,7 @@ from belfast.groupsheets.models import GroupSheet, get_rdf_groupsheets
 
 logger = logging.getLogger(__name__)
 
+
 def view_sheet(request, id):
     try:
         gs = GroupSheet.objects.also('ark_list').get(id=id)
