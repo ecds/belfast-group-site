@@ -13,5 +13,5 @@ DBPPROP = rdflib.Namespace('http://dbpedia.org/property/')
 FOAF = rdflib.Namespace('http://xmlns.com/foaf/0.1/')
 
 # not strictly a namespace, but needs to be shared...
-BELFAST_GROUP_URI = 'http://viaf.org/viaf/123393054/'
+BELFAST_GROUP_URI = 'http://viaf.org/viaf/123393054'
 BELFAST_GROUP_URIREF = rdflib.URIRef(BELFAST_GROUP_URI)
