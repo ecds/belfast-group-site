@@ -6,20 +6,22 @@ http://networkx.github.io/documentation/latest/examples/javascript/force.html
 function ForceGraph(config) {
   /* minimally requires a url to json data, e.g.:
       ForceGraph({url: "/my/data/json"});
+      optional can specify width and height
   */
 
-var w = 400,
-    h = 400,
-    fill = d3.scale.category20();
+  var options = {
+    'width': 400,
+    'height': 400,
+    'fill': d3.scale.category20()
+  };
+  $.extend(options, config);
+  console.log(options);
 
+  var vis = d3.select("#chart")
+    .append("svg:svg")
+      .attr("width", options.width)
+      .attr("height", options.height);
 
-var vis = d3.select("#chart")
-  .append("svg:svg")
-    .attr("width", w)
-    .attr("height", h);
-
-//  d3.json("force.json", function(json) {  original
-//    d3.json("/people/viaf:39398205/ego.json", function(json) {
   return d3.json(config.url, function(json) {
   var force = d3.layout.force()
       .charge(-120)
@@ -27,7 +29,7 @@ var vis = d3.select("#chart")
       .gravity(1)
       .nodes(json.nodes)
       .links(json.links)
-      .size([w, h])
+      .size([options.width, options.height])
       .start();
 
   var link = vis.selectAll("line.link")
@@ -47,7 +49,7 @@ var vis = d3.select("#chart")
       .attr("cx", function(d) { return d.x; })
       .attr("cy", function(d) { return d.y; })
       .attr("r", 5)
-      .style("fill", function(d) { return fill(d.type); })
+      .style("fill", function(d) { return options.fill(d.type); })
       .call(force.drag);
 
   node.append("svg:title")
