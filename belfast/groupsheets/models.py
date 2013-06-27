@@ -94,6 +94,10 @@ class RdfGroupSheet(rdflib.resource.Resource):
     def genre(self):
         return self.value(rdfns.SCHEMA_ORG.genre)
 
+    @property
+    def url(self):
+        return self.value(rdfns.SCHEMA_ORG.URL)
+
     # more complex properties: aggregate, other resources
 
     @property

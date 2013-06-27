@@ -154,6 +154,8 @@ class GroupsheetViewsTest(testutil.TestCase):
             response, self.groupsheet.title,
             msg_prefix='search results should include title for matching groupsheet')
 
+    # TODO: not currently testing rdf object or rdf-based list
+
 
 class FormatTeiTestCase(unittest.TestCase):
     # test tei_format template tag explicitly
