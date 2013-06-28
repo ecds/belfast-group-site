@@ -180,8 +180,13 @@ class RdfGroupSheet(rdflib.resource.Resource):
         return sources
 
 
-def get_rdf_groupsheets():
+def get_rdf_groupsheets(author=None):
+    # query rdf data to get a list of belfast group sheets
+    # optionally filter by author (takes a URI)
     g = rdf_data()
+    fltr = ''
+    if author is not None:
+        fltr = '. ?ms schema:author <%s>' % author
     res = g.query('''
         PREFIX schema: <%s>
         PREFIX rdf: <%s>
@@ -194,9 +199,10 @@ def get_rdf_groupsheets():
             ?ms rdf:type bibo:Manuscript .
             ?ms schema:author ?author .
             ?author schema:name ?name
+            %s
         } ORDER BY ?name
         ''' % (rdflib.XSD, rdflib.RDF, rdfns.BIBO, rdfns.SKOS,
-               rdfns.BELFAST_GROUP_URI)
+               rdfns.BELFAST_GROUP_URI, fltr)
     )
 
     # } ORDER BY ?authorLast
