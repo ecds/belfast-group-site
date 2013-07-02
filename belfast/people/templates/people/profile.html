@@ -45,11 +45,13 @@
 <ul class="nav nav-tabs" id="vizTab">
   <li class="active"><a href="#connections">Connections</a></li>
   <li><a href="#graph">Network Graph</a></li>
+  {% if groupsheets %}
+    <li><a href="#groupsheets">Group Sheets</a></li>
+  {% endif %}
 </ul>
 
 <div class="tab-content">
   <div class="tab-pane active" id="connections">
-{#    <h3>Connections</h3>#}
 
     <h4>People</h4>
     <ul>
@@ -74,7 +76,18 @@
 
   <div class="tab-pane" id="graph">
     {% include "people/ego_graph.html" %}
+  </div>
+
+  {% if groupsheets %}
+    <div class="tab-pane" id="groupsheets">
+        <ul>
+            {% for doc in groupsheets %}
+            <li>{% include 'groupsheets/snippets/list_groupsheet.html' %}</li>
+            {% endfor %}
+        </ul>
     </div>
+  {% endif %}
+
 </div>
 
 <script>

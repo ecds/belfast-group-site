@@ -7,6 +7,7 @@ import rdflib
 from belfast import rdfns
 from belfast.util import rdf_data
 from belfast.people.models import RdfPerson, BelfastGroup
+from belfast.groupsheets.models import get_rdf_groupsheets
 
 
 def list(request):
@@ -25,8 +26,7 @@ def init_person(id):
         raise Http404
 
     if idtype == 'viaf':
-        uri = 'http://viaf.org/viaf/%s/' % idnum
-        # NOTE: trailing slash not actually canonical, but is in current test data
+        uri = 'http://viaf.org/viaf/%s' % idnum
         graph = rdf_data()
         if (rdflib.URIRef(uri), rdflib.RDF.type, rdfns.SCHEMA_ORG.Person) in graph:
             person = RdfPerson(graph, rdflib.URIRef(uri))
@@ -40,7 +40,9 @@ def init_person(id):
 
 def profile(request, id):
     person = init_person(id)
-    return render(request, 'people/profile.html', {'person': person})
+    groupsheets = get_rdf_groupsheets(author=str(person.identifier))
+    return render(request, 'people/profile.html',
+        {'person': person, 'groupsheets': groupsheets})
 
 
 def egograph_js(request, id):

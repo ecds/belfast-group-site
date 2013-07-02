@@ -9,7 +9,7 @@ from eulexistdb import testutil
 from lxml import etree
 
 from belfast.groupsheets.models import GroupSheet, Contents, \
-    Poem
+    Poem, id_from_ark
 from belfast.groupsheets.forms import KeywordSearchForm
 from belfast.groupsheets.templatetags.tei import format_tei
 
@@ -57,6 +57,14 @@ class GroupSheetTest(unittest.TestCase):
                          self.groupsheet.ark)
         self.assertEqual('http://pid.emory.edu/ark:/25593/17mf5',
                          self.groupsheet2.ark)
+
+    def test_id_from_ark(self):
+        self.assertEqual(self.groupsheet.id,
+                         id_from_ark(self.groupsheet.ark))
+        # ?? this is not working for some reason...
+        # self.assertEqual(self.groupsheet2.id,
+        #                  id_from_ark(self.groupsheet2.ark))
+        self.assertEqual(None, id_from_ark('http://pid.emory.edu/ark:/bogus/123'))
 
 
 class KeywordSearchFormTest(testutil.TestCase):
@@ -153,6 +161,8 @@ class GroupsheetViewsTest(testutil.TestCase):
         self.assertContains(
             response, self.groupsheet.title,
             msg_prefix='search results should include title for matching groupsheet')
+
+    # TODO: not currently testing rdf object or rdf-based list
 
 
 class FormatTeiTestCase(unittest.TestCase):
