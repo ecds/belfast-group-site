@@ -11,6 +11,8 @@ urlpatterns = patterns('',
         namespace='groupsheets')),
     url(r'^people/', include('belfast.people.urls',
         namespace='people')),
+    url(r'^network/', include('belfast.network.urls',
+        namespace='network')),
     url(r'^', include('belfast.pages.urls')),
     # Examples:
     # url(r'^$', 'belfast.views.home', name='home'),
