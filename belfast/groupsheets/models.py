@@ -45,7 +45,9 @@ def id_from_ark(ark):
     # to allow linking within the current site based on an ARK
     try:
         return ArkIdentifier.objects.get(value=ark).id
-    except Exception:
+    except Exception as err:
+        logger.warn('Error attempting to retrieve TEI id for ARK %s : %s'
+                    % (ark, err))
         pass
 
 
