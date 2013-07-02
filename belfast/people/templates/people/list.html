@@ -9,7 +9,9 @@
 <ul>
 {% for person, rels in people.iteritems %}
     <li><a href="{% url 'people:profile' person.short_id %}">{{ person.fullname }}</a>
-      ({{ rels|join:', '}})
+      {% if rels %}
+        ({{ rels|join:', '}})
+      {% endif %}
      {# {{ person.fullname|slugify }} {{ person.short_id }} #}
    </li>
 {% endfor %}
