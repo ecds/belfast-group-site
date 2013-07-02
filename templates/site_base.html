@@ -47,6 +47,10 @@
                {% url 'bios' as bios_url %}
               <li{% if request.path = bios_url %} class="active"{% endif %}>
                  <a href="{{ bios_url }}">Biographies</a></li>
+
+               {% url 'network:full' as network_url %}
+              <li{% if request.path = network_url %} class="active"{% endif %}>
+                 <a href="{{ network_url }}">Network</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
