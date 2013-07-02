@@ -10,7 +10,8 @@ from belfast.groupsheets.models import RdfGroupSheet
 
 
 def full_js(request):
-    graph = network_data()
+    graph = network_data().copy()   # don't modify the original network
+
     rdfgraph = rdf_data()
     # filter graph by type of node
     types = ['Person', 'Organization', 'Place', 'BelfastGroupSheet']
