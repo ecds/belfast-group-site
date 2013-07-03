@@ -55,7 +55,8 @@ def full(request):
 
 
 def group_people(request):
-    return render(request, 'network/bg.html')
+    return render(request, 'network/bg.html',
+                  {'bg_uri': BELFAST_GROUP_URI})
 
 
 def group_people_js(request):

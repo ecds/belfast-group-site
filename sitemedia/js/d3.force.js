@@ -7,12 +7,14 @@ function ForceGraph(config) {
   /* minimally requires a url to json data, e.g.:
       ForceGraph({url: "/my/data/json"});
       optional can specify width and height
+      optionally takes a list of identifiers for nodes to highlight
   */
 
   var options = {
     'width': 400,
     'height': 400,
-    'fill': d3.scale.category20()
+    'fill': d3.scale.category20(),
+    'highlight': [],
   };
   $.extend(options, config);
 
@@ -84,7 +86,7 @@ function ForceGraph(config) {
         .attr("r", 5)
 // rough-cut at sizing node by degree (ish)
 //        .attr("r", function(d) {return 3 * Math.sqrt(d.weight || 1); })
-        .style("fill", function(d) { return options.fill(d.type); })
+        .style("fill", function(d) { return options.fill(d.type); });
 
     node.call(force.drag);
 
@@ -93,15 +95,21 @@ function ForceGraph(config) {
    var anchorNode = vis.selectAll("g.anchorNode")
       .data(force_labels.nodes()).enter()
         .append("svg:g")
-        .attr("class", "anchorNode");
+        .attr("class", function(d) {
+            var cls = "anchorNode";
+            if ($.inArray(d.node.id, options.highlight) != -1) {
+              cls += " highlight";
+            }
+            return cls;
+          })
+        .attr("id", function(d) { return d.node.id; });
 
     anchorNode.append("svg:circle").attr("r", 0).style("fill", "#FFF");
       anchorNode.append("svg:text").text(function(d, i) {
         return i % 2 === 0 ? "" : d.node.label;
       })
-      .attr('class', 'node-label')
-      .style("fill", "#adadad")
-      .style("font-family", "Arial").style("font-size", 12);
+      .attr('class', 'node-label');
+      // NOTE: styles configured in css for easier override on hover/highlight
 
   vis.style("opacity", 1e-6)
     .transition()

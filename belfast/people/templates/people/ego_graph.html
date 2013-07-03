@@ -16,5 +16,6 @@
         url: "{% url 'people:egograph-js' id=person.short_id %}",
         width: 800,
         height: 500,
+        highlight: ['{{ person.identifier }}']
       });
    </script>
