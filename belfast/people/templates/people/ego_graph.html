@@ -12,6 +12,8 @@
    <script type="text/javascript" src="{% static 'js/d3.force.js' %}"></script>
    <script type="text/javascript">
       ForceGraph({
-        url: "{% url 'people:egograph-js' id=person.short_id %}"
+        url: "{% url 'people:egograph-js' id=person.short_id %}",
+        width: 800,
+        height: 500,
       });
    </script>

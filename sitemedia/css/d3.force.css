@@ -8,3 +8,8 @@ line.link {
   stroke: #999;
   stroke-opacity: .6;
 }
+
+.node-label:hover {
+    fill: black !important;
+    font-weight: bold;
+}

@@ -15,7 +15,6 @@ function ForceGraph(config) {
     'fill': d3.scale.category20()
   };
   $.extend(options, config);
-  console.log(options);
 
   var vis = d3.select("#chart")
     .append("svg:svg")
@@ -24,12 +23,42 @@ function ForceGraph(config) {
 
   return d3.json(config.url, function(json) {
   var force = d3.layout.force()
-      .charge(-120)
-      .linkDistance(80)
-      .gravity(0.1)
+      .charge(-1000)
+      .linkDistance(120)
+      .gravity(0.5)   // 0.1 is the default
       .linkStrength(function(x) { return x.weight || 1; })
       .nodes(json.nodes)
       .links(json.links)
+      .size([options.width, options.height])
+      .start();
+
+  // force-adjusted labels
+  // based on http://bl.ocks.org/MoritzStefaner/1377729
+  var label_nodes = [];
+  var label_links = [];
+
+  // generate labels based on actual nodes
+  for(var i = 0; i < json.nodes.length; i++) {
+    // add twice: once to track the node
+    label_nodes.push({node: json.nodes[i]});
+    // and once to generate a label that will be bound to the node
+    label_nodes.push({node: json.nodes[i]});
+    // add a link between the node and its label
+    label_links.push({
+          source : i * 2,
+          target : i * 2 + 1,
+          weight : 1
+    });
+  }
+
+  // generate a secondary force-directed graph for the labels
+  var force_labels = d3.layout.force()
+      .nodes(label_nodes)
+      .links(label_links)
+      .gravity(0)
+      .linkDistance(12)
+      .linkStrength(15)
+      .charge(-50)
       .size([options.width, options.height])
       .start();
 
@@ -45,32 +74,96 @@ function ForceGraph(config) {
       .attr("x2", function(d) { return d.target.x; })
       .attr("y2", function(d) { return d.target.y; });
 
-  var node = vis.selectAll("circle.node")
+  var node = vis.selectAll("g.node")
       .data(json.nodes)
-    .enter().append("svg:circle")
+    .enter().append("svg:g")
       .attr("class", function(d) { return "node " + d.type; })
-      .attr("cx", function(d) { return d.x; })
-      .attr("cy", function(d) { return d.y; })
-      .attr("r", 5)
-      .style("fill", function(d) { return options.fill(d.type); })
-      .call(force.drag);
+      .style("fill", function(d) { return options.fill(d.type); });
 
-  node.append("svg:title")
-      .text(function(d) { return d.label; });
+    node.append("svg:circle")
+        .attr("r", 5)
+// rough-cut at sizing node by degree (ish)
+//        .attr("r", function(d) {return 3 * Math.sqrt(d.weight || 1); })
+        .style("fill", function(d) { return options.fill(d.type); })
+
+    node.call(force.drag);
+
+    var anchorLink = vis.selectAll("line.anchorLink").data(label_links);
+
+   var anchorNode = vis.selectAll("g.anchorNode")
+      .data(force_labels.nodes()).enter()
+        .append("svg:g")
+        .attr("class", "anchorNode");
+
+    anchorNode.append("svg:circle").attr("r", 0).style("fill", "#FFF");
+      anchorNode.append("svg:text").text(function(d, i) {
+        return i % 2 === 0 ? "" : d.node.label;
+      })
+      .attr('class', 'node-label')
+      .style("fill", "#adadad")
+      .style("font-family", "Arial").style("font-size", 12);
 
   vis.style("opacity", 1e-6)
     .transition()
       .duration(1000)
       .style("opacity", 1);
 
+
+      var updateLink = function() {
+        this.attr("x1", function(d) {
+          return d.source.x;
+        }).attr("y1", function(d) {
+          return d.source.y;
+        }).attr("x2", function(d) {
+          return d.target.x;
+        }).attr("y2", function(d) {
+          return d.target.y;
+        });
+
+      };
+
+      var updateNode = function() {
+        this.attr("transform", function(d) {
+          return "translate(" + d.x + "," + d.y + ")";
+        });
+
+      };
+
   force.on("tick", function() {
+    force_labels.start();
+
+    node.call(updateNode);
+
+
     link.attr("x1", function(d) { return d.source.x; })
         .attr("y1", function(d) { return d.source.y; })
         .attr("x2", function(d) { return d.target.x; })
         .attr("y2", function(d) { return d.target.y; });
 
-    node.attr("cx", function(d) { return d.x; })
-        .attr("cy", function(d) { return d.y; });
+        anchorNode.each(function(d, i) {
+          if (i % 2 === 0) {
+            //node: position where the real version of this node is
+            d.x = d.node.x;
+            d.y = d.node.y;
+          } else {
+
+            var b = this.childNodes[1].getBBox();
+
+            var diffX = d.x - d.node.x;
+            var diffY = d.y - d.node.y;
+            var dist = Math.sqrt(diffX * diffX + diffY * diffY);
+
+            var shiftX = b.width * (diffX - dist) / (dist * 2);
+            shiftX = Math.max(-b.width, Math.min(0, shiftX));
+            var shiftY = 5;
+            this.childNodes[1].setAttribute("transform", "translate(" + shiftX + "," + shiftY + ")");
+          }
+        });
+
+        anchorNode.call(updateNode);
+        link.call(updateLink);
+        anchorLink.call(updateLink);
+
   });
 });
 
