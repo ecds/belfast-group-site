@@ -1,8 +1,9 @@
 {% load static %}
 {# structured for inclusion as a profile tab #}
 
-<p>Force-directed ego graph of people, places, and organizations directly connected.
-  Colored by type.  Hover over a node to see the label.</p>
+<p>Force-directed ego graph of people, places, and organizations directly connected to
+  <b>{{ person.fullname }}</b>.
+  Nodes are colored by type.  Mouse over a label to see the text more clearly.</p>
   {# TODO: make ego-graph radius configurable / user-editable ? #}
 
  <div id="chart"></div>
@@ -12,6 +13,9 @@
    <script type="text/javascript" src="{% static 'js/d3.force.js' %}"></script>
    <script type="text/javascript">
       ForceGraph({
-        url: "{% url 'people:egograph-js' id=person.short_id %}"
+        url: "{% url 'people:egograph-js' id=person.short_id %}",
+        width: 800,
+        height: 500,
+        highlight: ['{{ person.identifier }}']
       });
    </script>
