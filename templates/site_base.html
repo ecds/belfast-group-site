@@ -42,9 +42,9 @@ by default; use page_rdf_type to override with a webpage subclass.
               {% url 'overview' as overview_url %}
               <li{% if request.path = overview_url %} class="active"{% endif %}>
                 <a href="{{ overview_url }}">Overview</a></li>
-              {% url 'groupsheets:list' as workshop_list %}
-              <li{% if request.path = overview_url %} class="active"{% endif %}>
-                 <a href="{{ workshop_list }}">Workshop List</a></li>
+              {% url 'groupsheets:list' as groupsheet_list %}
+              <li{% if request.path = groupsheet_list %} class="active"{% endif %}>
+                 <a href="{{ groupsheet_list }}">Group Sheets</a></li>
               {% url 'people:list' as people_list %}
               <li{% if request.path = people_list %} class="active"{% endif %}>
                  <a href="{{ people_list }}">People</a></li>
