@@ -22,6 +22,7 @@ class Poem(teimap._TeiBase):
     id = xmlmap.StringField('@xml:id')    # is this the correct id to use?
     title = xmlmap.StringField('tei:front/tei:titlePage/tei:docTitle/tei:titlePart[@type="main"]')
     body = xmlmap.NodeField('tei:body', xmlmap.XmlObject)
+    back = xmlmap.NodeField('tei:back', xmlmap.XmlObject)
     byline = xmlmap.StringField('tei:back/tei:byline')
 
 

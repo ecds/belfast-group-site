@@ -7,6 +7,7 @@
   {% if document.ark %}
     <link href="{{ document.ark }}" rel="bookmark"/>
   {% endif %}
+  <link rel="alternate" type="application/rdf+xml" href="{% url 'groupsheets:view' document.id %}RDF/"/>
   {# NOTE: not strictly an alternate (may contain multiple groupsheets), but close... #}
   <link rel="alternate" type="application/xml" href="{% url 'groupsheets:xml' document.document_name %}"/>
 {% endblock %}
@@ -14,8 +15,7 @@
 {% block content %}
 
 <div class="container-fluid">
-    <h1>{{ document.title }}</h1>
-
+    <h1 property="schema:name">{{ document.title }}</h1>
     <div class="span7">  {# NOTE: may want to shift into base site or a common template #}
 
     <div>
@@ -38,16 +38,17 @@
     </div>
 
     {% for poem in document.poems %}
-      <div class="poem">
+    {# NOTE: using ARK URL plus the poem id for poem URI #}
+      <div class="poem" typeof="schema:CreativeWork" about="{{ document.ark}}#{{poem.id }}">
         <a name="{{ poem.id }}"> </a>
         {% if poem.title %}
-          <h2>{{ poem.title }}</h2>
+          <h2 property="schema:name">{{ poem.title }}</h2>
         {% endif %}
         {{ poem.body|format_tei }}
-     </div>
-     {% if poem.byline %}
-       <p class="byline">{{ poem.byline }}</p>
-     {% endif %}
+        {% if poem.byline %}
+          <p class="byline">{{ poem.back|format_tei }}</p>
+        {% endif %}
+      </div>
     {% endfor %}
 
     <p class="pull-right"><a href="{% url 'groupsheets:xml' document.document_name %}" rel="alternate">TEI XML</a></p>

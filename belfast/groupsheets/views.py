@@ -18,7 +18,7 @@ def view_sheet(request, id):
     except DoesNotExist:
         raise Http404
     return render(request, 'groupsheets/display.html',
-                  {'document': gs})
+                  {'document': gs, 'page_rdf_url': getattr(gs, 'ark', None)})
 
 
 # TODO: throughout, would be good to use etag & last-modified headers
@@ -47,7 +47,7 @@ def list(request):
 def search(request):
     form = KeywordSearchForm(request.GET)
 
-    context = {'form': form}
+    context = {'form': form, 'page_rdf_type': 'schema:SearchResultsPage'}
     if form.is_valid():
         keywords = form.cleaned_data['keywords']
         # pagination todo (?)
