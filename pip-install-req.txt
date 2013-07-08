@@ -4,3 +4,4 @@ eulexistdb
 rdflib
 networkx
 eulcommon
+html5lib
