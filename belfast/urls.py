@@ -7,7 +7,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^$', pages_views.site_index, name='site-index'),
-    url(r'^group-sheets/', include('belfast.groupsheets.urls',
+    url(r'^groupsheets/', include('belfast.groupsheets.urls',
         namespace='groupsheets')),
     url(r'^people/', include('belfast.people.urls',
         namespace='people')),
