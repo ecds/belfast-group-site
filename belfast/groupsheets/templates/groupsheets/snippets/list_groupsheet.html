@@ -1,5 +1,5 @@
 {# snippet to display a single rdf groupsheet #}
-{% if doc.author %} <b>{{ doc.author.fullname }}</b> {% endif %}
+{% if doc.author and not profile %} <b>{{ doc.author.fullname }}</b> {% endif %}
 {% for t in doc.titles %}
 "{{ t }},"
 {% empty %}
