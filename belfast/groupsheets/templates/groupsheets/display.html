@@ -5,8 +5,9 @@
 
 {% block head-extras %}
   {% if document.ark %}
-    <link href="{{ document.ark }}" rel="bookmark">
+    <link href="{{ document.ark }}" rel="bookmark"/>
   {% endif %}
+  <link rel="alternate" type="application/xml" href="{% url 'groupsheets:xml' document.document_name %}"/>
 {% endblock %}
 
 {% block content %}
@@ -48,6 +49,7 @@
      {% endif %}
     {% endfor %}
 
+    <p class="pull-right"><a href="{% url 'groupsheets:xml' document.document_name %}" rel="alternate">TEI XML</a></p>
   </div>
 
 </div>

@@ -51,6 +51,12 @@ def id_from_ark(ark):
         pass
 
 
+class TeiDocument(XmlModel, teimap.Tei):
+    '''Simple top-level class to provide access to the full TEI document
+    (which may contain multiple groupsheets).'''
+    objects = Manager('/tei:TEI')
+
+
 class GroupSheet(XmlModel):
     ROOT_NS = teimap.TEI_NAMESPACE
     ROOT_NAMESPACES = {

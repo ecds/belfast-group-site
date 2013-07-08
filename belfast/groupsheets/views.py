@@ -1,21 +1,37 @@
 from django.shortcuts import render
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from eulexistdb.exceptions import DoesNotExist, ExistDBException
 import logging
 
 from belfast.groupsheets.forms import KeywordSearchForm
-from belfast.groupsheets.models import GroupSheet, get_rdf_groupsheets
+from belfast.groupsheets.models import GroupSheet, get_rdf_groupsheets, \
+    TeiDocument
 
 logger = logging.getLogger(__name__)
 
 
 def view_sheet(request, id):
     try:
-        gs = GroupSheet.objects.also('ark_list').get(id=id)
+        gs = GroupSheet.objects.also('ark_list',
+                                     'document_name') \
+                               .get(id=id)
     except DoesNotExist:
         raise Http404
     return render(request, 'groupsheets/display.html',
                   {'document': gs})
+
+
+# TODO: throughout, would be good to use etag & last-modified headers
+
+
+def teixml(request, name):
+    """Display the full TEI XML content for digitized groupsheets.
+
+    :param name: name of the document to be displayed
+    """
+    doc = TeiDocument.objects.get(document_name=name)
+    tei_xml = doc.serialize(pretty=True)
+    return HttpResponse(tei_xml, mimetype='application/xml')
 
 
 def list(request):
