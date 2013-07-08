@@ -16,9 +16,15 @@ from belfast.groupsheets.templatetags.tei import format_tei
 FIXTURE_DIR = path.join(path.dirname(path.abspath(__file__)), 'fixtures')
 
 
-class GroupSheetTest(unittest.TestCase):
-    # test xmlobject for TEI GroupSheet
+class GroupSheetTest(testutil.TestCase):
+    # for now, load all files in the fixture dir to eXist for testing
+    # NOTE: exist fixtures required to test generating id from ARK
+    exist_fixtures = {
+        'directory': FIXTURE_DIR,
+        # full-text index currently not need for these tests
+    }
 
+    # test xmlobject for TEI GroupSheet
     simmons_xml = path.join(FIXTURE_DIR, 'simmons1.xml')
 
     def setUp(self):
@@ -61,9 +67,8 @@ class GroupSheetTest(unittest.TestCase):
     def test_id_from_ark(self):
         self.assertEqual(self.groupsheet.id,
                          id_from_ark(self.groupsheet.ark))
-        # ?? this is not working for some reason...
-        # self.assertEqual(self.groupsheet2.id,
-        #                  id_from_ark(self.groupsheet2.ark))
+        self.assertEqual(self.groupsheet2.id,
+                         id_from_ark(self.groupsheet2.ark))
         self.assertEqual(None, id_from_ark('http://pid.emory.edu/ark:/bogus/123'))
 
 
