@@ -139,6 +139,23 @@ class GroupsheetViewsTest(testutil.TestCase):
                             html=True,
                             msg_prefix='groupsheet should include ARK link in header')
 
+    def test_tei_xml(self):
+        response = self.client.get(reverse('groupsheets:xml',
+                                           kwargs={'name': 'non-existent.xml'}))
+        self.assertEqual(
+            404, response.status_code,
+            'tei xml should return 404 for non-existent document')
+
+        response = self.client.get(reverse('groupsheets:xml',
+                                           kwargs={'name': 'simmons1.xml'}))
+        self.assertEqual(
+            200, response.status_code,
+            'tei xml should return 200 for loaded document')
+        self.assertEqual(
+            'application/xml', response.content_type,
+            'tei xml view should be returned as application/xml')
+        self.assertContains(response, '<head>POEMS BY JAMES SIMMONS</head>')
+
     def test_search(self):
         search_url = reverse('groupsheets:search')
         # no search term - should not error

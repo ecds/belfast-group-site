@@ -7,6 +7,7 @@
   {% if document.ark %}
     <link href="{{ document.ark }}" rel="bookmark"/>
   {% endif %}
+  {# NOTE: not strictly an alternate (may contain multiple groupsheets), but close... #}
   <link rel="alternate" type="application/xml" href="{% url 'groupsheets:xml' document.document_name %}"/>
 {% endblock %}
 

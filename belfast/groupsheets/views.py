@@ -29,7 +29,10 @@ def teixml(request, name):
 
     :param name: name of the document to be displayed
     """
-    doc = TeiDocument.objects.get(document_name=name)
+    try:
+        doc = TeiDocument.objects.get(document_name=name)
+    except DoesNotExist:
+        raise Http404
     tei_xml = doc.serialize(pretty=True)
     return HttpResponse(tei_xml, mimetype='application/xml')
 
