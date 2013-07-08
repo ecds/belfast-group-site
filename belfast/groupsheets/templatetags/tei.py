@@ -24,8 +24,6 @@ rend_attributes = {
     # 'doublequote': ('"', '"'),
 }
 
-# TODO: support rendX
-#   <l rend="indent12">Then one hot day when fields were rank</l>
 
 # tag names that can be converted to simple tags
 # - key is tag name (with namespace), value is a tuple of start/end tag
@@ -38,7 +36,48 @@ simple_tags = {
     #? bibl ?
 }
 
+# support for more complex tags
+
+# map tei name type attribute to rdf type
+name_types = {
+    'person': 'schema:Person',
+    'org': 'schema:Organization',
+    'place': 'schema:Place',
+}
+
+
+def format_name(node):
+    '''Convert a name tag with type and ref into corresponding RDFa.
+    '''
+    rdftype = name_types.get(node.get('type'), None)
+    uri = node.get('ref')
+    # for now, use mentions as a catch-all relation between text and name
+    rel = 'schema:mentions'
+    # if name is inside a byline, rel is author
+    if node.getparent().tag == '{%s}byline' % TEI_NAMESPACE:
+        rel = 'schema:author'
+
+    # TODO: or if no ref?
+    # if not a supported type, don't tag at all
+    if rdftype is None or uri is None:
+        return ('', '')
+
+    start = '''<span rel="%(rel)s">
+  <span about="%(uri)s" typeof="%(type)s">
+    <span property="schema:name">''' % \
+    {'rel': rel, 'uri': uri, 'type': rdftype}
+    end = '</span></span></span>'
+
+    return start, end
+
+
+other_tags = {
+    '{%s}name' % TEI_NAMESPACE: format_name
+}
+
+
 # TODO: how do we want to support add/gap/unclear etc ?
+
 
 @register.filter(needs_autoescape=True)
 def format_tei(value, autoescape=None):
@@ -99,13 +138,12 @@ def format_node(node, escape):
             # in some cases, rend style may be combined with another tag,
             # so simply nest the start and end tags
             start += '<span style="padding-left:%.1fem">' % \
-                    (float(rend[len('indent'):])/2)
+                     (float(rend[len('indent'):])/2)
             end = '</span>' + end
 
-
     # more complex tags
-    # elif node.tag in other_tags.keys():
-    #     start, end = other_tags[node.tag](node)
+    if node.tag in other_tags.keys():
+        start, end = other_tags[node.tag](node)
 
     # list of text contents to be compiled
     contents = [start]  # start tag
