@@ -12,6 +12,9 @@ GN = rdflib.Namespace('http://www.geonames.org/ontology#')
 DBPPROP = rdflib.Namespace('http://dbpedia.org/property/')
 FOAF = rdflib.Namespace('http://xmlns.com/foaf/0.1/')
 
+# local belfast group ontology
+BG = rdflib.Namespace('http://belfastgroup.library.emory.edu/ontologies/2013/6/belfastgroup/#')
+
 # not strictly a namespace, but needs to be shared...
 BELFAST_GROUP_URI = 'http://viaf.org/viaf/123393054'
 BELFAST_GROUP_URIREF = rdflib.URIRef(BELFAST_GROUP_URI)

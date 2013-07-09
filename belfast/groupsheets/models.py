@@ -163,11 +163,24 @@ class RdfGroupSheet(rdflib.resource.Resource):
         Key is URI,
         '''
         sources = {}
-        # TODO: convert into dict with name & access uri
+
+        # FIXME: for ormsby, this is displaying the series title in one case
+        # rather than the collection title (subsubseries... )
+
+        # TODO: refactor this so it is simpler
+
         for coll in self.graph.subjects(rdfns.SCHEMA_ORG.mentions, self.identifier):
             if (coll, rdflib.RDF.type, rdfns.ARCH.Collection) in self.graph:
                 name = self.graph.value(coll, rdfns.SCHEMA_ORG.name)
-                sources[unicode(coll)] = name  # title/name ?
+                # if a blank node (i.e. irishmisc), get the webpage with a url
+                if isinstance(coll, rdflib.BNode):
+                    for pcoll in self.graph.subjects(rdfns.SCHEMA_ORG.about, coll):
+                        if (pcoll, rdflib.RDF.type, rdfns.SCHEMA_ORG.WebPage) in self.graph:
+                            name = self.graph.value(pcoll, rdfns.SCHEMA_ORG.name).strip()
+                            sources[unicode(pcoll)] = name  # title/name ?
+
+                else:
+                    sources[unicode(coll)] = name  # title/name ?
             else:
                 # NOTE: may want to use transitive subjects here (?)
                 # FIXME: https: vs http: uri may be an issue!
@@ -196,22 +209,19 @@ def get_rdf_groupsheets(author=None):
     fltr = ''
     if author is not None:
         fltr = '. ?ms schema:author <%s>' % author
+
     res = g.query('''
-        PREFIX schema: <%s>
-        PREFIX rdf: <%s>
-        PREFIX bibo: <%s>
-        PREFIX skos: <%s>
+        PREFIX schema: <%(schema)s>
+        PREFIX rdf: <%(rdf)s>
         SELECT DISTINCT ?ms
         WHERE {
-            ?doc schema:about <%s> .
-            ?doc schema:mentions ?ms .
-            ?ms rdf:type bibo:Manuscript .
+            ?ms rdf:type <%(bg)s> .
             ?ms schema:author ?author .
             ?author schema:name ?name
-            %s
+            %(filter)s
         } ORDER BY ?name
-        ''' % (rdflib.XSD, rdflib.RDF, rdfns.BIBO, rdfns.SKOS,
-               rdfns.BELFAST_GROUP_URI, fltr)
+        ''' % {'schema': rdfns.SCHEMA_ORG, 'rdf': rdflib.RDF,
+               'bg': rdfns.BG.GroupSheet, 'filter': fltr}
     )
 
     # } ORDER BY ?authorLast
@@ -221,6 +231,6 @@ def get_rdf_groupsheets(author=None):
     # skos:prefLabel is in VIAF data but not directly related to viaf entity
 
     # FIXME: restricting to ms with author loses one anonymous sheet
-    # how to filter out non-group sheet irish misc content?
+
     gs = [RdfGroupSheet(g, r['ms']) for r in res]
     return gs
