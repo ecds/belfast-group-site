@@ -1,11 +1,14 @@
+from django.contrib import admin
 from django.conf.urls import patterns, include, url
+from django.views.generic import TemplateView
+
 from belfast.pages import views as pages_views
 
-# Uncomment the next two lines to enable the admin:
-from django.contrib import admin
+# enable django db-admin
 admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = patterns(
+    '',
     url(r'^$', pages_views.site_index, name='site-index'),
     url(r'^groupsheets/', include('belfast.groupsheets.urls',
         namespace='groupsheets')),
@@ -22,4 +25,11 @@ urlpatterns = patterns('',
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^tinymce/', include('tinymce.urls')),
+
+
+    # belfast group rdf ontology
+    #   http://belfastgroup.library.emory.edu/ontologies/2013/6/belfastgroup/
+    url(r'^ontologies/2013/6/belfastgroup/$',
+        TemplateView.as_view(template_name='bg-ontology.xml',
+        content_type='text/xml')),
 )
