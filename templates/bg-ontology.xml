@@ -10,23 +10,23 @@
 ]>
 
 
-<rdf:RDF xmlns="http://belfastgroup.library.emory.edu/ontologies/2013/6/belfastgroup#"
-     xml:base="http://belfastgroup.library.emory.edu/ontologies/2013/6/belfastgroup"
+<rdf:RDF xmlns="http://belfastgroup.library.emory.edu/ontologies/2013/6/belfastgroup/"
+     xml:base="http://belfastgroup.library.emory.edu/ontologies/2013/6/belfastgroup/"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:terms="http://purl.org/dc/terms/"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-    <owl:Ontology rdf:about="http://belfastgroup.library.emory.edu/ontologies/2013/6/belfastgroup">
-        <terms:description>An ontology for the &quot;Networking the Belfast Group&quot; project for use in identifying Belfast Group sheets as distinct from other types of manuscript and archival documents, and to describe literary connections between people.</terms:description>
+    <owl:Ontology rdf:about="http://belfastgroup.library.emory.edu/ontologies/2013/6/belfastgroup/">
         <terms:creator>Rebecca Sutton Koeser</terms:creator>
+        <terms:description>An ontology for the &quot;Networking the Belfast Group&quot; project for use in identifying Belfast Group sheets as distinct from other types of manuscript and archival documents, and to describe literary connections between people.</terms:description>
         <rdfs:comment>created with Protege-OWL</rdfs:comment>
         <owl:imports rdf:resource="http://purl.org/ontology/bibo/"/>
     </owl:Ontology>
+    
 
 
-
-    <!--
+    <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
     // Classes
@@ -34,12 +34,12 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
+    
 
 
+    <!-- http://belfastgroup.library.emory.edu/ontologies/2013/6/belfastgroup/#GroupSheet -->
 
-    <!-- http://belfastgroup.library.emory.edu/ontologies/2013/6/belfastgroup#GroupSheet -->
-
-    <owl:Class rdf:about="http://belfastgroup.library.emory.edu/ontologies/2013/6/belfastgroup#GroupSheet">
+    <owl:Class rdf:about="http://belfastgroup.library.emory.edu/ontologies/2013/6/belfastgroup/#GroupSheet">
         <rdfs:label>Belfast Group Sheet</rdfs:label>
         <rdfs:subClassOf rdf:resource="http://purl.org/ontology/bibo/Manuscript"/>
         <terms:description>A typescript of poetry, prose, or other writing presented or read at the Belfast Group.
