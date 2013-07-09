@@ -157,7 +157,7 @@ class GroupsheetViewsTest(testutil.TestCase):
             200, response.status_code,
             'tei xml should return 200 for loaded document')
         self.assertEqual(
-            'application/xml', response.content_type,
+            'application/xml', response['content-type'],
             'tei xml view should be returned as application/xml')
         self.assertContains(response, '<head>POEMS BY JAMES SIMMONS</head>')
 
