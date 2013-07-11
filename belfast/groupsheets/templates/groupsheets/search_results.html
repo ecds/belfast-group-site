@@ -4,42 +4,37 @@
 {% block page-subtitle %} | Search Results{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <h1>Search Results</h1>
+<h1>Search Results</h1>
 
-    <div class="span7">
+<div class="span7">
+  {% if form.errors %}
+    {% for field, msg in form.errors.iteritems %}
+      {{ msg }}
+    {% endfor %}
+  {% elif query_error %}
+  {# TODO: more detail here would probably be useful (could be anything) #}
+  <p>There was an error processing your search. </p>
+  {% else %}
 
-    {% if form.errors %}
-      {% for field, msg in form.errors.iteritems %}
-         {{ msg }}
-      {% endfor %}
-    {% elif query_error %}
-      {# TODO: more detail here would probably be useful (could be anything) #}
-      <p>There was an error processing your search. </p>
-    {% else %}
-
-    <p>Found {{ documents.count }} result{{ documents.count|pluralize }}
-        for <strong>{{ keywords }}</strong>.
-        Results sorted by relevance.</p>
+  <p>Found {{ documents.count }} result{{ documents.count|pluralize }}
+    for <strong>{{ keywords }}</strong>.
+    Results sorted by relevance.</p>
 
     {% for document in documents %}
-      <div>
-        {# note: relevance score available as document.fulltext_score #}
-        {% url 'groupsheets:view' id=document.id as document_url %}
-        <p><a href="{{ document_url }}">{{ document.title }}</a></p>
-        {# TODO: might be nice if groupsheet list and search result list were closer... #}
-        <ul>
-            {% for poem in document.poems %}
-            <li><a href="{{ document_url }}#{{ poem.id }}">{{ poem.title }}</a></li>
-            {% endfor %}
-        </ul>
-      </div>
+    <div>
+      {# note: relevance score available as document.fulltext_score #}
+      {% url 'groupsheets:view' id=document.id as document_url %}
+      <p><a href="{{ document_url }}">{{ document.title }}</a></p>
+      {# TODO: might be nice if groupsheet list and search result list were closer... #}
+      <ul>
+        {% for poem in document.poems %}
+        <li><a href="{{ document_url }}#{{ poem.id }}">{{ poem.title }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
     {% endfor %}
 
-    {% endif %}  {# valid form #}
-
-    </div>
-
+  {% endif %}  {# valid form #}
 </div>
 {% endblock %}
 

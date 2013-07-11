@@ -4,26 +4,32 @@ html, body {
  }
 
 /* Wrapper for page content to push down footer */
-.wrap {
+#wrap {
     min-height: 100%;
     height: auto !important;
     height: 100%;
     /* Negative indent footer by it's height */
-    margin: 40px auto -30px;
+    margin: 0px auto -30px;
+}
+
+#wrap > .container-fluid {
+    padding-top: 60px;
 }
 
 /* fixed height of the footer */
-.push, .footer {
+#push, #footer {
     height: 30px;
 }
-.footer {
+#footer {
     background-color: #f5f5f5;
 }
 /* adjust anchor links so they fall below site fixed header */
 a[name] {
-  padding-top: 100px;
-  margin-top: -100px;
+  padding-top: 50px;
+  margin-top: -50px;
   display: inline-block; /* required for webkit browsers */
+  text-decoration: none;
+  color: black;
 }
 
 .local-sidenav {
@@ -57,7 +63,7 @@ a[name] {
 @media (max-width: 767px) {
 
     /* adjust footer for responsive CSS */
-    .footer {
+    #footer {
         margin-left: -20px;
         margin-right: -20px;
         padding-left: 20px;
@@ -76,10 +82,11 @@ a[name] {
         top: 0;
     }
 
-     /* adjust page content wrapper */
-    .wrap {
-        margin-top: 0;
+    /* adjust page content margin */
+    #wrap > .container-fluid {
+        padding-top: 0;
     }
+}
 
 }
 

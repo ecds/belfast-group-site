@@ -20,7 +20,7 @@ by default; use page_rdf_type to override with a webpage subclass.
   </head>
   <body typeof="{{ page_rdf_type|default:'schema:Webpage' }}" about="{{ page_rdf_url|default:request.build_absolute_uri }}"
    {% block body-attrs %}{% endblock %}>
-    <div class="wrap">
+    <div id="wrap">
 
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
@@ -63,12 +63,15 @@ by default; use page_rdf_type to override with a webpage subclass.
         </div>
       </div>
     </div>
-    {% block content %}{% endblock %}
 
-  <div class="push"></div>
+    <div class="container-fluid">
+      {% block content %}{% endblock %}
+    </div>
+
+  <div id="push"></div>
   </div> {# end wrap #}
 
-    <div class="footer">
+    <div id="footer">
       <div class="container">
         <p class="pull-right">{{ SW_VERSION }}</p>
         <ul class="inline muted credit">
