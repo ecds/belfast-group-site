@@ -3,6 +3,7 @@ from django.http import Http404, HttpResponse
 from eulexistdb.exceptions import DoesNotExist, ExistDBException
 import logging
 
+from belfast import rdfns
 from belfast.groupsheets.forms import KeywordSearchForm
 from belfast.groupsheets.models import GroupSheet, get_rdf_groupsheets, \
     TeiDocument
@@ -11,14 +12,20 @@ logger = logging.getLogger(__name__)
 
 
 def view_sheet(request, id):
+    context = {
+        'extra_ns': {'bg': rdfns.BG},
+        'page_rdf_type': 'bg:GroupSheet'
+    }
     try:
         gs = GroupSheet.objects.also('ark_list',
                                      'document_name') \
                                .get(id=id)
     except DoesNotExist:
         raise Http404
-    return render(request, 'groupsheets/display.html',
-                  {'document': gs, 'page_rdf_url': getattr(gs, 'ark', None)})
+
+    context.update({'document': gs,
+                   'page_rdf_url': getattr(gs, 'ark', None)})
+    return render(request, 'groupsheets/display.html', context)
 
 
 # TODO: throughout, would be good to use etag & last-modified headers

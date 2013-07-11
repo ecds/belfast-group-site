@@ -4,7 +4,9 @@ NOTE: This site uses RDFa and schema.org vocabulary.  Every page will be declare
 by default; use page_rdf_type to override with a webpage subclass.
 {% endcomment %}
 <!DOCTYPE html>
-<html xmlns:schema="http://schema.org/">
+<html xmlns:schema="http://schema.org/"
+{# additional namespaces (primarly for semantic web/RDFa) #}
+{% for prefix, ns in extra_ns.iteritems %}xmlns:{{ prefix}}="{{ ns }}" {% endfor %}>
   <head>
     <title>{% block page-title %}The Belfast Group{% block page-subtitle %}{% endblock %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,8 +18,9 @@ by default; use page_rdf_type to override with a webpage subclass.
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
     {% block head-extras %}{% endblock %}
   </head>
-  <body typeof="{{ page_rdf_type|default:'schema:Webpage' }}" about="{{ page_rdf_url|default:request.build_absolute_uri }}">
-    <div id="wrap">
+  <body typeof="{{ page_rdf_type|default:'schema:Webpage' }}" about="{{ page_rdf_url|default:request.build_absolute_uri }}"
+   {% block body-attrs %}{% endblock %}>
+    <div class="wrap">
 
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
@@ -32,7 +35,7 @@ by default; use page_rdf_type to override with a webpage subclass.
 
             {# keyword search form #}
             {% if kwsearch_form %}
-            <form class="form-search navbar-text pull-right" action="{% url 'groupsheets:search' %}">
+            <form class="form-search navbar-search pull-right" action="{% url 'groupsheets:search' %}">
               {{ kwsearch_form.keywords }}
               <button type="submit" class="btn btn-primary"><i class="icon-search icon-white"></i></button>
             </form>
@@ -62,10 +65,10 @@ by default; use page_rdf_type to override with a webpage subclass.
     </div>
     {% block content %}{% endblock %}
 
-  <div id="push"></div>
+  <div class="push"></div>
   </div> {# end wrap #}
 
-    <div id="footer">
+    <div class="footer">
       <div class="container">
         <p class="pull-right">{{ SW_VERSION }}</p>
         <ul class="inline muted credit">

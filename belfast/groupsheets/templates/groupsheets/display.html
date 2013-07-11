@@ -12,38 +12,54 @@
   <link rel="alternate" type="application/xml" href="{% url 'groupsheets:xml' document.document_name %}"/>
 {% endblock %}
 
+{% block body-attrs %}data-spy="scroll" data-target=".local-sidenav" data-offset-top="200"{% endblock %}
+
 {% block content %}
 
 <div class="container-fluid">
-    <h1 property="schema:name">{{ document.title }}</h1>
-    <div class="span7">  {# NOTE: may want to shift into base site or a common template #}
+  <div class="span9">  {# NOTE: may want to shift into base site or a common template #}
 
+ <div class="row">
+
+  <div class="contents span2 local-sidenav">
+    {# use toc item titles for RDF title list #}
+    {% for item in document.toc.items %}
+      <meta property="dc:title" inlist="inlist" content="{{ item }}"/>
+    {% endfor %}
+
+    {# NOTE: there is a table of contents item list, but it does not include ids #}
+    {# generating toc from the actual poems instead #}
+    <ul class="nav nav-list sidenav affix">
+        <li>{{ document.toc.title }}</li> {# must be in list to stay fixed #}
+        {% for poem in document.poems %}
+          <li><a href="#{{ poem.id }}">{{ poem.title|default:'[untitled]' }}</a></li>
+        {% endfor %}
+    </ul>
+  </div>
+
+  <div class="span7">
+    <h1 property="schema:name">{{ document.title }}</h1>
     <div>
       <p><strong>Time period</strong>: {{ document.date }}</p>
-      <p><strong>Poet</strong>: {{ document.author }}</p>
+      {# NOTE: using byline from the first poem rather than document.author in order to generate RDF person info #}
+      <p><strong>Poet</strong>: {{ document.poems.0.back|format_tei }}</p>
+
       {% if document.ark %}
-      <p><strong>Permanent URL</strong>: <a href="{{ document.ark }}" rel="bookmark">{{ document.ark }}</a></p>
+      <p><strong>Permanent URL</strong>:
+          <a href="{{ document.ark }}" rel="bookmark schema:URL">{{ document.ark }}</a></p>
       {% endif %}
     </div>
 
-    <div class="contents">
-      <p>{{ document.toc.title }}</p>
-      <ul>
-{# NOTE: there is a table of contents item list, but it does not include ids #}
-{# generating toc from the actual poems instead #}
-        {% for poem in document.poems %}
-        <li><a href="#{{ poem.id }}">{{ poem.title|default:'[untitled]' }}</a></li>
-        {% endfor %}
-      </ul>
-    </div>
+
 
     {% for poem in document.poems %}
     {# NOTE: using ARK URL plus the poem id for poem URI #}
-      <div class="poem" typeof="schema:CreativeWork" about="{{ document.ark}}#{{poem.id }}">
-        <a name="{{ poem.id }}"> </a>
+      <div class="poem" typeof="schema:CreativeWork" about="{{ document.ark}}#{{poem.id }}" id="{{ poem.id }}">
+        <a name="{{ poem.id }}">
         {% if poem.title %}
           <h2 property="schema:name">{{ poem.title }}</h2>
         {% endif %}
+        </a>
         {{ poem.body|format_tei }}
         {% if poem.byline %}
           <p class="byline">{{ poem.back|format_tei }}</p>
