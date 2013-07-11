@@ -1,5 +1,6 @@
 {# snippet to display a single rdf groupsheet #}
-{% if doc.author and not profile %} <b>{{ doc.author.fullname }}</b> {% endif %}
+<p>
+  {% if doc.author and not profile %} <b>{{ doc.author.fullname }}</b> {% endif %}
 {% for t in doc.titles %}
 "{{ t }},"
 {% empty %}
@@ -8,12 +9,16 @@
 {% if doc.date %}{{ doc.date }}{% else %}no date{% endif %}.  {# TODO: format date for readability #}
 {# perhaps simply omit the no date since the majority are undated? #}
 {% if doc.num_pages %}({{ doc.num_pages }} page{{ doc.num_pages|pluralize }}){% endif %}
+</p>
 {% if doc.url and doc.groupsheet_id %}
-   <a href="{% url 'groupsheets:view' doc.groupsheet_id %}">[view]</a>
+   <p><a class="btn btn-primary btn-small" href="{% url 'groupsheets:view' doc.groupsheet_id %}">view digital edition</a></p>
 {% endif %}
-<p>Source:         {# source archives with a copy of this group sheet #}
-{% for uri, name in doc.sources.iteritems %}
-         {% if 'http' not in uri %}{{ uri }}{% endif %}
-  {% if 'http' in uri %}
-    <a href="{{ uri }}">{{ name }}</a>{% else %}{{ name }}{% endif %}{% if forloop.last %}. {% else %}; {% endif %}
-{% endfor %}</p>
+{% if doc.sources %}
+  <p><small>Source:         {# source archives with a copy of this group sheet #}
+    {% for uri, name in doc.sources.iteritems %}
+        {% if 'http' not in uri %}{{ uri }}{% endif %}
+        {% if 'http' in uri %}
+        <a href="{{ uri }}">{{ name }}</a>{% else %}{{ name }}{% endif %}{% if forloop.last %}. {% else %}; {% endif %}
+        {% endfor %}</small>
+  </p>
+{% endif %}

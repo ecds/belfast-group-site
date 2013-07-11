@@ -13,10 +13,10 @@ html, body {
 }
 
 /* fixed height of the footer */
-#push, #footer {
-    min-height: 30px;
+.push, .footer {
+    height: 30px;
 }
-#footer {
+.footer {
     background-color: #f5f5f5;
 }
 /* adjust anchor links so they fall below site fixed header */
@@ -38,24 +38,31 @@ a[name] {
     font-style:italic;
 }
 .linegroup {
-   margin: 1em 0px;
+   margin: 1em 0;
 }
 .linegroup p {
-    margin: 0px;
+    margin: 0;
 }
 .poem blockquote {
     border-left: none;
 }
 
+.groupsheet-list p {
+    margin: 0;
+}
+.groupsheet-list li {
+    padding-bottom: 10px;
+}
 /* Tablet  ------------------------- */
-  @media (max-width: 767px) {
+@media (max-width: 767px) {
 
     /* adjust footer for responsive CSS */
-    #footer {
+    .footer {
         margin-left: -20px;
         margin-right: -20px;
         padding-left: 20px;
         padding-right: 20px;
+        height: auto;
     }
 
     /* Sidenav */
@@ -71,7 +78,7 @@ a[name] {
 
      /* adjust page content wrapper */
     .wrap {
-        margin-top: 0px;
+        margin-top: 0;
     }
 
 }

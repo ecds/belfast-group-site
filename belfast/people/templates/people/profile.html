@@ -80,7 +80,7 @@
 
   {% if groupsheets %}
     <div class="tab-pane" id="groupsheets">
-        <ul>
+        <ul class="groupsheet-list">
             {% for doc in groupsheets %}
             <li>{% include 'groupsheets/snippets/list_groupsheet.html' with profile=True %}</li>
             {% endfor %}
