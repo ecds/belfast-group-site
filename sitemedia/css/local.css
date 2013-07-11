@@ -4,7 +4,7 @@ html, body {
  }
 
 /* Wrapper for page content to push down footer */
-#wrap {
+.wrap {
     min-height: 100%;
     height: auto !important;
     height: 100%;
@@ -14,21 +14,21 @@ html, body {
 
 /* fixed height of the footer */
 #push, #footer {
-    height: 30px;
+    min-height: 30px;
 }
 #footer {
     background-color: #f5f5f5;
 }
-/* adjust footer for responsive CSS */
-@media (max-width: 767px) {
-    #footer {
-        margin-left: -20px;
-        margin-right: -20px;
-        padding-left: 20px;
-        padding-right: 20px;
-    }
+/* adjust anchor links so they fall below site fixed header */
+a[name] {
+  padding-top: 100px;
+  margin-top: -100px;
+  display: inline-block; /* required for webkit browsers */
 }
 
+.local-sidenav {
+    padding: 20px 0;
+}
 
 /* group sheet + poetry formatting */
 .poem {
@@ -46,3 +46,34 @@ html, body {
 .poem blockquote {
     border-left: none;
 }
+
+/* Tablet  ------------------------- */
+  @media (max-width: 767px) {
+
+    /* adjust footer for responsive CSS */
+    #footer {
+        margin-left: -20px;
+        margin-right: -20px;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    /* Sidenav */
+    .local-sidenav {
+        width: auto;
+        margin-bottom: 20px;
+    }
+    .local-sidenav .affix {
+        position: static;
+        width: auto;
+        top: 0;
+    }
+
+     /* adjust page content wrapper */
+    .wrap {
+        margin-top: 0px;
+    }
+
+}
+
+
