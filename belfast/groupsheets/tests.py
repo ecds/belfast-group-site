@@ -135,7 +135,7 @@ class GroupsheetViewsTest(testutil.TestCase):
                      'document in template context should be a group sheet')
 
         # test that ARK is retrieved & displayed
-        permalink = '<a href="%(url)s" rel="bookmark">%(url)s</a>' % \
+        permalink = '<a href="%(url)s" rel="bookmark schema:URL">%(url)s</a>' % \
             {'url': self.groupsheet.ark}
         self.assertContains(response, permalink, html=True,
                             msg_prefix='groupsheet should include ARK link with rel=bookmark')
