@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import Http404, HttpResponse
+from django.views.decorators.http import last_modified
 from eulexistdb.exceptions import DoesNotExist, ExistDBException
 import logging
 
@@ -7,9 +8,20 @@ from belfast import rdfns
 from belfast.groupsheets.forms import KeywordSearchForm
 from belfast.groupsheets.models import GroupSheet, get_rdf_groupsheets, \
     TeiDocument
+from belfast.util import rdf_data_lastmodified, network_data_lastmodified
 
 logger = logging.getLogger(__name__)
 
+
+def rdf_lastmod(request, *args, **kwargs):
+    return rdf_data_lastmodified()
+
+
+def rdf_nx_lastmod(request, *args, **kwargs):
+    return max(rdf_data_lastmodified(), network_data_lastmodified())
+
+# TODO: add etag/last-modified headers for views based on single-document TEI
+# use document last-modification date in eXist (should be similar to findingaids code)
 
 def view_sheet(request, id):
     context = {
@@ -44,6 +56,7 @@ def teixml(request, name):
     return HttpResponse(tei_xml, mimetype='application/xml')
 
 
+@last_modified(rdf_lastmod)  # for now, list is based on rdf
 def list(request):
     # use rdf to generate a list of belfast group sheets
     results = get_rdf_groupsheets()

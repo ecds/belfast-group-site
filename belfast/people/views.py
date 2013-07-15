@@ -1,15 +1,26 @@
 from django.shortcuts import render
 from django.http import Http404, HttpResponse
+from django.views.decorators.http import last_modified
 import json
 from networkx.readwrite import json_graph
 import rdflib
 
 from belfast import rdfns
-from belfast.util import rdf_data
+from belfast.util import rdf_data, rdf_data_lastmodified, \
+    network_data_lastmodified
 from belfast.people.models import RdfPerson, BelfastGroup
 from belfast.groupsheets.models import get_rdf_groupsheets
 
 
+def rdf_lastmod(request, *args, **kwargs):
+    return rdf_data_lastmodified()
+
+
+def rdf_nx_lastmod(request, *args, **kwargs):
+    return max(rdf_data_lastmodified(), network_data_lastmodified())
+
+
+@last_modified(rdf_lastmod)  # for now, list is based on rdf
 def list(request):
     # display a list of people one remove from belfast group
     results = BelfastGroup.connected_people
@@ -38,6 +49,7 @@ def init_person(id):
     return person
 
 
+@last_modified(rdf_nx_lastmod)  # uses both rdf and gexf
 def profile(request, id):
     person = init_person(id)
     groupsheets = get_rdf_groupsheets(author=str(person.identifier))
@@ -45,6 +57,7 @@ def profile(request, id):
         {'person': person, 'groupsheets': groupsheets})
 
 
+@last_modified(rdf_nx_lastmod)  # uses both rdf and gexf
 def egograph_js(request, id):
     person = init_person(id)
     # TODO: possibly make ego-graph radius a parameter in future
@@ -55,6 +68,7 @@ def egograph_js(request, id):
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
+@last_modified(rdf_nx_lastmod)  # uses both rdf and gexf (?)
 def egograph(request, id):
     person = init_person(id)
     return render(request, 'people/ego_graph.html', {'person': person})
