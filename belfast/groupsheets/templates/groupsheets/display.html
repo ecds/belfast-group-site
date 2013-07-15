@@ -17,7 +17,7 @@
 {% block content %}
   <div class="row">
 
-  <div class="contents span3 local-sidenav">
+  <div class="contents span4 local-sidenav">
     {# use toc item titles for RDF title list #}
     {% for item in document.toc.items %}
       <meta property="dc:title" inlist="inlist" content="{{ item }}"/>
@@ -33,7 +33,7 @@
     </ul>
   </div> {# end sidenav #}
 
-  <div class="span6">
+  <div class="span5">
     <h1 property="schema:name">{{ document.title }}</h1>
     <div>
       <p><strong>Time period</strong>: {{ document.date }}</p>
