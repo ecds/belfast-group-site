@@ -131,6 +131,13 @@ class RdfOrganization(RdfEntity):
 class RdfPerson(RdfEntity):
     _org_type = RdfOrganization
 
+    @cached_property
+    def dbpedia_uri(self):
+        # same as
+        for res in self.objects(rdflib.OWL.sameAs):
+            if 'dbpedia.org' in res.identifier:
+                return res.identifier
+
     @property
     def name(self):
         # NOTE: would be better if we could use preferredLabel somehow
@@ -169,6 +176,15 @@ class RdfPerson(RdfEntity):
         'list of occupations via http://schema.org/jobTitle property'
         return list(self.objects(rdfns.SCHEMA_ORG.jobTitle))
 
+    @property
+    def same_as(self):
+        return list(self.objects(rdflib.OWL.sameAs))
+
+    @property
+    def description(self):
+        'http://schema.org/description, if available'
+        return self.value(rdfns.SCHEMA_ORG.description)
+
     @cached_property
     def locations(self):
         place_uris = list(self.objects(rdfns.SCHEMA_ORG.workLocation))
@@ -188,29 +204,17 @@ class RdfPerson(RdfEntity):
 
     @cached_property
     def dbpedia_description(self):
-        # TODO: grab same-as URIs at init so we can query directly (?)
-        # FIXME: why are these not returning any matches?
-        # print 'same as rels = ', list(self.objects(rdflib.OWL.sameAs))
-        # print 'same as rels = ', list(self.graph.objects(self.identifier.rstrip('/'),
-        #     rdflib.OWL.sameAs))
-        res = self.graph.query('''
-            PREFIX rdf: <%s>
-            PREFIX owl: <%s>
-            PREFIX dbpedia-owl: <%s>
-            SELECT ?abstract
-            WHERE {
-                <%s> owl:sameAs ?dbp .
-                ?dbp dbpedia-owl:abstract ?abstract
-                FILTER langMatches( lang(?abstract), "EN" )
-            }
-        ''' % (rdflib.RDF, rdflib.OWL, rdfns.DBPEDIA_OWL,
-               self.identifier.rstrip('/'))
-        )
-        # FIXME: discrepancy in VIAF uris - RDF has no trailing slash
+        if self.dbpedia_uri is not None:
+            for desc in self.graph.objects(subject=self.dbpedia_uri,
+                                           predicate=rdfns.DBPEDIA_OWL.abstract):
+                if desc.language == 'en':  # TODO: configurable (?)
+                    return desc
 
-        # TODO: filter by language
-        for r in res:
-            return r['abstract']
+    @cached_property
+    def wikipedia_url(self):
+        if self.dbpedia_uri is not None:
+            return self.graph.value(subject=self.dbpedia_uri,
+                                    predicate=rdfns.FOAF.isPrimaryTopicOf)
 
     # TODO: need access to groupsheets by this person
 
