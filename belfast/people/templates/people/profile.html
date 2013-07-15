@@ -34,9 +34,16 @@
     in <a href="{{ person.birthplace.identifier }}">{{ person.birthplace }}</a>{% endif %}.</p>
 {% endif %}
 
+{% if person.description %}
+ <p>{{ person.description }}
+    <small><i>(MARBL)</i></small> {# should be safe to assume for now ... #}
+    {# TODO: should really link to the findingaids where the description comes from #}
+ </p>
+{% endif %}
+
 {% if person.dbpedia_description %}
  <p>{{ person.dbpedia_description }}
-    <small><i>(DBpedia)</i></small></p>
+    <small><i>({% if person.wikipedia_url %}<a href="{{ person.wikipedia_url }}">Wikipedia</a>{% else %}Wikipedia{% endif %})</i></small></p>
 {% endif %}
 
 <ul class="nav nav-tabs" id="vizTab">
