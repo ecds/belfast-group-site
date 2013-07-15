@@ -1,6 +1,8 @@
 import glob
+from datetime import datetime
 import rdflib
 import logging
+import os
 from os import path
 import time
 import networkx as nx
@@ -10,6 +12,15 @@ from django.conf import settings
 from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
+
+
+def rdf_data_lastmodified():
+    # get a last modification time for rdf data, based on the
+    # most recently modified file
+    filelist = os.listdir(settings.RDF_DATA_DIR)
+    filelist = filter(lambda x: not os.path.isdir(x) and x.endswith('.xml'), filelist)
+    newest = max([os.stat(os.path.join(settings.RDF_DATA_DIR, x)).st_mtime for x in filelist])
+    return datetime.fromtimestamp(newest)
 
 
 def rdf_data():
@@ -50,8 +61,12 @@ def rdf_data():
     #     g.parse(infile)
 
 
-_NX_GRAPH = None
+def network_data_lastmodified():
+    # last modification time for nx network data, based on the gexf file
+    return datetime.fromtimestamp(os.stat(settings.GEXF_DATA).st_mtime)
 
+
+_NX_GRAPH = None
 
 def network_data():
     global _NX_GRAPH
