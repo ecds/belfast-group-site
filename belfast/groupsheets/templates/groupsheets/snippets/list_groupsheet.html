@@ -1,5 +1,6 @@
 {# snippet to display a single rdf groupsheet #}
 <p>
+  {# FIXME: should list author if different than profile name (e.g. Brendan Kennelly poems on Heaney groupsheet) #}
   {% if doc.author and not profile %} <b>{{ doc.author.fullname }}</b> {% endif %}
 {% for t in doc.titles %}
 "{{ t }},"
