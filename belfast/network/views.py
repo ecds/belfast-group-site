@@ -1,15 +1,16 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 import json
-from networkx.readwrite import json_graph
+from networkx.readwrite import json_graph, gexf
 import rdflib
+from StringIO import StringIO
 
 from belfast.util import network_data, rdf_data
 from belfast.rdfns import BELFAST_GROUP_URI
 from belfast.groupsheets.models import RdfGroupSheet
 
 
-def full_js(request):
+def _network_graph():
     graph = network_data().copy()   # don't modify the original network
 
     rdfgraph = rdf_data()
@@ -46,8 +47,22 @@ def full_js(request):
 
     print 'removed %d zero-degree nodes' % zeroes
 
+    return graph
+
+
+def full_js(request):
+    graph = _network_graph()
     data = json_graph.node_link_data(graph)
     return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+def full_gexf(request):
+    graph = _network_graph()
+    buf = StringIO()
+    gexf.write_gexf(graph, buf)
+    response = HttpResponse(buf.getvalue(), content_type='application/gexf+xml')
+    response['Content-Disposition'] = 'attachment; filename=belfastgroup.gexf'
+    return response
 
 
 def full(request):
