@@ -57,6 +57,7 @@
 <div class="tab-content">
   <div class="tab-pane active" id="connections">
 
+  {% if person.connected_people %}
     <h4>People</h4>
     <ul>
     {% for conn, rel in person.connected_people.iteritems %}
@@ -66,7 +67,9 @@
         </li>
     {% endfor %}
     </ul>
+  {% endif %}
 
+  {% if person.connected_organizations %}
     <h4>Organizations</h4>
     <ul>
     {% for conn, rel in person.connected_organizations.iteritems %}
@@ -76,6 +79,7 @@
         </li>
     {% endfor %}
     </ul>
+  {% endif %}
   </div>
 
   <div class="tab-pane" id="graph">
