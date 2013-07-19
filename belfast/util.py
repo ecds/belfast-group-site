@@ -23,12 +23,18 @@ def rdf_data_lastmodified():
     return datetime.fromtimestamp(newest)
 
 
+_rdf_data = None
+
 def rdf_data():
+    global _rdf_data
+    if _rdf_data is not None:
+        return _rdf_data
+
+    start = time.time()
     cache_key = 'BELFAST_RDF_GRAPH'
     timeout = 60 * 60 * 24
     graph = cache.get(cache_key)
     if graph is None:
-        start = time.time()
 
         graph = rdflib.Graph()
         filecount = 0
@@ -54,7 +60,11 @@ def rdf_data():
                      (filecount, time.time() - start, errcount))
 
         cache.set(cache_key, graph, timeout)
+    else:
+        logger.debug('Loaded RDF data from cache in %.02f sec' % \
+                     (time.time() - start))
 
+    _rdf_data = graph
     return graph
     # load related info (viaf, dbpedia, geonames)
     # for infile in glob.iglob(path.join(settings.RDF_DATA_DIR, 'viaf/*.rdf')):
