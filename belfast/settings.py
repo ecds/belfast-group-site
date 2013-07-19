@@ -76,7 +76,7 @@ TEMPLATE_LOADERS = (
 #     'django.template.loaders.eggs.Loader',
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE_CLASSES = [
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -85,7 +85,7 @@ MIDDLEWARE_CLASSES = (
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'belfast.rdf_middleware.RDFaMiddleware'
-)
+]
 
 ROOT_URLCONF = 'belfast.urls'
 
@@ -171,3 +171,5 @@ if django_nose is not None:
     NOSE_ARGS = ['--with-existdbsetup']
 
 
+if DEBUG:
+   MIDDLEWARE_CLASSES.append('belfast.profiling.ProfileMiddleware')
