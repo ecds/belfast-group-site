@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.views.decorators.http import last_modified
 import json
 import logging
+import networkx as nx
 from networkx.readwrite import json_graph, gexf
 import rdflib
 from StringIO import StringIO
@@ -70,6 +71,14 @@ def full_js(request):
     data = json_graph.node_link_data(graph)
     return HttpResponse(json.dumps(data), content_type='application/json')
 
+
+@last_modified(rdf_nx_lastmod)
+def adjacency_js(request):
+    graph = _network_graph()
+    matrix = nx.linalg.graphmatrix.adjacency_matrix(graph)
+    return HttpResponse(json.dumps(matrix.tolist()), content_type='application/json')
+
+
 @last_modified(rdf_nx_lastmod)
 def full_gexf(request):
     # generate same network graph as gexf for download/use in tools like gephi
@@ -80,14 +89,25 @@ def full_gexf(request):
     response['Content-Disposition'] = 'attachment; filename=belfastgroup.gexf'
     return response
 
+
 @last_modified(rdf_nx_lastmod)
-def full(request):
+def force_graph(request):
+    # force directed graph of entire network
     return render(request, 'network/graph.html')
+
+
+@last_modified(rdf_nx_lastmod)
+def chord_diagram(request):
+    # circular chord chart of entire network
+    return render(request, 'network/chord.html')
+
 
 @last_modified(rdf_nx_lastmod)
 def group_people(request):
+    # graph of just people directly connected to the belfast group
     return render(request, 'network/bg.html',
                   {'bg_uri': BELFAST_GROUP_URI})
+
 
 @last_modified(rdf_nx_lastmod)
 def group_people_js(request):

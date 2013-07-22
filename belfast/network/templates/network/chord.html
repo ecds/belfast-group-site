@@ -1,0 +1,32 @@
+{% extends 'site_base.html' %}
+{% load static %}
+
+{% block page-subtitle %} | Network Chord Diagram{% endblock %}
+
+{% block content %}
+<p>Chord diagram of people, places, and organizations in the network.
+{#   (Graph is weighted, and nodes of zero-degree have been omitted.)  #}
+  Mouse over the smaller, unlabeled sections to see the name.</p>
+
+ <div id="chart"></div>
+
+  <script src="{% static 'js/d3.min.js' %}" charset="utf-8"></script>
+  <link type="text/css" href="{% static 'css/d3.chord.css' %}" rel="stylesheet" media="screen"/>
+   <script type="text/javascript" src="{% static 'js/d3.chord.js' %}"></script>
+   <script type="text/javascript">
+/*      ForceGraph({
+        url: "{% url 'network:full-js' %}",
+        width: 1000,
+        height: 650,
+      });*/
+      ChordDiagram({
+        matrix: "{% url 'network:adjacency-js' %}",
+        nodes: "{% url 'network:full-js' %}",
+      });
+
+      // CircularBundle({
+      //   url: "{% url 'network:full-js' %}",
+      // });
+
+   </script>
+{% endblock %}
