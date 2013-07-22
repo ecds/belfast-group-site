@@ -59,6 +59,11 @@ a[name] {
 .groupsheet-list li {
     padding-bottom: 10px;
 }
+
+.description {
+    white-space: pre-line;
+}
+
 /* Tablet  ------------------------- */
 @media (max-width: 767px) {
 

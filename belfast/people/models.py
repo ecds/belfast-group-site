@@ -183,7 +183,7 @@ class RdfPerson(RdfEntity):
     @property
     def description(self):
         'http://schema.org/description, if available'
-        return self.value(rdfns.SCHEMA_ORG.description)
+        return self.value(rdfns.SCHEMA_ORG.description).strip()
 
     @cached_property
     def locations(self):
