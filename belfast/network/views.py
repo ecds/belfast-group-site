@@ -11,6 +11,7 @@ from belfast.util import network_data, rdf_data,  \
     rdf_data_lastmodified, network_data_lastmodified
 from belfast.rdfns import BELFAST_GROUP_URI
 from belfast.groupsheets.models import RdfGroupSheet
+from belfast.people.models import RdfOrganization
 
 
 logger = logging.getLogger(__name__)
@@ -91,53 +92,7 @@ def group_people(request):
 
 @last_modified(rdf_nx_lastmod)
 def group_people_js(request):
-    # FIXME: significant overlap with full_js above
-    graph = network_data().copy()   # don't modify the original network
-
-    rdfgraph = rdf_data()
-    # restrict to people and belfast group ONLY
-    zeroes = 0
-    # connect groupsheet authors to the group
-    for n in graph.nodes():
-        # use groupsheets to infer a connection between the author
-        # of the groupsheet and the group itself
-        if 'type' in graph.node[n] and graph.node[n]['type'] == 'BelfastGroupSheet':
-
-            sheet = RdfGroupSheet(rdfgraph, rdflib.URIRef(n))
-            # FIXME: error handling when author is not in the graph?
-            # should probably at least log this...
-            if sheet.author and unicode(sheet.author.identifier) in graph:
-                graph.add_edge(unicode(sheet.author.identifier),
-                               BELFAST_GROUP_URI, weight=4)
-
-            # remove the groupsheet itself from the network, to avoid
-            # cluttering up the graph with too much information
-            #graph.add_edge(n, BELFAST_GROUP_URI, weight=5)
-            graph.remove_node(n)
-
-    # now filter to just belfast group & people
-    for n in graph.nodes():
-        if n == BELFAST_GROUP_URI:
-            # cheating here (something in FA code is wrong)
-            graph.node[n]['type'] = 'Organization'
-            continue
-
-        if ('type' not in graph.node[n] or
-           graph.node[n]['type'] != 'Person'):
-            graph.remove_node(n)
-
-    # remove any edges that don't involve the belfast group
-    # FIXME: this makes the graph *very* small
-    for edge in graph.edges():
-        if BELFAST_GROUP_URI not in edge:
-            graph.remove_edge(*edge)
-
-    # AFTER filtering by type, filter out 0-degree nodes
-    for n in graph.nodes():
-        if len(graph.in_edges(n)) == 0 and len(graph.out_edges(n)) == 0:
-            zeroes += 1
-            graph.remove_node(n)
-    logger.info('removed %d zero-degree nodes' % zeroes)
-
-    data = json_graph.node_link_data(graph)
+    belfast_group = RdfOrganization(network_data().copy(), BELFAST_GROUP_URI)
+    ego_graph = belfast_group.ego_graph(radius=1, types=['Person'])
+    data = json_graph.node_link_data(ego_graph)
     return HttpResponse(json.dumps(data), content_type='application/json')
