@@ -25,16 +25,16 @@ def rdf_nx_lastmod(request, *args, **kwargs):
     return max(rdf_data_lastmodified(), network_data_lastmodified())
 
 
-def _network_graph():
+def _network_graph(min_degree=1, **kwargs):
     graph = network_data().copy()   # don't modify the original network
 
     rdfgraph = rdf_data()
     # filter graph by type of node
     types = ['Person', 'Organization', 'Place', 'BelfastGroupSheet']
-    zeroes = 0
+
     for n in graph.nodes():
-        if 'type' not in graph.node[n] or \
-           graph.node[n]['type'] not in types:
+        if ('type' not in graph.node[n] or \
+           graph.node[n]['type'] not in types) :
             graph.remove_node(n)
             continue
 
@@ -54,29 +54,40 @@ def _network_graph():
             #graph.add_edge(n, BELFAST_GROUP_URI, weight=5)
             graph.remove_node(n)
 
-    # AFTER filtering by type, filter out 0-degree nodes
+    # AFTER filtering by type, filter out by requested minimum degree
+
+    removed = 0
     for n in graph.nodes():
-        if len(graph.in_edges(n)) == 0 and len(graph.out_edges(n)) == 0:
-            zeroes += 1
+        if graph.degree(n) < min_degree:
+            removed += 1
             graph.remove_node(n)
 
-    logger.info('removed %d zero-degree nodes' % zeroes)
+    logger.info('removed %d nodes with degree less than %d' % (removed, min_degree))
 
     return graph
 
 
 @last_modified(rdf_nx_lastmod)
-def full_js(request):
-    graph = _network_graph()
-    data = json_graph.node_link_data(graph)
-    return HttpResponse(json.dumps(data), content_type='application/json')
+def full_js(request, mode):
+    # mode options:
+    #  full (node & link data) or adjacency (adjacency matrix)
 
+    # optionally filter by minimum degree
+    min_degree =  request.GET.get('min_degree', None)
+    filter = {}
+    if min_degree:
+        filter['min_degree'] = int(min_degree)
 
-@last_modified(rdf_nx_lastmod)
-def adjacency_js(request):
-    graph = _network_graph()
-    matrix = nx.linalg.graphmatrix.adjacency_matrix(graph)
-    return HttpResponse(json.dumps(matrix.tolist()), content_type='application/json')
+    graph = _network_graph(**filter)
+    if mode == 'full':
+        # standard nodes & links data
+        data = json_graph.node_link_data(graph)
+        content = json.dumps(data)
+    if mode == 'adjacency':
+        # adjacency matrix for generating chord diagram
+        matrix = nx.linalg.graphmatrix.adjacency_matrix(graph)
+        content = matrix.tolist()
+    return HttpResponse(content, content_type='application/json')
 
 
 @last_modified(rdf_nx_lastmod)

@@ -12,9 +12,9 @@ function ChordDiagram(config) {
   var options = {
     'width': 720,
     'height': 720,
-    // FIXME: not enough colors to distinguish individuals
-    // coloring by type only for now...
     'fill': d3.scale.category20(),
+    // NOTE: assigning separate color by id for now,
+    // but if dataset is large enough should probably be by category
     'highlight': [],
   };
   $.extend(options, config);
@@ -58,7 +58,8 @@ return d3.json(config.nodes, function(data) {
         .data(layout.groups)
       .enter().append("g")
         .attr("class", "group")
-        .on("mouseover", mouseover);
+        .on("mouseover", mouseover)
+        .on("mouseout", mouseout);
 
     // Add a mouseover title.
     group.append("title").text(function(d, i) {
@@ -69,7 +70,7 @@ return d3.json(config.nodes, function(data) {
     var groupPath = group.append("path")
         .attr("id", function(d, i) { return "group" + i; })
         .attr("d", arc)
-    .style("fill", function(d, i) { return options.fill(data.nodes[i].type); });
+    .style("fill", function(d, i) { return options.fill(data.nodes[i].id); });  // or use node.type
 
     // Add a text label.
     var groupText = group.append("text")
@@ -90,24 +91,17 @@ return d3.json(config.nodes, function(data) {
         .data(layout.chords)
       .enter().append("path")
         .attr("class", "chord")
-        .style("fill", function(d, i) { return options.fill(data.nodes[d.source.index].type); })
+        .style("fill", function(d, i) { return options.fill(data.nodes[d.source.index].id); })  // or node.type
         .attr("d", path);
-
-    // from the example: Add an elaborate mouseover title for each chord.
-    // chord.append("title").text(function(d) {
-    //   return cities[d.source.index].name
-    //       + " → " + cities[d.target.index].name
-    //       + ": " + formatPercent(d.source.value)
-    //       + "\n" + cities[d.target.index].name
-    //       + " → " + cities[d.source.index].name
-    //       + ": " + formatPercent(d.target.value);
-    // });
 
     function mouseover(d, i) {
       chord.classed("fade", function(p) {
-        return p.source.index != i
-            && p.target.index != i;
+        return p.source.index != i && p.target.index != i;
       });
+    }
+    // chord example doesn't need this for some reason... (?)
+    function mouseout(d, i) {
+      chord.classed("fade", false);
     }
   });  // matrix data
 }); // node info
