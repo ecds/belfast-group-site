@@ -5,3 +5,7 @@ rdflib
 networkx
 eulcommon
 html5lib
+
+# for graph matrices?
+numpy
+#scipy (?)
