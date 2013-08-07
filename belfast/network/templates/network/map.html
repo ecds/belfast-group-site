@@ -1,0 +1,40 @@
+{% extends 'site_base.html' %}
+{% load static %}
+
+{% block page-subtitle %} | Places in the Network{% endblock %}
+
+{% block head-extras %}
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
+{# <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script> #}
+<script type="text/javascript" src="{% static 'js/jquery.ui.map.min.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+<p>A map of all places referenced in our data specific to
+  the Belfast Group and the people associated with it.</p>
+
+
+<div id="map_canvas" style="border:1px solid black;width:75%;height:80%;position:absolute">
+
+<br/>
+</div>
+
+<script type="text/javascript">
+
+ $('#map_canvas').gmap().bind('init', function() {
+  // This URL won't work on your localhost, so you need to change it
+  // see http://en.wikipedia.org/wiki/Same_origin_policy
+  $.getJSON("{% url 'network:map-js' %}", function(data) {
+    $.each( data.markers, function(i, marker) {
+      $('#map_canvas').gmap('addMarker', {
+        'position': new google.maps.LatLng(marker.latitude, marker.longitude),
+        'bounds': true
+      }).click(function() {
+        $('#map_canvas').gmap('openInfoWindow', { 'content': marker.content }, this);
+      });
+    });
+  });
+});
+</script>
+{% endblock %}
