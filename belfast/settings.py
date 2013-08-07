@@ -171,5 +171,5 @@ if django_nose is not None:
     NOSE_ARGS = ['--with-existdbsetup']
 
 
-if DEBUG:
-   MIDDLEWARE_CLASSES.append('belfast.profiling.ProfileMiddleware')
+#if DEBUG:
+   #MIDDLEWARE_CLASSES.append('belfast.profiling.ProfileMiddleware')
