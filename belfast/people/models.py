@@ -243,7 +243,11 @@ RdfOrganization._person_type = RdfPerson
 RdfOrganization._org_type = RdfOrganization
 RdfPerson._person_type = RdfPerson
 
-BelfastGroup = RdfOrganization(rdf_data(), rdfns.BELFAST_GROUP_URIREF)
+# NOTE: this is forcing rdf graph load every restart
+#BelfastGroup = RdfOrganization(rdf_data(), rdfns.BELFAST_GROUP_URIREF)
+
+def BelfastGroup():
+  return RdfOrganization(rdf_data(), rdfns.BELFAST_GROUP_URIREF)
 
 
 # deprecated; this is slow, use BelfastGroup.connected_people instead

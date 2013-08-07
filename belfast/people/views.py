@@ -23,7 +23,7 @@ def rdf_nx_lastmod(request, *args, **kwargs):
 @last_modified(rdf_lastmod)  # for now, list is based on rdf
 def list(request):
     # display a list of people one remove from belfast group
-    results = BelfastGroup.connected_people
+    results = BelfastGroup().connected_people
     return render(request, 'people/list.html',
                   {'people': results})
 
