@@ -12,7 +12,7 @@ from belfast.util import network_data, rdf_data,  \
     rdf_data_lastmodified, network_data_lastmodified
 from belfast.rdfns import BELFAST_GROUP_URI
 from belfast.groupsheets.models import RdfGroupSheet
-from belfast.people.models import RdfOrganization
+from belfast.people.models import RdfOrganization, find_places
 
 
 logger = logging.getLogger(__name__)
@@ -127,3 +127,28 @@ def group_people_js(request):
     ego_graph = belfast_group.ego_graph(radius=1, types=['Person'])
     data = json_graph.node_link_data(ego_graph)
     return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+
+def map(request):
+    return render(request, 'network/map.html')
+
+def map_js(request):
+    places = find_places()
+    markers = []
+    for pl in places:
+        # for now, just skip places w/o lat & long
+        # because we won't be able to map them anyway
+        if not pl.latitude or not pl.longitude:
+            continue
+
+        info = {
+            'latitude': pl.latitude,
+            'longitude': pl.longitude,
+            'title': unicode(pl),
+            'content': unicode(pl),   # text content when you click on a marker
+        }
+        markers.append(info)
+    map_data = {'markers': markers}
+    return HttpResponse(json.dumps(map_data), content_type='application/json')
+

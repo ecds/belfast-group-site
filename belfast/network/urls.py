@@ -9,4 +9,6 @@ urlpatterns = patterns('',
     url(r'^full.gexf$', views.full_gexf, name='full-gexf'),
     url(r'^belfast-group/$', views.group_people, name='bg'),
     url(r'^belfast-group.json$', views.group_people_js, name='bg-js'),
+    url(r'^map/$', views.map, name='map'),
+    url(r'^map.json$', views.map_js, name='map-js'),
 )

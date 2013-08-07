@@ -4,9 +4,14 @@
 {% block page-subtitle %} | Network Graph{% endblock %}
 
 {% block content %}
-<p>See also a network graph of <a href="{% url 'network:bg' %}">people connected to
-  the Belfast Group</a> or a
-  <a href="{% url 'network:chord' %}">chord diagram of the network</a>.</p>
+<div>See also:
+  <ul>
+    <li><a href="{% url 'network:bg' %}">a network graph of people connected to
+  the Belfast Group</a></li>
+  <li><a href="{% url 'network:chord' %}">a chord diagram of the network</a></li>
+  <li><a href="{% url 'network:map' %}">a map of places connected to the network</a></li>
+</ul>
+</div>
 
 <p>Force-directed network graph people, places, and organizations.
    (Graph is weighted, and nodes of zero-degree have been omitted.)

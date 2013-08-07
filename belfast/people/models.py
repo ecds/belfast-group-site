@@ -9,17 +9,6 @@ from belfast.util import rdf_data, network_data, cached_property
 logger = logging.getLogger(__name__)
 
 
-class RdfLocation(rdflib.resource.Resource):
-
-    @property
-    def name(self):
-        return self.value(rdfns.SCHEMA_ORG.name)
-
-    def __unicode__(self):
-        return self.value(rdfns.GN.name) or self.value(rdfns.DBPPROP.name) \
-            or self.graph.preferredLabel(self) \
-            or self.name or self.identifier
-
 
 class RdfEntity(rdflib.resource.Resource):
     # base class with common functionality for person, org
@@ -66,6 +55,10 @@ class RdfEntity(rdflib.resource.Resource):
         :class:`rdflib.resource.Resource` to initialize the entity as.'''
         network = network_data()
         graph = rdf_data()
+
+        if self.nx_node_id not in network.nodes():
+            return {}
+
         # this also works...
         # neighbors = network.neighbors(self.nx_node_id)
         ego_graph = self.ego_graph()
@@ -122,6 +115,31 @@ class RdfEntity(rdflib.resource.Resource):
         logger.debug('Found %d organizations in %.02f sec' % (len(conn),
                      time.time() - start))
         return conn
+
+
+class RdfLocation(RdfEntity):
+
+    @property
+    def name(self):
+        return self.value(rdfns.SCHEMA_ORG.name)
+
+    def __unicode__(self):
+        return self.value(rdfns.GN.name) or self.value(rdfns.DBPPROP.name) \
+            or self.graph.preferredLabel(self) \
+            or self.name or self.identifier
+
+    @property
+    def latitude(self):
+        val = self.value(rdfns.GEO.lat)
+        if val is not None:
+            return float(unicode(val))
+
+    @property
+    def longitude(self):
+        val = self.value(rdfns.GEO.long)
+        if val is not None:
+            return float(unicode(val))
+
 
 
 class RdfOrganization(RdfEntity):
@@ -266,4 +284,8 @@ def get_belfast_people():
     people = [RdfPerson(g, r['person']) for r in res]
     return people
 
+def find_places():
+    g = rdf_data()
+    return [RdfLocation(g, subj) for subj in g.subjects(predicate=rdflib.RDF.type,
+                                                       object=rdfns.SCHEMA_ORG.Place)]
 
