@@ -83,12 +83,11 @@ def full_js(request, mode):
     if mode == 'full':
         # standard nodes & links data
         data = json_graph.node_link_data(graph)
-        content = json.dumps(data)
     if mode == 'adjacency':
         # adjacency matrix for generating chord diagram
         matrix = nx.linalg.graphmatrix.adjacency_matrix(graph)
-        content = matrix.tolist()
-    return HttpResponse(content, content_type='application/json')
+        data = matrix.tolist()
+    return HttpResponse(json.dumps(data), content_type='application/json')
 
 
 @last_modified(rdf_nx_lastmod)
@@ -124,7 +123,7 @@ def group_people(request):
 @last_modified(rdf_nx_lastmod)
 def group_people_js(request):
     belfast_group = RdfOrganization(network_data().copy(), BELFAST_GROUP_URI)
-    ego_graph = belfast_group.ego_graph(radius=1, types=['Person'])
+    ego_graph = belfast_group.ego_graph(radius=1, types=['Person', 'Organization'])
     data = json_graph.node_link_data(ego_graph)
     return HttpResponse(json.dumps(data), content_type='application/json')
 
@@ -133,6 +132,8 @@ def group_people_js(request):
 def map(request):
     return render(request, 'network/map.html')
 
+
+@last_modified(rdf_lastmod)
 def map_js(request):
     places = find_places()
     markers = []
