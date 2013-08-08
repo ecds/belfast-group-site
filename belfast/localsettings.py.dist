@@ -22,6 +22,15 @@ DATABASES = {
         'PASSWORD': '',
         'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '',                      # Set to empty string for default.
+    },
+    # separate database to store rdf data via sqlalchemy; assuming mysql
+    'rdf': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': o',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
     }
 }
 

@@ -5,6 +5,8 @@ rdflib
 networkx
 eulcommon
 html5lib
+progressbar
+git+https://github.com/RDFLib/rdflib-sqlalchemy#egg=rdflib-sqlalchemy
 
 # for graph matrices?
 numpy
