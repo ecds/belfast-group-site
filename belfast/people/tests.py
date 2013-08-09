@@ -5,7 +5,7 @@ from networkx.readwrite import gexf
 from os import path
 import rdflib
 
-from belfast.people.models import RdfPerson, RdfLocation, RdfOrganization
+from belfast.people.rdfmodels import RdfPerson, RdfLocation, RdfOrganization
 
 FIXTURE_DIR = path.join(path.dirname(path.abspath(__file__)), 'fixtures')
 
@@ -20,8 +20,8 @@ class PeopleViewsTest(TestCase):
         self.person = RdfPerson(self.graph,
                                 rdflib.URIRef('http://viaf.org/viaf/39398205/'))
 
-    @patch('belfast.people.models.network_data')
-    @patch('belfast.people.models.rdf_data')
+    @patch('belfast.people.rdfmodels.network_data')
+    @patch('belfast.people.rdfmodels.rdf_data')
     def test_profile(self, mockrdf, mocknx):
         # test against fixture rdf/gexf data
         mockrdf.return_value = self.graph
@@ -126,8 +126,8 @@ class RdfPersonTest(TestCase):
         self.assertEqual('Michael Longley, CBE (born 27 July 1939) is a Northern Irish poet from Belfast.',
                          unicode(self.person.dbpedia_description))
 
-    @patch('belfast.people.models.network_data')
-    @patch('belfast.people.models.rdf_data')
+    @patch('belfast.people.rdfmodels.network_data')
+    @patch('belfast.people.rdfmodels.rdf_data')
     def test_connected_people(self, mockrdf, mocknx):
         # test against fixture rdf/gexf data
         mockrdf.return_value = self.graph
@@ -146,8 +146,8 @@ class RdfPersonTest(TestCase):
         self.assert_('colleague' in names['Seamus Heaney'])
         self.assert_('knows' in names['Seamus Heaney'])
 
-    @patch('belfast.people.models.network_data')
-    @patch('belfast.people.models.rdf_data')
+    @patch('belfast.people.rdfmodels.network_data')
+    @patch('belfast.people.rdfmodels.rdf_data')
     def test_connected_organizations(self, mockrdf, mocknx):
         # test against fixture rdf/gexf data
         mockrdf.return_value = self.graph

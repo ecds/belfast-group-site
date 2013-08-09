@@ -8,8 +8,8 @@ import rdflib
 from belfast import rdfns
 from belfast.util import rdf_data, rdf_data_lastmodified, \
     network_data_lastmodified
-from belfast.people.models import RdfPerson, BelfastGroup
-from belfast.groupsheets.models import get_rdf_groupsheets
+from belfast.people.rdfmodels import RdfPerson, BelfastGroup
+from belfast.groupsheets.rdfmodels import get_rdf_groupsheets
 
 
 def rdf_lastmod(request, *args, **kwargs):

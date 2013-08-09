@@ -6,7 +6,7 @@ import logging
 
 from belfast import rdfns
 from belfast.groupsheets.forms import KeywordSearchForm
-from belfast.groupsheets.models import GroupSheet, get_rdf_groupsheets, \
+from belfast.groupsheets.rdfmodels import GroupSheet, get_rdf_groupsheets, \
     TeiDocument
 from belfast.util import rdf_data_lastmodified, network_data_lastmodified
 

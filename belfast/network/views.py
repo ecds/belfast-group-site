@@ -11,8 +11,8 @@ from StringIO import StringIO
 from belfast.util import network_data, rdf_data,  \
     rdf_data_lastmodified, network_data_lastmodified
 from belfast.rdfns import BELFAST_GROUP_URI
-from belfast.groupsheets.models import RdfGroupSheet
-from belfast.people.models import RdfOrganization, find_places
+from belfast.groupsheets.rdfmodels import RdfGroupSheet
+from belfast.people.rdfmodels import RdfOrganization, find_places
 
 
 logger = logging.getLogger(__name__)

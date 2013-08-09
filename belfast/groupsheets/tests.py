@@ -8,7 +8,7 @@ from django.test import TestCase
 from eulexistdb import testutil
 from lxml import etree
 
-from belfast.groupsheets.models import GroupSheet, Contents, \
+from belfast.groupsheets.rdfmodels import GroupSheet, Contents, \
     Poem, id_from_ark
 from belfast.groupsheets.forms import KeywordSearchForm
 from belfast.groupsheets.templatetags.tei import format_tei
