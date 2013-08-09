@@ -9,22 +9,32 @@
 
   <div class="span3 sidebar">
     <p><b>Filter groupsheets:</b></p>
+
+    {# TODO: display filters and make them toggle-able #}
+
+    {# FIXME: this link loses current filter when combining #}
+    {% if facets.digital %}
     <p><a href="?edition=digital">digital editions</a> ({{ facets.digital }})</p>
+    {% endif %}
 
-
-
+    {% if facets.authors %}
     <p><b>Author</b></p>
     <ul>
-        {% for author_info in facets.authors|dictsortreversed:'total' %}
-        <li><a href="#">{{ author_info.name }}</a> ({{ author_info.total}})</li>
+        {% for author in facets.authors %}
+        <li><a href="?author={{ author.slug }}">{{ author.name }}</a> ({{ author.total_groupsheets }})</li>
         {% endfor %}
     </ul>
+    {% endif %}
+
+
 
   </div> {# end sidebar #}
 
   <div class="span9">
 
     <h1 property="schema:name">Group Sheets</h1>
+
+    <p>Displaying {{ documents.count }} group sheets.</p>
 
     <ul class="groupsheet-list">
         {% for doc in documents %}

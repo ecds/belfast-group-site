@@ -1,8 +1,8 @@
 {# snippet to display a single rdf groupsheet #}
 <p>
   {# FIXME: should list author if different than profile name (e.g. Brendan Kennelly poems on Heaney groupsheet) #}
-  {% if doc.author and not profile %} <b>{{ doc.author.fullname }}</b> {% endif %}
-{% for t in doc.titles %}
+  {% if doc.author and not profile %} <b>{{ doc.author.last_name }}, {{ doc.author.first_name }}</b> {% endif %}
+{% for t in doc.title_list %}
 "{{ t }},"
 {% empty %}
   Untitled{{ ' '|add:doc.genre|default:'' }},
@@ -11,15 +11,13 @@
 {# perhaps simply omit the no date since the majority are undated? #}
 {% if doc.num_pages %}({{ doc.num_pages }} page{{ doc.num_pages|pluralize }}){% endif %}
 </p>
-{% if doc.url and doc.groupsheet_id %}
-   <p><a class="btn btn-primary btn-small" href="{% url 'groupsheets:view' doc.groupsheet_id %}">view digital edition</a></p>
+{% if doc.tei_id %}
+   <p><a class="btn btn-primary btn-small" href="{% url 'groupsheets:view' doc.tei_id %}">view digital edition</a></p>
 {% endif %}
 {% if doc.sources %}
   <p><small>Source:         {# source archives with a copy of this group sheet #}
-    {% for uri, name in doc.sources.iteritems %}
-        {% if 'http' not in uri %}{{ uri }}{% endif %}
-        {% if 'http' in uri %}
-        <a href="{{ uri }}">{{ name }}</a>{% else %}{{ name }}{% endif %}{% if forloop.last %}. {% else %}; {% endif %}
+    {% for src in doc.sources.all %}
+        <a href="{{ src.url }}">{{ src.name }}</a>{% if forloop.last %}. {% else %}; {% endif %}
         {% endfor %}</small>
   </p>
 {% endif %}

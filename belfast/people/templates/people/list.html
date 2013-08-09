@@ -5,11 +5,13 @@
 {% block content %}
 <h1 property="schema:name">People associated with the Belfast Group</h1>
 <ul>
-{% for person, rels in people.iteritems %}
-    <li><a href="{% url 'people:profile' person.short_id %}">{{ person.fullname }}</a>
+{% for person in people %}
+    <li><a href="{% url 'people:profile' person.slug %}">{{ person.last_name }}, {{ person.first_name }}</a>
+        {% comment %}  {# rels not in db yet #}
       {% if rels %}
         ({{ rels|join:', '}})
       {% endif %}
+              {% endcomment %}
      {# {{ person.fullname|slugify }} {{ person.short_id }} #}
    </li>
 {% endfor %}

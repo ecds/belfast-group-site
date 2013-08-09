@@ -13,6 +13,8 @@ from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
 
+def normalize_whitespace(str):
+    return re.sub(r'\s+', ' ', str.strip())
 
 def rdf_data_lastmodified():
     # get a last modification time for rdf data, based on the

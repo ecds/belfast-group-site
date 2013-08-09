@@ -1,3 +1,4 @@
+from django.db.models import Count
 from django.shortcuts import render
 from django.http import Http404, HttpResponse
 from django.views.decorators.http import last_modified
@@ -6,8 +7,10 @@ import logging
 
 from belfast import rdfns
 from belfast.groupsheets.forms import KeywordSearchForm
+from belfast.groupsheets.models import GroupSheet
 from belfast.groupsheets.rdfmodels import TeiGroupSheet, get_rdf_groupsheets, \
     TeiDocument
+from belfast.people.models import Person
 from belfast.util import rdf_data_lastmodified, network_data_lastmodified
 
 logger = logging.getLogger(__name__)
@@ -56,44 +59,47 @@ def teixml(request, name):
     return HttpResponse(tei_xml, mimetype='application/xml')
 
 
-@last_modified(rdf_lastmod)  # for now, list is based on rdf
+# TODO: based on db, how to calculate?
+#@last_modified(rdf_lastmod)  # for now, list is based on rdf
 def list(request):
-    filters = {}
+    results = GroupSheet.objects.all()
+
+    # FIXME: naming to differentiate filters from facets
     digital = request.GET.get('edition', None)
     if digital is not None:
-        filters['has_url'] = True
+        results = results.filter(url__isnull=False)
 
-    # use rdf to generate a list of belfast group sheets
-    results = get_rdf_groupsheets(**filters)
-    # generate facets
-    digital = 0
-    authors = {}
-    author_totals = {}
-    # facets = {'online': 0, 'authors': []}
-    for r in results:
-        if r.url:
-            digital += 1
+    author = request.GET.get('author', None)
+    if author is not None:
+        results = results.filter(author__slug=author)
 
-        authid = str(r.author.identifier)
-        # store rdf person so we can extract info
-        if authid not in authors:
-            authors[authid] = r.author
-        if authid not in author_totals:
-            author_totals[authid] = 0
-        author_totals[authid] += 1
+    results = results.order_by('author__last_name').all()
 
-        # what other facets? sources?
+    # FIXME: combinations of facets?
+    digital_count = None
+    if digital is None:
+        gs = GroupSheet.objects.all()
+        if author is not None:
+            gs = gs.filter(author__slug=author)
 
-    author_info = []
-    for id, val in author_totals.iteritems():
-        author_info.append({
-            'name': unicode(authors[id].name),
-            'total': val,
-            'id': id
-        })
+        digital_count = gs.filter(url__isnull=False).count()
 
+    # probably shouldn't display if digital count == total displayed count
 
-    facets = {'digital': digital, 'authors': author_info}
+    authors = None
+    if author is None:
+        authors = Person.objects.all()
+        if digital is not None:
+            authors = authors.filter(groupsheet__url__isnull=False)
+
+        authors = authors.annotate(total_groupsheets=Count('groupsheet')) \
+                         .filter(total_groupsheets__gte=1) \
+                         .order_by('-total_groupsheets')
+
+    # TODO: archival collection source ?
+
+    # FIXME: make facets empty dict to indicate nothing to show?
+    facets = {'digital': digital_count, 'authors': authors}
 
     return render(request, 'groupsheets/list.html',
                   {'documents': results, 'facets': facets})
