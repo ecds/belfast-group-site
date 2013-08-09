@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import Http404, HttpResponse
 from django.views.decorators.http import last_modified
 import json
@@ -8,6 +8,7 @@ import rdflib
 from belfast import rdfns
 from belfast.util import rdf_data, rdf_data_lastmodified, \
     network_data_lastmodified
+from belfast.people.models import Person
 from belfast.people.rdfmodels import RdfPerson, BelfastGroup
 from belfast.groupsheets.rdfmodels import get_rdf_groupsheets
 
@@ -23,9 +24,10 @@ def rdf_nx_lastmod(request, *args, **kwargs):
 @last_modified(rdf_lastmod)  # for now, list is based on rdf
 def list(request):
     # display a list of people one remove from belfast group
-    results = BelfastGroup().connected_people
+    people = Person.objects.order_by('last_name').all()
+    # results = BelfastGroup().connected_people
     return render(request, 'people/list.html',
-                  {'people': results})
+                  {'people': people})
 
 
 def init_person(id):
@@ -51,10 +53,11 @@ def init_person(id):
 
 @last_modified(rdf_nx_lastmod)  # uses both rdf and gexf
 def profile(request, id):
-    person = init_person(id)
-    groupsheets = get_rdf_groupsheets(author=str(person.identifier))
+    person = get_object_or_404(Person, slug=id)
+
+    # groupsheets = get_rdf_groupsheets(author=str(person.identifier))
     return render(request, 'people/profile.html',
-        {'person': person, 'groupsheets': groupsheets})
+        {'person': person, 'groupsheets': person.groupsheet_set.all()})
 
 
 @last_modified(rdf_nx_lastmod)  # uses both rdf and gexf

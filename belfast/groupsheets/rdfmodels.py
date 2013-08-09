@@ -7,8 +7,9 @@ import rdflib
 from rdflib.collection import Collection as RdfCollection
 
 from belfast import rdfns
-from belfast.util import rdf_data
+from belfast.util import rdf_data, normalize_whitespace
 from belfast.people.rdfmodels import RdfPerson
+
 
 logger = logging.getLogger(__name__)
 
@@ -154,7 +155,7 @@ class RdfGroupSheet(rdflib.resource.Resource):
             title = self.value(rdfns.DC.title)
             # single literal
             if isinstance(title, rdflib.Literal):
-                titles.append(title)
+                titles.append(normalize_whitespace(title))
 
             # otherwise, assuming node is an rdf sequence
             else:
@@ -220,8 +221,6 @@ def get_rdf_groupsheets(author=None, has_url=None):
 
     if has_url is True:
         fltr += '. ?ms schema:URL ?url '
-
-    print '*** filter - ', fltr
 
     res = g.query('''
         PREFIX schema: <%(schema)s>

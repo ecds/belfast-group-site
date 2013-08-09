@@ -1,6 +1,7 @@
 import logging
 import networkx as nx
 import rdflib
+import re
 import time
 
 from belfast import rdfns
@@ -156,18 +157,56 @@ class RdfPerson(RdfEntity):
             if 'dbpedia.org' in res.identifier:
                 return res.identifier
 
+    @cached_property
+    def viaf_uri(self):
+        if 'viaf.org' in self.identifier:
+            return unicode(self.identifier)
+
     @property
     def name(self):
         # NOTE: would be better if we could use preferredLabel somehow
         return self.value(rdfns.SCHEMA_ORG.name)
 
+    name_re = re.compile('^((?P<last>[^ ]{2,}), (?P<first>[^.,( ]{2,}))[.,]?')
+    _firstname = None
+    _lastname = None
+
+    def _calculate_first_last_name(self):
+        for name in self.objects(rdfns.FOAF.name):
+            match = self.name_re.match(unicode(name))
+            if match:
+                name_info = match.groupdict()
+                self._firstname = name_info['first']
+                self._lastname = name_info['last']
+                # stop after we get the first name we can use (?)
+                # note that for ciaran carson only one variant has the accent...
+                break
+
     @property
     def lastname(self):
-        return self.value(rdfns.SCHEMA_ORG.familyName)
+        if self._lastname is not None:
+            return self._lastname
+        val = self.value(rdfns.SCHEMA_ORG.familyName)
+        if val is not None:
+            return val
+        self._calculate_first_last_name()
+        return self._lastname
+
 
     @property
     def firstname(self):
-        return self.value(rdfns.SCHEMA_ORG.givenName)
+        if self._firstname is not None:
+            return self._firstname
+        fname = self.value(rdfns.SCHEMA_ORG.givenName)
+        if fname is not None:
+            return fname
+        self._calculate_first_last_name()
+        return self._firstname
+
+# (u'Carson, Ciaran Irish poet and novelist, born 1948'), rdflib.term.Literal(u'Ciaran Carson'), rdflib.term.Literal(u'Carson, Ciaran, 1948-'), rdflib.term.Literal(u'Carson, Ciaran.'), rdflib.term.Literal(u'Carson, Ciaran'), rdflib.term.Literal(u'Carson, Ciar\xe1n (1948- ).')]
+# error: no first/last name for http://viaf.org/viaf/85621766 - na
+
+        return fname
 
     @property
     def fullname(self):
