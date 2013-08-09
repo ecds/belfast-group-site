@@ -44,4 +44,6 @@ Initial setup
 
 * Ensure that a cache is configured in ``localsettings.py``
 
+# TODO: notes about secondary database for rdf
+
 

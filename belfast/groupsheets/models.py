@@ -40,12 +40,19 @@ class ArkIdentifier(IdNumber, XmlModel):
     }
     objects = Manager('//tei:idno[@type="ark"]')
 
+# cache ark -> ids that have been looked up recently
+_id_from_ark = {}
 
 def id_from_ark(ark):
+    global _id_from_ark
     # simple method to look up a TEI id based on the ARK url,
     # to allow linking within the current site based on an ARK
+    if ark in _id_from_ark:
+        return _id_from_ark[ark]
     try:
-        return ArkIdentifier.objects.get(value=ark).id
+        id = ArkIdentifier.objects.get(value=ark).id
+        _id_from_ark[ark] = id
+        return id
     except Exception as err:
         logger.warn('Error attempting to retrieve TEI id for ARK %s : %s'
                     % (ark, err))
@@ -202,13 +209,18 @@ class RdfGroupSheet(rdflib.resource.Resource):
         return sources
 
 
-def get_rdf_groupsheets(author=None):
+def get_rdf_groupsheets(author=None, has_url=None):
     # query rdf data to get a list of belfast group sheets
     # optionally filter by author (takes a URI)
     g = rdf_data()
     fltr = ''
     if author is not None:
-        fltr = '. ?ms schema:author <%s>' % author
+        fltr = '. ?ms schema:author <%s> ' % author
+
+    if has_url is True:
+        fltr += '. ?ms schema:URL ?url '
+
+    print '*** filter - ', fltr
 
     res = g.query('''
         PREFIX schema: <%(schema)s>

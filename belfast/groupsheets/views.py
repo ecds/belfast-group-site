@@ -58,10 +58,45 @@ def teixml(request, name):
 
 @last_modified(rdf_lastmod)  # for now, list is based on rdf
 def list(request):
+    filters = {}
+    digital = request.GET.get('edition', None)
+    if digital is not None:
+        filters['has_url'] = True
+
     # use rdf to generate a list of belfast group sheets
-    results = get_rdf_groupsheets()
+    results = get_rdf_groupsheets(**filters)
+    # generate facets
+    digital = 0
+    authors = {}
+    author_totals = {}
+    # facets = {'online': 0, 'authors': []}
+    for r in results:
+        if r.url:
+            digital += 1
+
+        authid = str(r.author.identifier)
+        # store rdf person so we can extract info
+        if authid not in authors:
+            authors[authid] = r.author
+        if authid not in author_totals:
+            author_totals[authid] = 0
+        author_totals[authid] += 1
+
+        # what other facets? sources?
+
+    author_info = []
+    for id, val in author_totals.iteritems():
+        author_info.append({
+            'name': unicode(authors[id].name),
+            'total': val,
+            'id': id
+        })
+
+
+    facets = {'digital': digital, 'authors': author_info}
+
     return render(request, 'groupsheets/list.html',
-                  {'documents': results})
+                  {'documents': results, 'facets': facets})
 
 
 def search(request):
