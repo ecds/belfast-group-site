@@ -4,13 +4,36 @@
 {% block page-subtitle %} | Group Sheets{% endblock %}
 
 {% block content %}
-<h1 property="schema:name">Group Sheets</h1>
 
-<ul class="groupsheet-list">
-{% for doc in documents %}
-    <li>
-        {% include 'groupsheets/snippets/list_groupsheet.html' %}
-    </li>
-{% endfor %}
-</ul>
+<div class="row">
+
+  <div class="span3 sidebar">
+    <p><b>Filter groupsheets:</b></p>
+    <p><a href="?edition=digital">digital editions</a> ({{ facets.digital }})</p>
+
+
+
+    <p><b>Author</b></p>
+    <ul>
+        {% for author_info in facets.authors|dictsortreversed:'total' %}
+        <li><a href="#">{{ author_info.name }}</a> ({{ author_info.total}})</li>
+        {% endfor %}
+    </ul>
+
+  </div> {# end sidebar #}
+
+  <div class="span9">
+
+    <h1 property="schema:name">Group Sheets</h1>
+
+    <ul class="groupsheet-list">
+        {% for doc in documents %}
+        <li>
+            {% include 'groupsheets/snippets/list_groupsheet.html' %}
+        </li>
+        {% endfor %}
+    </ul>
+  </div>
+
+</div>
 {% endblock %}

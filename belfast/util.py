@@ -34,6 +34,7 @@ def rdf_dburi_from_settings():
 
     elif dbconfig['ENGINE'] == 'django.db.backends.mysql':
         # FIXME: what if django port is set to empty string for default ?
+        # TODO: if port is not set, default is 3306
         return rdflib.Literal('mysql+mysqldb://%(USER)s:%(PASSWORD)s@%(HOST)s:%(PORT)s/%(NAME)s?charset=utf8' % \
                               dbconfig)
 
