@@ -8,7 +8,7 @@ from rdflib.collection import Collection as RdfCollection
 
 from belfast import rdfns
 from belfast.util import rdf_data
-from belfast.people.models import RdfPerson
+from belfast.people.rdfmodels import RdfPerson
 
 logger = logging.getLogger(__name__)
 
