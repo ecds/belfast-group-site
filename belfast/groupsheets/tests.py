@@ -8,7 +8,7 @@ from django.test import TestCase
 from eulexistdb import testutil
 from lxml import etree
 
-from belfast.groupsheets.rdfmodels import GroupSheet, Contents, \
+from belfast.groupsheets.rdfmodels import TeiGroupSheet, Contents, \
     Poem, id_from_ark
 from belfast.groupsheets.forms import KeywordSearchForm
 from belfast.groupsheets.templatetags.tei import format_tei
@@ -16,7 +16,7 @@ from belfast.groupsheets.templatetags.tei import format_tei
 FIXTURE_DIR = path.join(path.dirname(path.abspath(__file__)), 'fixtures')
 
 
-class GroupSheetTest(testutil.TestCase):
+class TeiGroupSheetTest(testutil.TestCase):
     # for now, load all files in the fixture dir to eXist for testing
     # NOTE: exist fixtures required to test generating id from ARK
     exist_fixtures = {
@@ -34,8 +34,8 @@ class GroupSheetTest(testutil.TestCase):
         # find the first groupsheet via xpath and load
         groups = self.tei.node.xpath('//t:text/t:group/t:group',
             namespaces={'t': teimap.TEI_NAMESPACE})
-        self.groupsheet = GroupSheet(groups[0])
-        self.groupsheet2 = GroupSheet(groups[1])
+        self.groupsheet = TeiGroupSheet(groups[0])
+        self.groupsheet2 = TeiGroupSheet(groups[1])
 
     def test_fields(self):
         self.assertEqual('simmons1_1035', self.groupsheet.id)
@@ -114,7 +114,7 @@ class GroupsheetViewsTest(testutil.TestCase):
         # find the first groupsheet via xpath and load
         groups = self.tei.node.xpath('//t:text/t:group/t:group',
                                      namespaces={'t': teimap.TEI_NAMESPACE})
-        self.groupsheet = GroupSheet(groups[0])
+        self.groupsheet = TeiGroupSheet(groups[0])
 
     def test_view_sheet(self):
         response = self.client.get(reverse('groupsheets:view',
@@ -131,7 +131,7 @@ class GroupsheetViewsTest(testutil.TestCase):
                          'view should should not 404 for id that is loaded in eXist')
         self.assert_('document' in response.context,
                      'document should be included in template context')
-        self.assert_(isinstance(response.context['document'], GroupSheet),
+        self.assert_(isinstance(response.context['document'], TeiGroupSheet),
                      'document in template context should be a group sheet')
 
         # test that ARK is retrieved & displayed

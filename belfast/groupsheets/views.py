@@ -6,7 +6,7 @@ import logging
 
 from belfast import rdfns
 from belfast.groupsheets.forms import KeywordSearchForm
-from belfast.groupsheets.rdfmodels import GroupSheet, get_rdf_groupsheets, \
+from belfast.groupsheets.rdfmodels import TeiGroupSheet, get_rdf_groupsheets, \
     TeiDocument
 from belfast.util import rdf_data_lastmodified, network_data_lastmodified
 
@@ -29,7 +29,7 @@ def view_sheet(request, id):
         'page_rdf_type': 'bg:GroupSheet'
     }
     try:
-        gs = GroupSheet.objects.also('ark_list',
+        gs = TeiGroupSheet.objects.also('ark_list',
                                      'document_name') \
                                .get(id=id)
     except DoesNotExist:
@@ -109,7 +109,7 @@ def search(request):
         # page = request.REQUEST.get('page', 1)
 
         try:
-            results = GroupSheet.objects \
+            results = TeiGroupSheet.objects \
                                 .filter(fulltext_terms=keywords) \
                                 .order_by('-fulltext_score') \
                                 .also('fulltext_score')

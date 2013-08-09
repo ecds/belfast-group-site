@@ -65,7 +65,8 @@ class TeiDocument(XmlModel, teimap.Tei):
     objects = Manager('/tei:TEI')
 
 
-class GroupSheet(XmlModel):
+# TODO: move to tei models?
+class TeiGroupSheet(XmlModel):
     ROOT_NS = teimap.TEI_NAMESPACE
     ROOT_NAMESPACES = {
         'tei': ROOT_NS,
