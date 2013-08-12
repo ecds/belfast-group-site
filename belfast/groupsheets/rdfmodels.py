@@ -78,6 +78,8 @@ class TeiGroupSheet(XmlModel):
     author = xmlmap.StringField('tei:docAuthor')
     date = xmlmap.StringField('tei:docDate')
     toc = xmlmap.NodeField('tei:argument', Contents)
+    # in one case, list of Contents sectiosn (multiple authors in a single sheet)
+    toc_list = xmlmap.NodeListField('tei:argument', Contents)
 
     poems = xmlmap.NodeListField('tei:text', Poem)
 

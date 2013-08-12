@@ -19,8 +19,10 @@
 
   <div class="contents span4 local-sidenav">
     {# use toc item titles for RDF title list #}
-    {% for item in document.toc.items %}
+    {% for toc in document.toc_list %}
+      {% for item in toc.items %}
       <meta property="dc:title" inlist="inlist" content="{{ item }}"/>
+      {% endfor %}
     {% endfor %}
 
     {# NOTE: there is a table of contents item list, but it does not include ids #}
@@ -30,6 +32,7 @@
         {% for poem in document.poems %}
           <li><a href="#{{ poem.id }}">{{ poem.title|default:'[untitled]' }}</a></li>
         {% endfor %}
+        {# FIXME: section headings for groupsheet with multiple authors ? #}
     </ul>
   </div> {# end sidenav #}
 
