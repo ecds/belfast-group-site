@@ -125,8 +125,9 @@ class RdfLocation(RdfEntity):
         return self.value(rdfns.SCHEMA_ORG.name)
 
     def __unicode__(self):
-        return self.value(rdfns.GN.name) or self.value(rdfns.DBPPROP.name) \
+        return self.value(rdfns.GN.name) \
             or self.graph.preferredLabel(self) \
+            or self.value(rdfns.DBPPROP.name) \
             or self.name or self.identifier
 
     @property

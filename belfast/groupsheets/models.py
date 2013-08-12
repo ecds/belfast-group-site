@@ -26,7 +26,7 @@ class GroupSheet(models.Model):
     # title_list = models.TextField(max_length=255)
     title_list = SeparatedValuesField(token='|')
     url = models.URLField(unique=True, blank=True, null=True)
-    tei_id = models.CharField(max_length=30, blank=True, null=True)
+    tei_id = models.CharField(max_length=30, blank=True, null=True, unique=True)
 
     # or should poems be separate? where we have data: uri, places, etc
     date = models.CharField(max_length=50, blank=True, null=True)
@@ -34,6 +34,8 @@ class GroupSheet(models.Model):
     author = models.ForeignKey(Person)   # possibly multiple?
     # many to many archival collection
     sources = models.ManyToManyField(ArchivalCollection)
+    alt_uri = models.URLField(max_length=255, unique=True)
+    # internal groupsheet uri used to smush/de-dupe records
 
     # todo: time period (BG phase 1/2)
 
@@ -44,6 +46,7 @@ class GroupSheet(models.Model):
     # def __unicode__(self):
     #     return self.titles or ''
 
+    @property
     def titles(self):
         return ', '.join(self.title_list)
 
