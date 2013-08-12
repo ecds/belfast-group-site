@@ -4,6 +4,7 @@ import rdflib
 import logging
 import os
 from os import path
+import re
 import time
 import networkx as nx
 from networkx.readwrite import gexf
@@ -40,17 +41,49 @@ def rdf_dburi_from_settings():
         return rdflib.Literal('mysql+mysqldb://%(USER)s:%(PASSWORD)s@%(HOST)s:%(PORT)s/%(NAME)s?charset=utf8' % \
                               dbconfig)
 
+_rdf_data = None
+
 
 def rdf_data():
+    global _rdf_data
+    if _rdf_data is not None:
+        return _rdf_data
+
     start = time.time()
-    # FIXME: should graph ident be configured in settings or similar?
-    # load rdf data for the site from database
-    ident = rdflib.URIRef('http://belfastgroup.ecds.emory.edu/')
-    datastore = rdflib.plugin.get("SQLAlchemy", rdflib.store.Store)(identifier=ident)
-    graph = rdflib.Graph(datastore, identifier=ident)
-    graph.open(rdf_dburi_from_settings())
-    logger.debug('Opened RDF graph from db in %.02f sec' % \
-                 (time.time() - start))
+    cache_key = 'BELFAST_RDF_GRAPH'
+    timeout = 60 * 60 * 24
+    graph = cache.get(cache_key)
+    if graph is None:
+
+        graph = rdflib.Graph()
+        filecount = 0
+        errcount = 0
+        # TODO: log time it takes to parse and load, totalnumber of files
+        for infile in glob.iglob(path.join(settings.RDF_DATA_DIR, '*.xml')):
+            try:
+                graph.parse(infile)
+                filecount += 1
+            except Exception as err:
+                logger.error('Failed to parse file %s: %s' % (infile, err))
+                errcount += 1
+
+        for infile in glob.iglob(path.join(settings.RDF_DATA_DIR, '*', '*.xml')):
+            try:
+                graph.parse(infile)
+                filecount += 1
+            except Exception as err:
+                logger.error('Failed to parse file %s: %s' % (infile, err))
+                errcount += 1
+
+        logger.debug('Loaded %d RDF documents in %.02f sec (%d errors)' % \
+                     (filecount, time.time() - start, errcount))
+
+        cache.set(cache_key, graph, timeout)
+    else:
+        logger.debug('Loaded RDF data from cache in %.02f sec' % \
+                     (time.time() - start))
+
+    _rdf_data = graph
     return graph
 
 
