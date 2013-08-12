@@ -12,7 +12,8 @@ from belfast.util import network_data, rdf_data,  \
     rdf_data_lastmodified, network_data_lastmodified
 from belfast.rdfns import BELFAST_GROUP_URI
 from belfast.groupsheets.rdfmodels import RdfGroupSheet
-from belfast.people.rdfmodels import RdfOrganization, find_places
+from belfast.people.rdfmodels import RdfOrganization
+from belfast.people.models import Place
 
 
 logger = logging.getLogger(__name__)
@@ -41,6 +42,7 @@ def _network_graph(min_degree=1, **kwargs):
 
         # use groupsheets to infer a connection between the author
         # of the groupsheet and the group itself
+        # FIXME: this needs to be in data prep/clean, NOT here
         if graph.node[n]['type'] == 'BelfastGroupSheet':
 
             sheet = RdfGroupSheet(rdfgraph, rdflib.URIRef(n))
@@ -135,19 +137,15 @@ def map(request):
 
 @last_modified(rdf_lastmod)
 def map_js(request):
-    places = find_places()
+    places = Place.objects.all()
     markers = []
     for pl in places:
-        # for now, just skip places w/o lat & long
-        # because we won't be able to map them anyway
-        if not pl.latitude or not pl.longitude:
-            continue
-
+        # lat/long required in db, so shouldn't need to skip
         info = {
             'latitude': pl.latitude,
             'longitude': pl.longitude,
-            'title': unicode(pl),
-            'content': unicode(pl),   # text content when you click on a marker
+            'title': pl.name,
+            'content': pl.name,   # text content when you click on a marker
         }
         markers.append(info)
     map_data = {'markers': markers}

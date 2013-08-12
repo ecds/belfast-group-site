@@ -5,7 +5,8 @@
 {% for t in doc.title_list %}
 "{{ t }},"
 {% empty %}
-  Untitled{{ ' '|add:doc.genre|default:'' }},
+  {# Untitled{{ ' '|add:doc.genre|default:'' }}, #}
+  Untitled,
 {% endfor %}
 {% if doc.date %}{{ doc.date }}{% else %}no date{% endif %}.  {# TODO: format date for readability #}
 {# perhaps simply omit the no date since the majority are undated? #}
