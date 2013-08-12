@@ -4,13 +4,12 @@ from django.http import Http404, HttpResponse
 from django.views.decorators.http import last_modified
 from eulexistdb.exceptions import DoesNotExist, ExistDBException
 import logging
+import urllib
 
 from belfast import rdfns
 from belfast.groupsheets.forms import KeywordSearchForm
-from belfast.groupsheets.models import GroupSheet
-from belfast.groupsheets.rdfmodels import TeiGroupSheet, get_rdf_groupsheets, \
-    TeiDocument
-from belfast.people.models import Person
+from belfast.groupsheets.models import GroupSheet, ArchivalCollection
+from belfast.groupsheets.rdfmodels import TeiGroupSheet, TeiDocument
 from belfast.util import rdf_data_lastmodified, network_data_lastmodified
 
 logger = logging.getLogger(__name__)
@@ -59,50 +58,95 @@ def teixml(request, name):
     return HttpResponse(tei_xml, mimetype='application/xml')
 
 
-# TODO: based on db, how to calculate?
+# TODO: based on db, how to calculate last modified?
 #@last_modified(rdf_lastmod)  # for now, list is based on rdf
 def list(request):
+    # without filters, find all group sheets
     results = GroupSheet.objects.all()
 
-    # FIXME: naming to differentiate filters from facets
-    digital = request.GET.get('edition', None)
-    if digital is not None:
+    url_args = {}
+    filter_digital = request.GET.get('edition', None)
+    if filter_digital is not None:
         results = results.filter(url__isnull=False)
+        url_args['edition'] = 'digital'
 
-    author = request.GET.get('author', None)
-    if author is not None:
-        results = results.filter(author__slug=author)
+    filter_author = request.GET.get('author', None)
+    if filter_author is not None:
+        results = results.filter(author__slug=filter_author)
+        url_args['author'] = filter_author
+
+    filter_source = request.GET.get('source', None)
+    if filter_source is not None:
+        results = results.filter(sources__name=filter_source)
+        url_args['source'] = filter_source
 
     results = results.order_by('author__last_name').all()
 
-    # FIXME: combinations of facets?
+    # generate labels/totals for 'facet' filters
     digital_count = None
-    if digital is None:
-        gs = GroupSheet.objects.all()
-        if author is not None:
-            gs = gs.filter(author__slug=author)
+    # if not already filtered on digital, get a count
+    if filter_digital is None:
+        # use the already filtered group sheet query from above
+        digital_count = results.filter(url__isnull=False).count()
 
-        digital_count = gs.filter(url__isnull=False).count()
-
-    # probably shouldn't display if digital count == total displayed count
-
+    # filter to group sheets by author
     authors = None
-    if author is None:
-        authors = Person.objects.all()
-        if digital is not None:
-            authors = authors.filter(groupsheet__url__isnull=False)
+    if filter_author is None:
+        # find authors and calculate totals relative to filtered groupsheets we'll return
+        # NOTE: should use distinct here, but apparently it's not supported on mysql
+        gsauth = results.only('author').annotate(total_groupsheets=Count('author__groupsheet')) \
+                        .filter(total_groupsheets__gte=1) \
+                        .order_by('-total_groupsheets', 'author')
+        # generate a list of tuples: author, total
+        authors = []
+        last = None
+        for auth in gsauth:
+            # if the same as the previous, skip
+            if auth.author == last:
+                continue
+            last = auth.author
+            authors.append((auth.author, auth.total_groupsheets))
 
-        authors = authors.annotate(total_groupsheets=Count('groupsheet')) \
-                         .filter(total_groupsheets__gte=1) \
-                         .order_by('-total_groupsheets')
+    # filter to group sheets by source
+    sources = None
+    if filter_source is None:
+        # can't find relative to filtered groupsheet b/c rel is many-to-many
+        sources = ArchivalCollection.objects.all()
+        # filter based on other facets that are set
+        if filter_digital:
+            sources = sources.filter(groupsheet__url__isnull=False)
+        if filter_author:
+            sources = sources.filter(groupsheet__author__slug=filter_author)
 
-    # TODO: archival collection source ?
+        sources = sources.annotate(total_groupsheets=Count('groupsheet')) \
+                                 .filter(total_groupsheets__gte=1) \
+                                 .order_by('-total_groupsheets')
 
     # FIXME: make facets empty dict to indicate nothing to show?
-    facets = {'digital': digital_count, 'authors': authors}
+    facets = {'digital': digital_count, 'authors': authors, 'sources': sources}
+    url_suffix = urllib.urlencode(url_args)
+    # if not empty, prepend & for easy combination with other url args
+    if url_suffix != '':
+        url_suffix = '&%s' % url_suffix
+
+    # generate query args to remove individual filters
+    filters = {}
+    if filter_digital is not None:
+        args = url_args.copy()
+        del args['edition']
+        filters['digital edition'] = '?' + urllib.urlencode(args)
+    if filter_author is not None:
+        args = url_args.copy()
+        del args['author']
+        filters[results[0].author.name] = '?' + urllib.urlencode(args)
+    if filter_source is not None:
+        args = url_args.copy()
+        del args['source']
+        filters[filter_source] = '?' + urllib.urlencode(args)
 
     return render(request, 'groupsheets/list.html',
-                  {'documents': results, 'facets': facets})
+                  {'documents': results, 'facets': facets,
+                   'url_suffix': url_suffix, 'filters': filters})
 
 
 def search(request):

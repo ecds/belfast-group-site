@@ -8,25 +8,42 @@
 <div class="row">
 
   <div class="span3 sidebar">
-    <p><b>Filter groupsheets:</b></p>
+    <h4>Filter groupsheets</h4>
+
+    {% if filters %}
+      <ul>
+        {% for label, link in filters.iteritems %}
+        <li>{{ label }} <a class="small" href="{{ link }}"><i class="icon-remove-sign"></i></a></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
 
     {# TODO: display filters and make them toggle-able #}
 
+    <hr/>
+
     {# FIXME: this link loses current filter when combining #}
     {% if facets.digital %}
-    <p><a href="?edition=digital">digital editions</a> ({{ facets.digital }})</p>
+    <p><a href="?edition=digital{{ url_suffix }}">digital editions</a> ({{ facets.digital }})</p>
     {% endif %}
 
     {% if facets.authors %}
     <p><b>Author</b></p>
     <ul>
-        {% for author in facets.authors %}
-        <li><a href="?author={{ author.slug }}">{{ author.name }}</a> ({{ author.total_groupsheets }})</li>
+        {% for author, total in facets.authors %}
+        <li><a href="?author={{ author.slug }}{{ url_suffix }}">{{ author.name }}</a> ({{ total }})</li>
         {% endfor %}
     </ul>
     {% endif %}
 
-
+    {% if facets.sources %}
+    <p><b>Source</b></p>
+    <ul>
+        {% for source in facets.sources %}  {# TODO: need to use short names here! #}
+        <li><a href="?source={{ source }}{{ url_suffix }}">{{ source }}</a> ({{ source.total_groupsheets }})</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
 
   </div> {# end sidebar #}
 
