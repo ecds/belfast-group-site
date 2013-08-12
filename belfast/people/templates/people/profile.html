@@ -7,13 +7,14 @@
 {% endblock %}
 
 {% block content %}
-<h1>{{ person.name }}</h1>
+{% if person.rdfinfo.dbpedia_thumbnail %}
+<div class="pull-right">
+  <img src="{{ person.rdfinfo.dbpedia_thumbnail }}"/>
+  <p><small><i>image via <a href="{{ person.rdfinfo.wikipedia_url }}">Wikipedia</a></i></small></p>
+</div>
+{% endif %}
 
-{# name = {{ person.name }}<br/> #}
-{# fullname = {{ person.fullname }}<br/> #}
-{# lastname {{ person.lastname}}<br/> #}
-{# firstname {{ person.firstname}}<br/> #}
-{# short id {{ person.short_id }}<br/> #}
+<h1>{{ person.name }}</h1>
 
 {% if person.rdfinfo.occupation %}
 <p><b>Occupation:</b> {{ person.rdfinfo.occupation|join:', ' }}</p>

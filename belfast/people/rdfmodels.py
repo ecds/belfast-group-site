@@ -274,6 +274,12 @@ class RdfPerson(RdfEntity):
             return self.graph.value(subject=self.dbpedia_uri,
                                     predicate=rdfns.FOAF.isPrimaryTopicOf)
 
+    @cached_property
+    def dbpedia_thumbnail(self):
+        if self.dbpedia_uri is not None:
+            return self.graph.value(subject=self.dbpedia_uri,
+                                    predicate=rdfns.DBPEDIA_OWL.thumbnail)
+
     # TODO: need access to groupsheets by this person
 
 
