@@ -47,6 +47,12 @@
       <p><strong>Permanent URL</strong>:
           <a href="{{ document.ark }}" rel="bookmark schema:URL">{{ document.ark }}</a></p>
       {% endif %}
+
+      <p><strong>Source{{ sources|pluralize }}</strong>:
+        {% for source in sources %}
+        <a href="{{ source.url }}">{{ source.name }}</a>{% if not forloop.last %}; {% endif %}
+        {% endfor %}
+      </p>
     </div>
 
     {% for poem in document.poems %}

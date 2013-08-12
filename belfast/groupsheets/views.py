@@ -37,8 +37,11 @@ def view_sheet(request, id):
     except DoesNotExist:
         raise Http404
 
+    sources = ArchivalCollection.objects.filter(groupsheet__tei_id=id)
+
     context.update({'document': gs,
-                   'page_rdf_url': getattr(gs, 'ark', None)})
+                   'page_rdf_url': getattr(gs, 'ark', None),
+                   'sources': sources})
     return render(request, 'groupsheets/display.html', context)
 
 
