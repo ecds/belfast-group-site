@@ -9,8 +9,6 @@ from belfast import rdfns
 from belfast.util import rdf_data, rdf_data_lastmodified, \
     network_data_lastmodified
 from belfast.people.models import Person
-from belfast.people.rdfmodels import RdfPerson, BelfastGroup
-from belfast.groupsheets.rdfmodels import get_rdf_groupsheets
 
 
 def rdf_lastmod(request, *args, **kwargs):
@@ -25,47 +23,23 @@ def rdf_nx_lastmod(request, *args, **kwargs):
 def list(request):
     # display a list of people one remove from belfast group
     people = Person.objects.order_by('last_name').all()
-    # results = BelfastGroup().connected_people
     return render(request, 'people/list.html',
                   {'people': people})
-
-
-def init_person(id):
-    # consolidate common person lookup logic for single-person/profile views
-    person = None
-    try:
-        idtype, idnum = id.split(':')
-    except:
-        raise Http404
-
-    if idtype == 'viaf':
-        uri = 'http://viaf.org/viaf/%s' % idnum
-        graph = rdf_data()
-        if (rdflib.URIRef(uri), rdflib.RDF.type, rdfns.SCHEMA_ORG.Person) in graph:
-            person = RdfPerson(graph, rdflib.URIRef(uri))
-
-    # anything else not found for now
-    if person is None:
-        raise Http404
-
-    return person
 
 
 @last_modified(rdf_nx_lastmod)  # uses both rdf and gexf
 def profile(request, id):
     person = get_object_or_404(Person, slug=id)
-
-    # groupsheets = get_rdf_groupsheets(author=str(person.identifier))
     return render(request, 'people/profile.html',
-        {'person': person, 'groupsheets': person.groupsheet_set.all()})
+                  {'person': person, 'groupsheets': person.groupsheet_set.all()})
 
 
 @last_modified(rdf_nx_lastmod)  # uses both rdf and gexf
 def egograph_js(request, id):
-    person = init_person(id)
+    person = get_object_or_404(Person, slug=id)
     # TODO: possibly make ego-graph radius a parameter in future
-    graph = person.ego_graph(radius=1,
-                             types=['Person', 'Organization', 'Place'])
+    graph = person.rdfinfo.ego_graph(radius=1,
+                                     types=['Person', 'Organization', 'Place'])
 
     data = json_graph.node_link_data(graph)
     return HttpResponse(json.dumps(data), content_type='application/json')
@@ -73,5 +47,5 @@ def egograph_js(request, id):
 
 @last_modified(rdf_nx_lastmod)  # uses both rdf and gexf (?)
 def egograph(request, id):
-    person = init_person(id)
+    person = get_object_or_404(Person, slug=id)
     return render(request, 'people/ego_graph.html', {'person': person})
