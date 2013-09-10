@@ -3,6 +3,45 @@
 http://networkx.github.io/documentation/latest/examples/javascript/force.html
 */
 
+function ForceGraphControls(config) {
+  var options = {
+    target: '#graph-controls',
+    graph_options: {
+      target: '#chart',  // needs a default here so we can remove (?)
+    }
+  };
+  $.extend(options, config);
+
+  var controls = $(options.target);
+  controls.append($("<h4>Graph Settings</h4>"));
+
+  // TODO: perhaps this could default to checked for graphs smaller
+  // than a certain threshold.
+
+  var label_toggle = $("<input/>").attr('type', 'checkbox').attr('id', 'graph-labels');
+  var p = $("<p>").append(label_toggle).append(" display labels <br/>")
+  p.append($("<small>(not recommended for large graphs)</small>"));
+  controls.append(p);
+  options.graph_options.labels = $("#graph-labels").is(":checked");
+
+
+  function launch_graph(options) {
+    // destroy previous version of the graph and re-create it with updated options
+    d3.select(options.target + " svg").remove();
+    ForceGraph(options);
+  }
+
+  // update label setting and relaunch the graph
+  label_toggle.change(function() {
+    options.graph_options.labels = $(this).is(':checked');
+    launch_graph(options.graph_options);
+  });
+
+  // initial launch
+  launch_graph(options.graph_options);
+}
+
+
 function ForceGraph(config) {
   /* minimally requires a url to json data, e.g.:
       ForceGraph({url: "/my/data/json"});
@@ -14,6 +53,7 @@ function ForceGraph(config) {
   */
 
   var options = {
+    'target': '#chart', // selector for element where svg should be added
     'width': 400,
     'height': 400,
     'fill': d3.scale.category20(),
@@ -22,7 +62,7 @@ function ForceGraph(config) {
   };
   $.extend(options, config);
 
-  var vis = d3.select("#chart")
+  var vis = d3.select(options.target)
     .append("svg:svg")
       .attr("width", options.width)
       .attr("height", options.height);
@@ -157,7 +197,7 @@ function ForceGraph(config) {
       };
 
   force.on("tick", function() {
-    if (options.label) {
+    if (options.labels) {
       force_labels.start();
     }
 

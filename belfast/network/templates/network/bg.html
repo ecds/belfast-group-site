@@ -4,20 +4,27 @@
 {% block page-subtitle %} | Network Graph{% endblock %}
 
 {% block content %}
+
+<div id="graph-controls" class="pull-right"> </div>
+
 <p>Force-directed network graph of people connected to the Belfast Group.
   Notes are colored by type.  Mouse over a label to see the text more clearly.</p>
 
- <div id="chart"></div>
+ <div id="network-graph"></div>
 
   <script src="{% static 'js/d3.min.js' %}" charset="utf-8"></script>
   <link type="text/css" href="{% static 'css/d3.force.css' %}" rel="stylesheet" media="screen"/>
    <script type="text/javascript" src="{% static 'js/d3.force.js' %}"></script>
    <script type="text/javascript">
-      ForceGraph({
+     ForceGraphControls({
+      target: '#graph-controls',
+      graph_options: {
+        target: "#network-graph",
         url: "{% url 'network:bg-js' %}",
         width: 1000,
         height: 650,
         highlight: ['{{ bg_uri }}']
-      });
+      }
+    });
    </script>
 {% endblock %}

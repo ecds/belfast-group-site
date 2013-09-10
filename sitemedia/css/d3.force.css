@@ -25,3 +25,9 @@ line.link {
     font-weight: bold;
     font-size: 11pt;
 }
+
+/* styles for graph controls */
+#graph-controls {
+    border: 2px solid #efefef;
+    padding: 10px;
+}
