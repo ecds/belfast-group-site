@@ -8,6 +8,9 @@ function ForceGraph(config) {
       ForceGraph({url: "/my/data/json"});
       optional can specify width and height
       optionally takes a list of identifiers for nodes to highlight
+      Set labels to True for in-graph labels using force-directed layout
+      (not recommended for large graphs).
+
   */
 
   var options = {
@@ -15,6 +18,7 @@ function ForceGraph(config) {
     'height': 400,
     'fill': d3.scale.category20(),
     'highlight': [],
+    'labels': false,
   };
   $.extend(options, config);
 
@@ -36,25 +40,27 @@ function ForceGraph(config) {
 
   // force-adjusted labels
   // based on http://bl.ocks.org/MoritzStefaner/1377729
-  var label_nodes = [];
-  var label_links = [];
+  // OPTIONALLY initialize force-directed labels
+  if (options.labels) {
+    var label_nodes = [];
+    var label_links = [];
 
-  // generate labels based on actual nodes
-  for(var i = 0; i < json.nodes.length; i++) {
-    // add twice: once to track the node
-    label_nodes.push({node: json.nodes[i]});
-    // and once to generate a label that will be bound to the node
-    label_nodes.push({node: json.nodes[i]});
-    // add a link between the node and its label
-    label_links.push({
+    // generate labels based on actual nodes
+    for(var i = 0; i < json.nodes.length; i++) {
+      // add twice: once to track the node
+      label_nodes.push({node: json.nodes[i]});
+      // and once to generate a label that will be bound to the node
+      label_nodes.push({node: json.nodes[i]});
+      // add a link between the node and its label
+      label_links.push({
           source : i * 2,
           target : i * 2 + 1,
           weight : 1
-    });
-  }
+      });
+    }
 
-  // generate a secondary force-directed graph for the labels
-  var force_labels = d3.layout.force()
+    // generate a secondary force-directed graph for the labels
+    var force_labels = d3.layout.force()
       .nodes(label_nodes)
       .links(label_links)
       .gravity(0)
@@ -63,6 +69,8 @@ function ForceGraph(config) {
       .charge(-50)
       .size([options.width, options.height])
       .start();
+
+  }
 
   var link = vis.selectAll("line.link")
       .data(json.links)
@@ -88,11 +96,20 @@ function ForceGraph(config) {
 //        .attr("r", function(d) {return 3 * Math.sqrt(d.weight || 1); })
         .style("fill", function(d) { return options.fill(d.type); });
 
+  // when not using force-directed graph labels, add node label
+  // for display as hover text
+  if (! options.labels) {
+    node.append("title")
+      .text(function(d) { return d.label; });
+  }
+
     node.call(force.drag);
+
+  if (options.labels) {
 
     var anchorLink = vis.selectAll("line.anchorLink").data(label_links);
 
-   var anchorNode = vis.selectAll("g.anchorNode")
+    var anchorNode = vis.selectAll("g.anchorNode")
       .data(force_labels.nodes()).enter()
         .append("svg:g")
         .attr("class", function(d) {
@@ -110,6 +127,8 @@ function ForceGraph(config) {
       })
       .attr('class', 'node-label');
       // NOTE: styles configured in css for easier override on hover/highlight
+
+  }
 
   vis.style("opacity", 1e-6)
     .transition()
@@ -138,7 +157,9 @@ function ForceGraph(config) {
       };
 
   force.on("tick", function() {
-    force_labels.start();
+    if (options.label) {
+      force_labels.start();
+    }
 
     node.call(updateNode);
 
@@ -148,6 +169,7 @@ function ForceGraph(config) {
         .attr("x2", function(d) { return d.target.x; })
         .attr("y2", function(d) { return d.target.y; });
 
+    if (options.labels) {
         anchorNode.each(function(d, i) {
           if (i % 2 === 0) {
             //node: position where the real version of this node is
@@ -171,6 +193,8 @@ function ForceGraph(config) {
         anchorNode.call(updateNode);
         link.call(updateLink);
         anchorLink.call(updateLink);
+
+    }
 
   });
 });
