@@ -7,7 +7,7 @@ function ForceGraphControls(config) {
   var options = {
     target: '#graph-controls',
     graph_options: {
-      target: '#chart',  // needs a default here so we can remove (?)
+      target: '#chart',  // needs a default here so we can remove svg (?)
     }
   };
   $.extend(options, config);
@@ -15,30 +15,97 @@ function ForceGraphControls(config) {
   var controls = $(options.target);
   controls.append($("<h4>Graph Settings</h4>"));
 
+  // checkbox to toggle in-graph labels
   // TODO: perhaps this could default to checked for graphs smaller
-  // than a certain threshold.
-
+  // than a certain threshold. (?)
   var label_toggle = $("<input/>").attr('type', 'checkbox').attr('id', 'graph-labels');
-  var p = $("<p>").append(label_toggle).append(" display labels <br/>")
+  var p = $("<p>").append(label_toggle).append(" display labels <br/>");
   p.append($("<small>(not recommended for large graphs)</small>"));
   controls.append(p);
   options.graph_options.labels = $("#graph-labels").is(":checked");
 
+  // load data so we can inspect to see if we have degree info, find max/min degrees
+  d3.json(options.graph_options.url, function(json) {
+    options.graph_options.data = json;   // store for re-use when generating actual graph
+    var sizeopts = {};
+    if (json.nodes[0].degree) {
+      sizeopts.degree = true;
+      sizeopts.degree_max = d3.max(json.nodes, function(n) { return n.degree; });
+      sizeopts.degree_min = d3.min(json.nodes, function(n) { return n.degree; });
+    }
+
+  var degree = $("<input/>").attr('type', 'radio').attr('name', 'node-size').attr('value', 'degree');
+  // if data includes degree, make graph nodes resizable based on degree
+  if (sizeopts.degree) {
+    // generate a scale to convert degree into node size
+    var scale = d3.scale.linear()
+      .domain([sizeopts.degree_min, sizeopts.degree_max])
+      .range([3, 20]);
+
+    // adjust node size
+    var p2 = $("<p/>").append("Size nodes by: <br/>");
+    var none = $("<input/>").attr('type', 'radio').attr('name', 'node-size').attr('value', 'none');
+
+    p2.append(degree).append(" degree"); // use a label?
+    controls.append(p2);
+    // slider control for min/max node size
+    //  controls.append($("<label/>").attr('for', 'range').append('size range'));
+    controls.append($("<input/>").attr('type', 'text')
+      .attr('id', 'range').attr('style', 'border: 0; color: #f6931f; font-weight: bold;'));
+    controls.append($("<div> </div>").attr('id', 'nodesize-range'));
+    $("#nodesize-range").slider({
+        range: true,
+        min: 3,  // if any smaller, color becomes invisible
+        max: 20,
+        values: [5, 18],
+        slide: function(event, ui) {
+          $("#range").val(ui.values[0] + " - " + ui.values[1]);
+        }
+    });
+    // display currently selected range
+   $("#range").val($("#nodesize-range").slider("values", 0) +
+      " - " + $("#nodesize-range").slider("values", 1));
+
+    options.graph_options.nodesize = function nodesize(x) {
+      var sizetype = $("input[name=node-size]:checked").val();
+      if (sizetype == 'degree') {
+        var values = $("#nodesize-range" ).slider("option", "values");
+        // adjust the scale to current values
+        scale.range(values);
+        return scale(x.degree);
+      }
+      return 5;  // default size
+    };
+
+  }
+
+  // initial launch
+  var force = launch_graph(options.graph_options);
+  // store the forcegraph object so we can update it
 
   function launch_graph(options) {
     // destroy previous version of the graph and re-create it with updated options
     d3.select(options.target + " svg").remove();
-    ForceGraph(options);
+    force = ForceGraph(options);
+    return force;
   }
 
-  // update label setting and relaunch the graph
+  // if in-graph label option is toggled, update label setting and relaunch the graph
   label_toggle.change(function() {
     options.graph_options.labels = $(this).is(':checked');
     launch_graph(options.graph_options);
   });
 
-  // initial launch
-  launch_graph(options.graph_options);
+  // if degree is selected or slider changes, resume the graph
+  // (force node size to be recalculated using existing function)
+  if (sizeopts.degree) {
+    degree.change(function() { force.resume(); });
+    $("#nodesize-range").slider().on('slidechange', function(event, ui) {
+        force.resume();
+    });
+  }
+
+  });  //end json load
 }
 
 
@@ -59,6 +126,7 @@ function ForceGraph(config) {
     'fill': d3.scale.category20(),
     'highlight': [],
     'labels': false,
+    'nodesize': 5,
   };
   $.extend(options, config);
 
@@ -67,7 +135,8 @@ function ForceGraph(config) {
       .attr("width", options.width)
       .attr("height", options.height);
 
-  return d3.json(config.url, function(json) {
+function init_graph(json) {
+
   var force = d3.layout.force()
       .charge(-1000)
       .linkDistance(120)
@@ -131,9 +200,7 @@ function ForceGraph(config) {
       .style("fill", function(d) { return options.fill(d.type); });
 
     node.append("svg:circle")
-        .attr("r", 5)
-// rough-cut at sizing node by degree (ish)
-//        .attr("r", function(d) {return 3 * Math.sqrt(d.weight || 1); })
+        .attr("r", options.nodesize)
         .style("fill", function(d) { return options.fill(d.type); });
 
   // when not using force-directed graph labels, add node label
@@ -202,6 +269,8 @@ function ForceGraph(config) {
     }
 
     node.call(updateNode);
+    // update nodesize based on function/ui controls
+    node.selectAll("circle").attr("r", options.nodesize);
 
 
     link.attr("x1", function(d) { return d.source.x; })
@@ -237,6 +306,17 @@ function ForceGraph(config) {
     }
 
   });
-});
+
+return force;
+}
+
+// if json data is already loaded and passed in, use it
+if (options.data) {
+  return init_graph(options.data);
+} else {
+  return d3.json(options.url, init_graph);
+  // FIXME: this doesn't actually return the force-directed graph
+  // because the json call is asynchronous
+}
 
 }

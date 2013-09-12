@@ -83,8 +83,14 @@ def full_js(request, mode):
 
     graph = _network_graph(**filter)
     if mode == 'full':
+        # FIXME: refactor to be sharable
+        # annotate nodes in graph with degree
+        for node, degree in graph.degree_iter():
+            graph.node[node]['degree'] = degree
+
         # standard nodes & links data
         data = json_graph.node_link_data(graph)
+
     if mode == 'adjacency':
         # adjacency matrix for generating chord diagram
         matrix = nx.linalg.graphmatrix.adjacency_matrix(graph)
@@ -126,6 +132,10 @@ def group_people(request):
 def group_people_js(request):
     belfast_group = RdfOrganization(network_data().copy(), BELFAST_GROUP_URI)
     ego_graph = belfast_group.ego_graph(radius=1, types=['Person', 'Organization'])
+    # FIXME: refactor to be sharable
+    # annotate nodes in graph with degree
+    for node, degree in ego_graph.degree_iter():
+        ego_graph.node[node]['degree'] = degree
     data = json_graph.node_link_data(ego_graph)
     return HttpResponse(json.dumps(data), content_type='application/json')
 

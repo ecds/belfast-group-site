@@ -40,6 +40,9 @@ def egograph_js(request, id):
     # TODO: possibly make ego-graph radius a parameter in future
     graph = person.rdfinfo.ego_graph(radius=1,
                                      types=['Person', 'Organization', 'Place'])
+    # annotate nodes in graph with degree
+    for node, degree in graph.degree_iter():
+        graph.node[node]['degree'] = degree
 
     data = json_graph.node_link_data(graph)
     return HttpResponse(json.dumps(data), content_type='application/json')

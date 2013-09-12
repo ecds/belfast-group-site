@@ -3,6 +3,12 @@
 
 {% block page-subtitle %} | Network Graph{% endblock %}
 
+{% block head-extras %}
+  {{ block.super }}
+ <link href="{% static 'js/jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.min.css' %}" rel="stylesheet" media="screen"/>
+  <script type="text/javascript" src="{% static 'js/jquery-ui/js/jquery-ui-1.10.3.custom.min.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 <div>See also:
   <ul>
@@ -20,7 +26,7 @@
   Notes are colored by type.
   Mouse over a label to see the text more clearly.</p>
 
- <div id="network-graph"></div>
+  <div id="network-graph"></div>
 
   <script src="{% static 'js/d3.min.js' %}" charset="utf-8"></script>
   <link type="text/css" href="{% static 'css/d3.force.css' %}" rel="stylesheet" media="screen"/>
