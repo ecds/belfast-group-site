@@ -9,6 +9,7 @@ from belfast import rdfns
 from belfast.util import rdf_data, rdf_data_lastmodified, \
     network_data_lastmodified
 from belfast.people.models import Person
+from belfast.network.util import annotate_graph
 
 
 def rdf_lastmod(request, *args, **kwargs):
@@ -41,8 +42,11 @@ def egograph_js(request, id):
     graph = person.rdfinfo.ego_graph(radius=1,
                                      types=['Person', 'Organization', 'Place'])
     # annotate nodes in graph with degree
-    for node, degree in graph.degree_iter():
-        graph.node[node]['degree'] = degree
+        # FIXME: not a directional graph; in/out degree not available
+
+    graph = annotate_graph(graph, fields=['degree', 'in_degree', 'out_degree',
+                                          'betweenness_centrality',
+                                          'eigenvector_centrality'])
 
     data = json_graph.node_link_data(graph)
     return HttpResponse(json.dumps(data), content_type='application/json')
