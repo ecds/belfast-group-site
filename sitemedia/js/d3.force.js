@@ -24,91 +24,60 @@ function ForceGraphControls(config) {
   controls.append(p);
   options.graph_options.labels = $("#graph-labels").is(":checked");
 
+  var size_attributes = {
+    degree: {label: 'degree', attr: 'degree'},
+    in_degree: {label: 'in degree', attr: 'in_degree'},
+    out_degree: {label: 'out degree', attr: 'out_degree'},
+    betweenness: {label: 'betweenness', attr: 'betweenness'},
+    eigenvc: {label: 'eigenvector centrality', attr: 'eigenvector_centrality'},
+  };
+
   // load data so we can inspect to see if we have degree info, find max/min degrees
   d3.json(options.graph_options.url, function(json) {
     options.graph_options.data = json;   // store for re-use when generating actual graph
-    var sizeopts = {};
-    if (json.nodes[0].degree !== undefined) {
-      sizeopts.degree = true;
-      sizeopts.degree_max = d3.max(json.nodes, function(n) { return n.degree; });
-      sizeopts.degree_min = d3.min(json.nodes, function(n) { return n.degree; });
-    }
-    if (json.nodes[0].in_degree !== undefined) {
-      sizeopts.in_degree = true;
-      sizeopts.in_degree_max = d3.max(json.nodes, function(n) { return n.in_degree; });
-      sizeopts.in_degree_min = d3.min(json.nodes, function(n) { return n.in_degree; });
-    }
-    if (json.nodes[0].out_degree !== undefined) {  // could be zero
-      sizeopts.out_degree = true;
-      sizeopts.out_degree_max = d3.max(json.nodes, function(n) { return n.out_degree; });
-      sizeopts.out_degree_min = d3.min(json.nodes, function(n) { return n.out_degree; });
-    }
-    if (json.nodes[0].betweenness !== undefined) {  // could be zero
-      sizeopts.betweenness = true;
-      sizeopts.betweenness_max = d3.max(json.nodes, function(n) { return n.betweenness; });
-      sizeopts.betweenness_min = d3.min(json.nodes, function(n) { return n.betweenness; });
-    }
-    if (json.nodes[0].eigenvector_centrality !== undefined) {  // could be zero
-      sizeopts.eigenvector_centrality = true;
-      sizeopts.eigenvector_centrality_max = d3.max(json.nodes, function(n) { return n.eigenvector_centrality; });
-      sizeopts.eigenvector_centrality_min = d3.min(json.nodes, function(n) { return n.eigenvector_centrality; });
-    }
 
-
-  var degree = $("<input/>").attr('type', 'radio').attr('name', 'node-size').attr('value', 'degree');
-  var in_degree = $("<input/>").attr('type', 'radio').attr('name', 'node-size').attr('value', 'in-degree');
-  var out_degree = $("<input/>").attr('type', 'radio').attr('name', 'node-size').attr('value', 'out-degree');
-  var betweenness = $("<input/>").attr('type', 'radio').attr('name', 'node-size').attr('value', 'betweenness');
-  var eigenvector_centrality = $("<input/>").attr('type', 'radio').attr('name', 'node-size').attr('value', 'eigenvector_centrality');
-  // if data includes degree, make graph nodes resizable based on degree
-  if (sizeopts.degree || sizeopts.in_degree || sizeopts.out_degree ||
-      sizeopts.betweenness || sizeopts.eigenvector_centrality) {
-    // generate a scale to convert degree into node size
+    var key;
     var initial_range = [3, 20];
-    var dscale = d3.scale.linear()
-      .domain([sizeopts.degree_min, sizeopts.degree_max])
-      .range(initial_range);
-    var indscale = d3.scale.linear()
-      .domain([sizeopts.in_degree_min, sizeopts.in_degree_max])
-      .range(initial_range);
-    var outdscale = d3.scale.linear()
-      .domain([sizeopts.out_degree_min, sizeopts.out_degree_max])
-      .range(initial_range);
-    var btwscale = d3.scale.linear()
-      .domain([sizeopts.betweenness_min, sizeopts.betweenness_max])
-      .range(initial_range);
-    var eigvscale = d3.scale.linear()
-      .domain([sizeopts.eigenvector_centrality_min, sizeopts.eigenvector_centrality_max])
-      .range(initial_range);
+    var sizeopts = {};
+
+    for (key in size_attributes) {
+      field_opts = size_attributes[key];
+      if (json.nodes[0][field_opts.attr] !== undefined) {  // in some cases, could be zero
+        sizeopts[key] = {};
+        var minmax = [
+            d3.min(json.nodes, function(n) { return n[field_opts.attr]; }),
+            d3.max(json.nodes, function(n) { return n[field_opts.attr]; })
+        ];
+        sizeopts[key].min_max = minmax;
+
+        // generate an input to select this feature as basis for size
+        sizeopts[key].input = $("<input/>").attr('type', 'radio')
+             .attr('name', 'node-size').attr('value', key);
+        // TODO: label
+        // generate scale for this feature based on observed min/max
+        // convert degree or other attribute into relative node size
+        sizeopts[key].scale = d3.scale.linear().range(initial_range)
+            .domain(minmax);
+
+      }
+   } // end for loop through size attribute keys
 
     // adjust node size
     var p2 = $("<p/>").append("Size nodes by: <br/>");
+    // TODO: have an option to switch back to all the same size?
     var none = $("<input/>").attr('type', 'radio').attr('name', 'node-size').attr('value', 'none');
 
-    if (sizeopts.degree) {
-      p2.append(degree).append(" degree "); // use <label> tags here?
-    }
-    if (sizeopts.in_degree) {
-      p2.append(in_degree).append(" in-degree ");
-    }
-    if (sizeopts.out_degree) {
-      p2.append(out_degree).append(" out-degree ");
-    }
-    if (sizeopts.betweenness) {
-      p2.append(betweenness).append(" betweenness ");
-    }
-    if (sizeopts.eigenvector_centrality) {
-      p2.append(eigenvector_centrality).append(" eigenvector centrality ");
+    for (key in sizeopts) {
+      p2.append(sizeopts[key].input).append(' ' + size_attributes[key].label + ' ');
     }
     controls.append(p2);
     // slider control for min/max node size
-    //  controls.append($("<label/>").attr('for', 'range').append('size range'));
     controls.append($("<input/>").attr('type', 'text')
       .attr('id', 'range').attr('style', 'border: 0; color: #f6931f; font-weight: bold;'));
     controls.append($("<div> </div>").attr('id', 'nodesize-range'));
     $("#nodesize-range").slider({
         range: true,
-        min: initial_range[0],  // if any smaller, color becomes invisible
+        min: initial_range[0],  // if any smaller than 3 or so, color becomes invisible
         max: initial_range[1],
         values: [5, 18],
         slide: function(event, ui) {
@@ -122,35 +91,19 @@ function ForceGraphControls(config) {
     options.graph_options.nodesize = function nodesize(x) {
       var sizetype = $("input[name=node-size]:checked").val();
       var values = $("#nodesize-range" ).slider("option", "values");
-      if (sizetype == 'degree') {
-        // adjust the scale to current values
-        dscale.range(values);
-        return dscale(x.degree);
-      } else if (sizetype == 'in-degree') {
-        // adjust the scale to current values
-        indscale.range(values);
-        return indscale(x.in_degree);
-      } else if (sizetype == 'out-degree') {
-        // adjust the scale to current values
-        outdscale.range(values);
-        return outdscale(x.out_degree);
-      } else if (sizetype == 'betweenness') {
-        // adjust the scale to current values
-        btwscale.range(values);
-        return btwscale(x.betweenness);
-      } else if (sizetype == 'eigenvector_centrality') {
-        // adjust the scale to current values
-        eigvscale.range(values);
-        return eigvscale(x.eigenvector_centrality);
+
+      if (sizeopts[sizetype]) {
+        // adjust the scale for this attribute to current slider values
+        sizeopts[sizetype].scale.range(values);
+        // get the appropriate attribute from the node and scale it
+        return sizeopts[sizetype].scale(x[size_attributes[sizetype].attr]);
       }
+
       return 5;  // default size
     };
 
-  }
-
-  // initial launch
-  var force = launch_graph(options.graph_options);
-  // store the forcegraph object so we can update it
+  // declare variable to hold the forcedirected graph once it's launched
+  var force;
 
   function launch_graph(options) {
     // destroy previous version of the graph and re-create it with updated options
@@ -158,6 +111,9 @@ function ForceGraphControls(config) {
     force = ForceGraph(options);
     return force;
   }
+
+  // initial launch; store force graph object for later interactions
+  force = launch_graph(options.graph_options);
 
   // if in-graph label option is toggled, update label setting and relaunch the graph
   label_toggle.change(function() {
@@ -167,17 +123,13 @@ function ForceGraphControls(config) {
 
   // if degree is selected or slider changes, resume the graph
   // (force node size to be recalculated using existing function)
-  if (sizeopts.degree || sizeopts.in_degree || sizeopts.out_degree ||
-      sizeopts.betweenness || sizeopts.eigenvector_centrality) {
-    degree.change(function() { force.resume(); });
-    in_degree.change(function() { force.resume(); });
-    out_degree.change(function() { force.resume(); });
-    betweenness.change(function() { force.resume(); });
-    eigenvector_centrality.change(function() { force.resume(); });
-    $("#nodesize-range").slider().on('slidechange', function(event, ui) {
-        force.resume();
-    });
+  for (key in sizeopts) {
+    // bind change method for all resize-attribute inputs
+    sizeopts[key].input.change(function() { force.resume(); });
   }
+  $("#nodesize-range").slider().on('slidechange', function(event, ui) {
+    force.resume();
+  });
 
   });  //end json load
 }
