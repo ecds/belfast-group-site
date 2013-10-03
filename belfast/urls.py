@@ -36,7 +36,9 @@ urlpatterns = patterns(
     url(r'^ontologies/2013/6/belfastgroup/$',
         TemplateView.as_view(template_name='bg-ontology.xml',
         content_type='text/xml'), name='bg-ontology'),
-
+    url(r'^robots\.txt$',
+        TemplateView.as_view(template_name='robots.txt',
+        content_type='text/plan'), name='robots.txt'),
 )
 
 # xml sitemaps for search-engine discovery

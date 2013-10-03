@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://testbeck.library.emory.edu/belfast/sitemap.xml
