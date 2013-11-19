@@ -3,6 +3,7 @@
 {% block page-subtitle %} | {{ flatpage.title }}{% endblock %}
 
 {% block content %}
+<div class="container">
     <h1 property="schema:name">{{ flatpage.title }}</h1>
 
     {% if perms.flatpages.change_flatpage or perms.flatpages.add_flatpage %}
@@ -19,4 +20,5 @@
     <div class="span7">
       {{ flatpage.content }}
   </div>
+</div>
 {% endblock %}
