@@ -13,6 +13,6 @@ $("document").ready(function(){
   .on('click','figure',function(){
     $url = $(this).find('a').attr('href');
     window.location.assign($url);
-  })
+  });
 
 });

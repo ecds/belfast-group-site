@@ -1,6 +1,10 @@
 {% extends 'site_base.html' %}
 {% load static %}
 
+{% block head-extras %}
+  <script src="{% static 'js/masonry.min.js' %}"></script>
+{% endblock %}
+
 {% block content %}
   <!-- START THE SECTIONS -->
   <div id="intro">
@@ -63,6 +67,8 @@
   </div>
   <!-- /END THE SECTIONS -->
 
-  <script src="{% static 'js/masonry.min.js' %}"></script>
+{% endblock %}
+
+{% block endbody %}
   <script src="{% static 'js/belfast.js' %}"></script>
 {% endblock %}
