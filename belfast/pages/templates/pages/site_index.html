@@ -2,12 +2,67 @@
 {% load static %}
 
 {% block content %}
-<div class="span9 text-center">
-    <div class="hero-unit">
-        <h1 property="schema:name">The Belfast Group</h1>
-        <img src="{% static 'img/old-splash.jpg' %}"/>
-    </div>
+  <!-- START THE SECTIONS -->
+  <div id="intro">
+    <div class="container">
+      <div class="section row">
+        <header class="col-xs-12 col-sm-10 col-sm-offset-1">
+          <h2 class="section-heading">The Belfast Group represented a new generation
+            of poets and writers from Northern Ireland.
+          </h2>
+        </header>
+        <div class="content col-xs-12 col-sm-9 col-sm-offset-1">
+          <p class="lead">From Philip Hobsbaum's house the Group grew to include young talent from all across Northern Ireland. The most notable members of the Group include Paul Muldoon, Michael Longley, James Simmons, and Seamus Heaney. <a href="#">Read more about the Group and their literary influence.</a>
+          </p>
+        </div>
+      </div>
+    </div><!-- /container -->
+  </div><!-- /#intro -->
 
-    <div>brief overview/introductory text will go here</div>
-</div>
+  <div id="networks">
+    <div class="container">
+      <div class="section row">
+        <header class="col-xs-12 col-sm-10 col-sm-offset-1">
+          <h2 class="section-heading">Interactive networks and digital group sheets
+            bring new light to the Belfast Group's influences.
+          </h2>
+        </header>
+        <div class="content col-xs-12 col-sm-9 col-sm-offset-1">
+          <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus, tellus ac cursus commodo.</p>
+          <button type="button" class="btn btn-primary pull-right">See how these connections made an impact ></button>
+        </div>
+      </div>
+    </div><!-- /container -->
+  </div><!-- /#networks -->
+
+  <div class="section" id="poets">
+    <figure>
+      <img src="{% static 'img/sh.png' %}"/>
+      <figcaption class="description">
+        <p><a href="#">Seamus Heaney</a></p>
+      </figcaption>
+    </figure>
+    <figure>
+      <img src="{% static 'img/pm.png' %}"/>
+      <figcaption class="description">
+        <p><a href="#">Paul Muldoon</a></p>
+      </figcaption>
+    </figure>
+    <figure>
+      <img src="{% static 'img/js.png' %}"/>
+      <figcaption class="description">
+        <p><a href="#">James Simmons</a></p>
+      </figcaption>
+    </figure>
+    <figure>
+      <img src="{% static 'img/ml.png' %}"/>
+      <figcaption class="description">
+        <p><a href="#">Michael Longley</a></p>
+      </figcaption>
+    </figure>
+  </div>
+  <!-- /END THE SECTIONS -->
+
+  <script src="{% static 'js/masonry.min.js' %}"></script>
+  <script src="{% static 'js/belfast.js' %}"></script>
 {% endblock %}

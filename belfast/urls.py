@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.conf.urls import patterns, include, url
 from django.views.generic import TemplateView
+from django.views.generic.base import RedirectView
 from django.contrib.sitemaps import FlatPageSitemap
 
 from belfast.pages import views as pages_views
@@ -21,6 +22,8 @@ urlpatterns = patterns(
     url(r'^network/', include('belfast.network.urls',
         namespace='network')),
     url(r'^', include('belfast.pages.urls')),
+    # add redirect for favicon at root of site
+    (r'^favicon\.ico$', RedirectView.as_view(url='/static/img/favicon.ico', permanent=True)),
     # Examples:
     # url(r'^$', 'belfast.views.home', name='home'),
     # url(r'^belfast/', include('belfast.foo.urls')),

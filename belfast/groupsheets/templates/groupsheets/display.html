@@ -15,9 +15,10 @@
 {% block body-attrs %}data-spy="scroll" data-target=".local-sidenav" data-offset-top="200"{% endblock %}
 
 {% block content %}
-  <div class="row">
+<div class="container">
 
-  <div class="contents span4 local-sidenav">
+  <div class="row">
+  <div class="contents col-md-4 local-sidenav">
     {# use toc item titles for RDF title list #}
     {% for toc in document.toc_list %}
       {% for item in toc.items %}
@@ -36,7 +37,7 @@
     </ul>
   </div> {# end sidenav #}
 
-  <div class="span5">
+  <div class="col-md-5">
     <h1 property="schema:name">{{ document.title }}</h1>
     <div>
       <p><strong>Time period</strong>: {{ document.date }}</p>
@@ -73,4 +74,5 @@
   </div> {# end right column #}
 
  </div> {# end row #}
+</div> {# end container #}
 {% endblock %}

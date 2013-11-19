@@ -11,7 +11,8 @@ class KeywordSearchForm(forms.Form):
         help_text=kw_help,
         widget=forms.TextInput(attrs={
             'autocomplete': 'off',
-            'class': 'search-query',
+            'class': 'searchform',
+            'placeholder': 'Search...',
             'autocomplete': 'off',
             'data-toggle': 'tooltip',
             'data-placement': 'bottom',

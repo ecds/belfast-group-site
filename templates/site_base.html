@@ -4,73 +4,104 @@ NOTE: This site uses RDFa and schema.org vocabulary.  Every page will be declare
 by default; use page_rdf_type to override with a webpage subclass.
 {% endcomment %}
 <!DOCTYPE html>
-<html xmlns:schema="http://schema.org/"
+<html lang="en" xmlns:schema="http://schema.org/"
 {# additional namespaces (primarly for semantic web/RDFa) #}
 {% for prefix, ns in extra_ns.iteritems %}xmlns:{{ prefix}}="{{ ns }}" {% endfor %}>
   <head>
     <title>{% block page-title %}The Belfast Group{% block page-subtitle %}{% endblock %}{% endblock %}</title>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    {#- Bootstrap #}
-    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" media="screen"/>
-    <link href="{% static 'bootstrap/css/bootstrap-responsive.min.css' %}" rel="stylesheet" media="screen"/>
-    <link href="{% static 'css/local.css' %}" rel="stylesheet" media="screen"/>
+    <link rel="icon" type="image/ico" href="{% static 'img/favicon.ico' %}" />
+
+    {# bootstrap v2 #}
+    {# <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" media="screen"/> #}
+    {# <link href="{% static 'bootstrap/css/bootstrap-responsive.min.css' %}" rel="stylesheet" media="screen"/> #}
+
+    {# Bootstrap core CSS #}
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" />
+    {# Custom CSS for the 'Belfast' Template #}
+    <link href="{% static 'css/belfast-style.css' %}" rel="stylesheet" />
+
+    {# <link href="{% static 'css/local.css' %}" rel="stylesheet" media="screen"/> #}
     <script src="{% static 'js/jquery.js' %}"></script>
-    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    {# <script src="{% static 'js/bootstrap.js' %}"></script> #}
+
     {% block head-extras %}{% endblock %}
   </head>
   <body typeof="{{ page_rdf_type|default:'schema:Webpage' }}" about="{{ page_rdf_url|default:request.build_absolute_uri }}"
    {% block body-attrs %}{% endblock %}>
-    <div id="wrap">
 
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container-fluid">
-          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="brand" href="{% url 'site-index' %}">The Belfast Group</a>
-          <div class="nav-collapse collapse">
+ <nav class="navbar navbar-fixed-top navbar-white" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="{% url 'site-index' %}">The Belfast Group</a>
+      </div>
 
-            {# keyword search form #}
-            {% if kwsearch_form %}
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse navbar-ex1-collapse">
+
+        <ul class="nav navbar-nav">
+          {% url 'site-index' as index_url %}
+          <li><a {% if request.path = index_url %} class="current"{% endif %} href="{{ index_url }}">Home</a></li>
+          {% url 'overview' as overview_url %}
+          <li><a {% if request.path = overview_url %} class="current"{% endif %} href="{{ overview_url }}">Overview</a></li>
+          {% url 'groupsheets:list' as groupsheet_list %}
+          <li><a {% if request.path = groupsheet_list %} class="current"{% endif %} href="{{ groupsheet_list }}">Group Sheets</a></li>
+          {# FIXME: use people list or bios here? #}
+          {% url 'people:list' as people_list %}
+          <li><a {% if request.path = people_list %} class="current"{% endif %} href="{{ people_list }}">Bios</a></li>
+          {% url 'network:force-graph' as network_url %}
+          <li><a {% if request.path = network_url %} class="current"{% endif %} href="{{ network_url }}">Networks</a></li>
+          <li class="search">
             <form class="form-search navbar-search pull-right" action="{% url 'groupsheets:search' %}">
               {{ kwsearch_form.keywords }}
-              <button type="submit" class="btn btn-primary"><i class="icon-search icon-white"></i></button>
+              <button type="submit" class="btn btn-search"><span class="glyphicon glyphicon-search"></span></button>
             </form>
-            {% endif %}
+          </li>
+        </ul>
 
-            <ul class="nav">
-              {% url 'overview' as overview_url %}
-              <li{% if request.path = overview_url %} class="active"{% endif %}>
-                <a href="{{ overview_url }}">Overview</a></li>
-              {% url 'groupsheets:list' as groupsheet_list %}
-              <li{% if request.path = groupsheet_list %} class="active"{% endif %}>
-                 <a href="{{ groupsheet_list }}">Group Sheets</a></li>
-              {% url 'people:list' as people_list %}
-              <li{% if request.path = people_list %} class="active"{% endif %}>
-                 <a href="{{ people_list }}">People</a></li>
-               {% url 'bios' as bios_url %}
-              <li{% if request.path = bios_url %} class="active"{% endif %}>
-                 <a href="{{ bios_url }}">Biographies</a></li>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container -->
+  </nav>
 
-               {% url 'network:force-graph' as network_url %}
-              <li{% if request.path = network_url %} class="active"{% endif %}>
-                 <a href="{{ network_url }}">Network</a></li>
-            </ul>
-          </div><!--/.nav-collapse -->
-        </div>
-      </div>
-    </div>
-
-    <div class="container-fluid">
+    {# <div class="container"> #}  {# NOTE: every page but index could probably use this #}
       {% block content %}{% endblock %}
-    </div>
+    {# </div> #}
 
-  <div id="push"></div>
-  </div> {# end wrap #}
+  <div class="footer">
+    <div class="container">
+      <!-- FOOTER -->
+      <footer>
+        <p>
+          <a href="http://beck.library.emory.edu/">Lewis H. Beck Center</a>
+          &middot;
+          <a href="http://marbl.library.emory.edu">Manuscript, Archives, and Rare Books Library</a>
+          &middot;
+          <a href="http://www.emory.edu/">Emory University</a>
+        </p>
+      </footer>
+      <!-- /END OF FOOTER -->
+    </div><!-- /container -->
+  </div><!-- /.footer-->
 
+
+    <script>
+    $(function () {
+      $('input[name=keywords]').tooltip();
+    });
+    </script>
+
+</body>
+
+</html>
+{% comment %}
     <div id="footer">
       <div class="container">
         <p class="pull-right">{{ SW_VERSION }}</p>
@@ -82,13 +113,4 @@ by default; use page_rdf_type to override with a webpage subclass.
         </ul>
       </div>
     </div>
-
-    <script>
-    $(function () {
-      $('input[name=keywords]').tooltip();
-    });
-    </script>
-
-
-  </body>
-</html>
+{% endcomment %}

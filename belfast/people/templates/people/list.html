@@ -3,6 +3,8 @@
 {% block page-subtitle %} | Members{% endblock %}
 
 {% block content %}
+<div class="container">
+
 <h1 property="schema:name">People associated with the Belfast Group</h1>
 <ul>
 {% for person in people %}
@@ -16,4 +18,6 @@
    </li>
 {% endfor %}
 </ul>
+
+</div>
 {% endblock %}

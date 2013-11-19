@@ -4,10 +4,11 @@
 {% block page-subtitle %} | Group Sheets{% endblock %}
 
 {% block content %}
+<div class="container">
 
 <div class="row">
 
-  <div class="span3 sidebar">
+  <div class="col-md-3 sidebar">
     <h4>Filter groupsheets</h4>
 
     {% if filters %}
@@ -47,7 +48,7 @@
 
   </div> {# end sidebar #}
 
-  <div class="span9">
+  <div class="col-md-9">
 
     <h1 property="schema:name">Group Sheets</h1>
 
@@ -62,5 +63,6 @@
     </ul>
   </div>
 
-</div>
+</div> {# end rows #}
+</div> {# end container #}
 {% endblock %}

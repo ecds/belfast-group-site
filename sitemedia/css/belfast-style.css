@@ -1,0 +1,349 @@
+body {
+	padding-top: 50px; /* 50px is the height of the navbar - change this if the navbarn height changes */
+
+	font-family: 'Droid Serif';
+}
+
+a{
+	color: #11a7e4;
+}
+
+.btn{
+	border-top-width: 0px;
+	border-right-width: 0px;
+	border-bottom-width: 2px;
+	border-left-width: 2px;
+}
+
+.btn-primary {
+	color: #1090C4;
+	background-color: #F5F5F5;
+	border-color: #B3B3B3;
+}
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open .dropdown-toggle.btn-primary {
+	color: #009EDF;
+	background-color: #E6E6E6;
+	border-color: #C4C4C4;
+}
+
+.btn-search {
+	background-color: rgba(0, 0, 0, 0);
+	border-color: rgba(0, 0, 0, 0);
+	padding-left: 8px;
+	padding-bottom: 3px;
+	margin-top: -4px;
+}
+
+.btn-search:hover, .btn-search:focus, .btn-search:active, .btn-search.active,
+.form-search:hover .btn-search{
+	color: #009EDF;
+}
+
+.btn-search:hover, .btn-search:focus, .btn-search:active, .btn-search.active{
+	background-color: #F7F7F7;;
+}
+
+body, .navbar-white{
+	background-color: #fff;
+	background-image: url('../img/blue-network.png');
+	background-repeat: no-repeat;
+}
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+	font-family: 'Droid Serif';
+	font-weight: 300;
+	line-height: 1.4;
+	color:#4E4E4E;
+}
+
+.navbar-white{
+	border: none;
+	border-bottom: 1px solid #888;
+}
+
+.navbar-white .navbar-toggle{
+	border-color: #DFDFDF;
+}
+
+.navbar-white .navbar-toggle .icon-bar{
+	background-color: #999;
+}
+
+.navbar-white a{
+	color: #333;
+}
+
+.nav > li > a {
+	text-transform: lowercase;
+	font-family: Arial,sans-serif;
+}
+
+.nav > li > a.current,
+.nav > li > a.current:hover,
+.nav > li > a:hover, .nav > li > a:focus{
+	background-color: #E5EEF1;
+	transition: background-color 0.2s ease-out;
+}
+
+.nav > li > a.current{
+	opacity: 0.7;
+	background-color: transparent;
+}
+
+.nav > li > a.current:hover{
+	opacity: 1;
+}
+
+.form-search{
+	margin:13px 0.85em 0px;
+}
+
+.form-search .searchform{
+	width: 100%;
+}
+
+@media (max-width: 768px) {
+	.container > .navbar-collapse{
+		background-color: rgba(255, 255, 255, 0.8);
+	}
+	.form-search{
+		width: 100%;
+		padding-bottom: 10px;
+	}
+	.form-search .searchform {
+		width: 48%;
+		float: left;
+		margin-left: 25px;
+	}
+}
+
+@media (min-width: 768px) {
+	.navbar-nav{
+		float: right;
+	}
+	.nav > li > a {
+		padding-left:5px;
+		margin-left: 7px;
+		padding-right:5px;
+		padding-top: 15px;
+		padding-bottom: 15px;
+	}
+
+	.nav > li:before{
+		content: '|';
+		float: left;
+		display: block;
+		position: absolute;
+		padding-top: 15px;
+	}
+
+	.nav > li:first-child:before{
+		content: '';
+	}
+	.section .lead {
+		font-size: 16px;
+	}
+
+	.navbar-nav .search{
+		margin-right: -50px;
+	}
+	.form-search .searchform{
+		opacity:0;
+		width:0;
+		transition:opacity .2s ease-out, width .2s ease-out;
+	}
+	.form-search:hover .searchform,
+	.form-search .searchform:focus{
+		opacity:1;
+		width:120px;
+	}
+}
+.navbar-brand{
+	font-size: 1.5em;
+}
+
+.headline {
+	padding: 120px 0;
+}
+
+.headline > .container > h1 {
+	font-size: 130px;
+	background: #ffffff;
+	background: rgba(255, 255, 255, 0.9);
+}
+
+.headline > .container > h2 {
+	font-size: 77px;
+	background: #ffffff;
+	background: rgba(255, 255, 255, 0.9);
+}
+
+.section-divider {
+	margin: 80px 0;
+}
+.section {
+	overflow: hidden; 
+}
+
+.section:first-child{
+	margin-top: 40px;
+}
+
+.section-image.pull-left {
+	margin-right: 40px;
+}
+.section-image.pull-right {
+	margin-left: 40px;
+}
+
+.section-heading {
+	font-size: 32px;
+	font-weight: 200;
+	margin-bottom: 0.75em;
+}
+
+.section .lead {
+	color: #7A7A7A;
+}
+
+
+#intro, #networks{
+	background-repeat: no-repeat;
+	background-size: 1200px;
+	padding-bottom: 180px;
+}
+#intro{
+	padding-top: 40px;
+	background-image: url('../img/connection-top.png');
+	background-position: 0 100%;
+}
+
+#networks{
+	background-color: #c2dbe5;
+	background-image: url('../img/connection-bottom.png');
+	background-position: 0 0%;
+	padding-bottom: 120px;
+}
+
+#poets{
+	background-image: url('../img/belfast-map.png');
+	background-image: url('../img/northern-ireland-map.png');
+	background-repeat: no-repeat;
+	background-size: auto 100%;
+	background-position: right top;
+}
+
+#poets, #poets figure{
+	background-color: #161616;
+}
+
+#poets figure{
+	cursor: pointer;
+}
+
+@media print{
+	#poets figure{
+		width: 200px;
+		float: left !important;
+		position: relative !important;
+		top: auto !important;
+		left: auto !important;
+	}
+	#poets figure img{
+		max-width: 100%;
+	}
+}
+
+#poets .description {
+	position: absolute;
+	float: left;
+	bottom: 15px;
+	left: 0px;
+}
+
+#poets .description p {
+	margin: 0;
+	color: #C2C2C2;
+	background-color: #161616;
+	background-color: rgba(32, 32, 32, 0.49);
+	padding: 3px 15px;
+}
+
+#poets .description a{
+	color: #C2C2C2;
+}
+
+#poets figure:hover .description a{
+	text-decoration: underline;
+}
+
+
+footer {
+	margin: 50px 0;
+}
+
+.footer{
+	background-color: #161616;
+	color: #64838F;
+}
+
+/* RESPONSIVE CSS */
+
+@media (max-width: 1200px) {
+
+	.headline > .container > h1 {font-size: 140px;}
+	.headline > .container > h2 {font-size: 63px;}
+	.section-divider {margin: 50px 0;}
+	.section-image.pull-left {margin-right: 20px;}
+	.section-image.pull-right {margin-left: 20px;}
+	.section-heading {font-size: 33px;}
+	.section .lead{font-size: 16px;}
+
+}
+
+@media (max-width: 991px) {
+
+	.headline > .container > h1 {font-size: 105px;}
+	.headline > .container > h2 {font-size: 50px;}
+	.section-divider {margin: 40px 0;}
+	.section-image {max-width: 50%;}
+	.section-image.pull-left {margin-right: 10px;}
+	.section-image.pull-right {margin-left: 10px;}
+	.section-heading {font-size: 30px;}
+	.section .lead{font-size: 13px;}
+
+}
+
+@media (max-width: 768px) {
+	
+	.container {margin: 0 15px;}
+	.section-divider {margin: 40px 0;}
+	.section-heading {font-size: 25px;}
+
+}
+
+
+@media (max-width: 668px) {
+
+	.headline > .container > h1 {font-size: 70px;}
+	.headline > .container > h2 {font-size: 32px;}
+	.section-divider {margin: 30px 0;}
+
+}
+
+@media (max-width: 640px) {
+
+	.headline {padding: 75px 0 25px 0;}
+	.headline > .container > h1 {font-size: 60px;}
+	.headline > .container > h2 {font-size: 30px;}
+
+}
+
+@media (max-width: 375px) {
+
+	.section-divider {margin: 10px 0;}
+	.section-image {max-width: 100%;}
+	.section-image.pull-left {margin-right: 0; margin-bottom: 10px;}
+	.section-image.pull-right {margin-left: 0; margin-bottom: 10px;}
+
+}
