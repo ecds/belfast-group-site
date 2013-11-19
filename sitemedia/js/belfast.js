@@ -1,10 +1,14 @@
 $("document").ready(function(){
-  $("#poets").masonry({
-    "itemSelector": 'figure',
-    "columnWidth": 1
-  })
+  var $poets = $("#poets");
 
-  .on('mouseover','figure',function(){
+  $(window).load(function(){
+   $poets.masonry({
+      "itemSelector": 'figure',
+      "columnWidth": 1
+    });
+  });
+  
+  $poets.on('mouseover','figure',function(){
     $(this).siblings("figure").children('img').stop().animate({"opacity":0.5});
   })
   .on('mouseout','figure',function(){
