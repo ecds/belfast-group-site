@@ -241,6 +241,19 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 	cursor: pointer;
 }
 
+
+/** Styles for the Poetry **/
+
+.linegroup p {
+font-family: 'PT Mono', courier, sans-serif;
+}
+
+.linegroup p strong{
+	font-family: courier, monospace, sans-serif;
+}
+
+/** end poetry style **/
+
 @media print{
 	#poets figure{
 		width: 200px;
