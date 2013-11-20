@@ -1,0 +1,558 @@
+
+<!DOCTYPE html>
+<html xmlns:ng="http://angularjs.org" ng-app ng-controller="Ctrl">
+<head>
+
+	<title>Style Tile</title>
+	<link href="css/bootstrap.css" rel="stylesheet" type="text/css"/>
+	<link rel="stylesheet" type="text/css" href="css/page.css"/>
+	<style type="text/css">
+	.loading-fonts{
+		display: none;
+		visibility: hidden;
+	}
+	html[class*='loading'] .loading-fonts{
+		display: block;
+		visibility: visible;
+	}
+	.poem p, #paragraph .poem p{
+		font-family: "PT Mono";
+	}
+	</style>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="bootstrap/js/bootstrap.min.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+	<script src="style-tile-import-1.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js"></script>
+	<script>
+	$(document).ready(function(){
+		WebFont.load({
+		    google: {
+		    	families: [
+	        	'Droid Serif','PT Mono'
+		        ]
+		    }
+		});
+		$("select").remove();
+	});
+	</script>
+
+
+	<script type="text/javascript">
+	$(document).ready(function(){
+
+		$(".dropdown, #images").on('click', 'a', function(e){
+			e.preventDefault();
+		});
+	});
+	</script>
+
+</head>
+
+<body>
+	<div class="container">
+		<div class="loading-fonts">loading webfonts...</div>
+		<header>
+			<h1 style="font-family:{{current0.name}}};font-weight:{{current_weight0.value}};">Style Tile: Belfast Group Site</h1>
+		</header>
+
+		<article id="intro">
+			<header>
+				<h2>Introduction</h2>
+			</header>
+			<section>
+				<p style="font-family:{{current2.name}};font-weight:{{current_weight2.value}};">Style Tiles are a design deliverable consisting of fonts, colors and interface elements that communicate the essence of a visual brand for the web. <a href="http://styletil.es/"> Source:styletil.es</a></p>
+			</section>
+		</article>
+
+		<article class="swatches">
+			<header>
+				<h2>Swatches</h2>
+			</header>
+
+			<section class="row">
+				<div class="col-xs-6 col-sm-4 col-md-3" ng-repeat="color in swatch">
+					<dl class="palette" style="background-color:{{color.hexVal}}">
+						<dt>	
+							<!-- <input style="width:1.75em;" type="color" ng-model="color.hexVal" />  -->
+						</dt>
+						<dt>
+							<label style="color:{{correctContrast(color.shade())}};">
+								{{color.hexVal}}<br/>
+								<span class="rgb">{{toRGB(color.hexVal)}}</span>
+							</label>
+						</dt>
+					</dl>
+					<dl class="palette" style="background-color:{{color.shade()}}">
+						<dt>
+							<label style="color:{{correctContrast(color.hexVal)}};">
+								{{color.shade()}}<br/>
+								<span class="rgb">{{toRGB(color.shade())}}</span>
+							</label>
+						</dt>
+					</dl>
+				</div>
+			</section>
+		</article>
+
+		<article id="typography">
+			<header>
+				<h2>Typography</h2>
+			</header>
+			
+			<section>
+				<header>
+					<h3>Display <small>{{current0.name}}</small></h3>
+				</header>
+				<div class="row col-xs-12">
+					<select ng-model='current0' ng-options='font.name group by font.type for font in fonts'></select>
+					<select ng-model='current_weight0' ng-options='font_weight.name for font_weight in font_weights'></select>
+					
+					
+				</div>
+				<p class="h1" style="font-family:{{current0.name}};font-weight:{{current_weight0.value}}">AaBbCc Handgloves</p>
+				
+			</section>
+			<section>
+				<header>
+					<h3>Headings <small>{{current1.name}}</small></h3>
+				</header>
+				<div class="row col-xs-12">
+					<select ng-model='current1' ng-options='font.name group by font.type for font in fonts'></select>
+					<select ng-model='current_weight1' ng-options='font_weight.name for font_weight in font_weights'></select>
+				</div>
+				
+				<section class="row" id="headings" style="font-family:{{current1.name}};font-weight:{{current_weight1.value}};">
+					
+					<div class="row col-xs-12">
+						<div class="col-xs-3">
+							<p class="h1"><span>Heading 1</span></p>
+						</div>
+						<div class="col-xs-9">
+							<p class="h1">The naive question broadens.</p>
+						</div>
+					</div>
+					
+					<div class="row col-xs-12">
+						<div class="col-xs-3">
+							<p class="h2"><span>Heading 2</span></p>
+						</div>
+						<div class="col-xs-9">
+							<p class="h2">The humor unifys the glorious thing.</p>
+						</div>
+					</div>
+					
+					<div class="row col-xs-12">
+						<div class="col-xs-3">
+							<p class="h3"><span>Heading 3</span></p>
+						</div>
+						<div class="col-xs-9">
+							<p class="h3">The experience assembles the industry.</p>
+						</div>
+					</div>
+					
+					<div class="row col-xs-12">
+						<div class="col-xs-3">
+							<p class="h4"><span>Heading 4</span></p>
+						</div>
+						<div class="col-xs-9">
+							<p class="h4">The polish collates the best development.</p>
+						</div>
+					</div>
+					
+					<div class="row col-xs-12">
+						<div class="col-xs-3">
+							<p class="h5"><span>Heading 5</span></p>
+						</div>
+						<div class="col-xs-9">
+							<p class="h5">The range discharges the unbecoming process.</p>
+						</div>
+					</div>
+
+					<div class="row col-xs-12">
+						<div class="col-xs-3">
+							<p class="h6"><span>Heading 6</span></p>
+						</div>
+						<div class="col-xs-9">
+							<p class="h6">The harmony discovers the committee.</p>
+						</div>
+					</div>
+				</section>
+			</section>
+
+			<section>
+				<header>
+					<h3>Paragraph <small>{{current2.name}}</small></h3>
+				</header>
+				<div class="row col-xs-12">
+					<select ng-model='current2' ng-options='font.name group by font.type for font in fonts'></select>
+					<select ng-model='current_weight2' ng-options='font_weight.name for font_weight in font_weights'></select>
+				</div>
+				<section id="paragraph" style="font-family:{{current2.name}};font-weight:{{current_weight2.value}};">
+					<div class="row col-xs-12">
+						<div class="col-xs-3">
+							<p><span>Paragraph</span></p>
+						</div>
+						<div class="col-xs-9">
+							<p>Over Him.</p>
+
+							<p>It must be borne in mind that all this time we have a Sperm Whale's prodigious head hanging to the Pequod's side. But we must let it continue hanging there a while till we can get a chance to attend to it. For the present other matters press, and the best we can do now for the head, is to pray heaven the tackles may hold.</p>
+
+							<p>Now, during the past night and forenoon, the Pequod had gradually drifted into a sea, which, by its occasional patches of yellow brit, gave unusual tokens of the vicinity of Right Whales, a species of the Leviathan that but few supposed to be at this particular time lurking anywhere near. And though all hands commonly disdained the capture of those inferior creatures; and though the Pequod was not commissioned to cruise for them at all, and though she had passed numbers of them near the Crozetts without lowering a boat; yet now that a Sperm Whale had been brought alongside and beheaded, to the surprise of all, the announcement was made that a Right Whale should be captured that day, if opportunity offered.</p>
+
+						</div>
+					</div>
+					<div class="row col-xs-12">
+						<div class="col-xs-3">
+							<p><span>Small</span></p>
+						</div>
+						<div class="col-xs-9">
+							<p>
+								<small>This is what the &lt;small&gt; font would look like.</small>
+							</p>
+						</div>
+					</div>
+					<br/>
+
+					<div class="row col-xs-12">
+						<div class="col-xs-3">
+							<p><span>Poem Text</span><br/><small>(PT Mono)</small></p>
+						</div>
+						<div class="col-xs-9">
+							<div class="poem">
+								<p>Here is Patrick </p>
+								<p>Banishing the serpents, </p>
+								<p>The gold nostrils flared</p>
+								<p>On his crozier. </p>
+							</div>
+						</div>
+					</div>
+				</section>
+			</section>
+		</article>
+
+
+		<article>
+			<header>
+				<h2>Examples</h2>
+			</header>
+			
+			<div class="row">
+				<section class="col-xs-12 col-md-6">
+					<div class="textbox" style="background-color:{{bg_color}};color:{{text_color}};">
+						<p class="h1" style="font-family:{{current0.name}};font-weight:{{current_weight0.value}};">A True Story</p>
+						<p class="h2" style="font-family:{{current1.name}};font-weight:{{current_weight1.value}};">Book One</p>
+						<p style="font-family:{{current2.name}};font-weight:{{current_weight2.value}};"><small>p. 249</small></p>
+						<p style="font-family:{{current2.name}};font-weight:{{current_weight2.value}};">Men interested in athletics and in the care of their bodies think not only of condition and exercise but also of relaxation in season; in fact, they consider this the principal part of training. In like manner students, I think, after much reading of serious works may profitably relax their minds and put them in better trim for future labour.</p>
+					</div>
+				</section>
+				<section class="col-xs-12 col-md-6" >
+					<div class="textbox" style="background-color:{{bg_color}};color:{{text_color}};">
+						<p class="h1" style="font-family:{{current0.name}};font-weight:{{current_weight0.value}};">Chapter 7</p>
+						<p class="h2" style="font-family:{{current1.name}};font-weight:{{current_weight1.value}};">A Mad Tea-Party</p>
+						<div class="row poem">
+							<div class="col-xs-6 linegroup">
+								<p>
+									`Have some wine,' the March Hare said in an encouraging tone.
+								</p>
+								<p>
+									Alice looked all round the table, but there was nothing on it but tea. `I don't see any wine,' she remarked.
+								</p>
+								<p>
+									`There isn't any,' said the March Hare.
+								</p>
+								<p>
+									`Then it wasn't very civil of you to offer it,' said Alice angrily.
+								</p>
+								<p>
+									`It wasn't very civil of you to sit down <strong>without being invited</strong>,' said the March Hare.
+								</p>
+								<p>
+									`I didn't know it was YOUR table,' said Alice; `it's laid for a great many more than three.'
+
+								</p>
+							</div>
+						</div>
+					</div>
+				</section>
+			</div>
+		</article>
+
+
+		<article class="col-xs-12 col-md-6 alpha-row">
+			<header>
+				<h2>Other Elements</h2>
+			</haeder>
+			<section>
+				<pre class="col-xs-10">
+This is a &lt;pre&gt; box
+				</pre>
+
+			</section>
+			<section>
+				<code>
+					This is a &lt;code&gt; box
+				</code>
+
+			</section>
+			<section>
+				<h3>Separators</h3>
+				<span class="col-xs-10">
+					<hr/>
+					<p style="font-family:{{current2.name}}">Some text with &lt;hr/&gt; separators.</p>
+					<hr/>
+					<p style="font-family:{{current2.name}}">More text.</p>
+				</span>
+			</section>
+			<section>
+				<header>
+					<h3>Captions</h3>
+				</header>
+				<section>
+					<figure>
+						<img src="img/sea_turtle.jpg" />
+						<figcaption>
+							This is the caption for the above image.
+						</figcaption>
+					</figure>
+				</section>
+			</section>
+
+			<section>
+				<header>
+					<h3>Quote</h3>
+				</header>
+				<section>
+					<blockquote>
+						<p>
+							"I found Rome a city of bricks and left it a city of marble."
+						</p>
+						<p>
+							<small>Suetonius on Augustus</small>
+						</p>
+					</blockquote>
+
+				</section>
+			</section>
+
+			<section>
+				<h3>Table</h3>
+				<section class="col-xs-12 row">
+					<table class="table">
+						<tbody style="font-family:{{current1.name}};font-weight:{{current_weight1.value}};">
+							<tr>
+								<th colspan=2>Top 6 Movies</th>
+							</tr>
+							<tr>
+								<th>Rank</th>
+								<th>Movie Title</th>
+							</tr>
+							<tr>
+								<td>1</td>
+								<td>The Shawshank Redemption (1994)</td>
+							</tr>
+							<tr>
+								<td>2</td>
+								<td>The Godfather (1972)</td>
+							</tr>
+							<tr>
+								<td>3</td>
+								<td>The Godfather: Part II (1974)</td>
+							</tr>
+							<tr>
+								<td>4</td>
+								<td>Pulp Fiction (1994)</td>
+							</tr>
+							<tr>
+								<td>5</td>
+								<td>The Good, the Bad and the Ugly (1966)</td>
+							</tr>
+							<tr>
+								<td>6</td>
+								<td>The Dark Knight (2008)</td>	
+							</tr>
+
+						</tbody>
+					</table>
+				</section>
+			</section>
+		</article>
+
+		<article class="col-xs-12 col-md-6 row">
+			<header>
+				<h2>Buttons</h2>
+			</header>
+			<section class="row">
+				<div class="col-xs-12 col-sm-3">
+					<input style="font-family:{{current1.name}}" type="button" class="btn" value="Default"/>
+				</div>
+				<div class="col-xs-12 col-sm-3">
+					<input style="font-family:{{current1.name}}" type="button" class="btn btn-primary" value="Primary"/>
+				</div>
+				<div class="col-xs-12 col-sm-3">
+					<input style="font-family:{{current1.name}}" type="button" class="btn btn-info" value="Info"/>
+				</div>
+				<div class="col-xs-12 col-sm-3">
+					<input style="font-family:{{current1.name}}" type="button" class="btn btn-success" value="Success"/>
+				</div>
+				<div class="col-xs-12 col-sm-3">
+					<input style="font-family:{{current1.name}}" type="button" class="btn btn-warning" value="Warning"/>
+				</div>
+				<div class="col-xs-12 col-sm-3">
+					<input style="font-family:{{current1.name}}" type="button" class="btn btn-danger" value="Danger"/>
+				</div>
+				<div class="col-xs-12 col-sm-3">
+					<input style="font-family:{{current1.name}}" type="button" class="btn btn-inverse" value="Inverse"/>
+				</div>
+				<div class="col-xs-12 col-sm-3">
+					<input style="font-family:{{current1.name}}" type="button" class="btn disabled" value="Disabled"/>
+				</div>
+			</section>
+		</article>
+
+		<article class="col-xs-12 col-md-6 row">
+			<header>
+				<h2>Inputs</h2>
+			</header>
+			<section class="row">
+				<div class="form-group col-xs-12 col-sm-3 col-md-6">
+					<label style="font-family:{{current1.name}};font-weight:{{current_weight1.value}};" class="control-label" for="input">Default input</label>
+					<input style="font-family:{{current2.name}};font-weight:{{current_weight2.value}};" type="text" class="form-control" id="input"/>
+				</div>
+
+				<div class="form-group has-success col-xs-12 col-sm-3 col-md-6">
+					<label style="font-family:{{current1.name}};font-weight:{{current_weight1.value}};" class="control-label" for="inputSuccess">Input with success</label>
+					<input style="font-family:{{current2.name}};font-weight:{{current_weight2.value}};" type="text" class="form-control" id="inputSuccess"/>
+				</div>
+
+				<div class="form-group has-warning col-xs-12 col-sm-3 col-md-6">
+					<label style="font-family:{{current1.name}};font-weight:{{current_weight1.value}};" class="control-label" for="inputWarning">Input with warning</label>
+					<input style="font-family:{{current2.name}};font-weight:{{current_weight2.value}};" type="text" class="form-control" id="inputWarning"/>
+				</div>
+
+				<div class="form-group has-error col-xs-12 col-sm-3 col-md-6">
+					<label style="font-family:{{current1.name}};font-weight:{{current_weight1.value}};" class="control-label" for="inputError">Input with error</label>
+					<input style="font-family:{{current2.name}};font-weight:{{current_weight2.value}};" type="text" class="form-control" id="inputError"/>
+				</div>
+
+				<div class="form-group col-xs-12 col-sm-3 col-md-6">
+					<label style="font-family:{{current1.name}};font-weight:{{current_weight1.value}};" class="control-label" for="inputDisabled">Disabled input</label>
+					<input style="font-family:{{current2.name}};font-weight:{{current_weight2.value}};" type="text" class="form-control" id="inputDisabled" disabled="disabled"/>
+				</div>
+			</section>
+		</article>
+
+		<article class="row">
+			<section class="col-xs-12 col-md-6">
+				<header>
+					<h2>Checkboxes</h2>
+				</header>
+
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" value=""/>
+						Unchecked
+					</label>
+				</div>
+
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" value="" checked="checked"/>
+						Checked
+					</label>
+				</div>
+
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" value="" disabled="disabled"/>
+						Unchecked and disabled
+					</label>
+				</div>
+
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" value="" checked="checked" disabled="disabled"/>
+						Checked and disabled
+					</label>
+				</div>			
+
+			</section>
+
+			<section class="col-xs-12 col-md-6">
+				<header>
+					<h2>Radios</h2>
+				</header>
+
+				<div class="radio">
+					<label>
+						<input type="radio" name="optionsRadios1" id="optionsRadios1" value="option1"/>
+						Radio off
+					</label>
+				</div>
+
+				<div class="radio">
+					<label>
+						<input type="radio" name="optionsRadios1" id="optionsRadios2" value="option2" checked="checked"/>
+						Radio on
+					</label>
+				</div>
+				<div class="radio">
+					<label>
+						<input type="radio" name="optionsRadios2" id="optionsRadios3" value="option3" disabled="disabled"/>
+						Radio off and disabled
+					</label>
+				</div>
+				<div class="radio">
+					<label>
+						<input type="radio" name="optionsRadios2" id="optionsRadios4" value="option4" checked="checked" disabled="disabled"/>
+						Radio on and disabled
+					</label>
+				</div>
+			</section>
+		</article>
+
+		<article id="images">
+			<header>
+				<h2>Images</h2>
+			</header>
+			<section class="alpha-row">
+				<div class="col-xs-4 col-md-3">
+					<img src="img/bald_eagle.jpg" alt="Bald Eagle" class="img-rounded"/>
+				</div>
+				<div class="col-xs-4 col-md-3">
+					<img src="img/grey_heron.jpg" alt="Grey Heron" class="img-circle"/>
+				</div>
+				<div class="col-xs-4 col-md-3">
+					<img src="img/playing_chess.jpg" alt="Man Playing Chess" class="img-thumbnail"/>
+				</div>
+			</section>
+			<section>
+				<header>
+					<h3>Hover State</h3>
+				</header>
+				<section class="row">
+				<div class="col-xs-4 col-md-3">
+					<a href="#" class="hover">
+						<img src="img/playing_chess.jpg" alt="Sample link to the this same page."/>
+					</a>
+				</div>
+
+				<div class="col-xs-4 col-md-3">
+					<a href="#" class="example">
+						<img src="img/playing_chess.jpg" alt="Sample link to the this same page."/>
+					</a>
+				</div>
+			</section>
+			</section>
+		</article>
+
+
+
+		
+</div><!--/.container-->
+
+</body>
+</html>

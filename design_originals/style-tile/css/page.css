@@ -1,0 +1,232 @@
+	body{
+		font-size: 16px;
+		color:#4E4E4E;
+	}
+	body p{
+		font-family: "Times New Roman", Times, serif;
+	}
+	
+	.container{
+		padding-bottom: 2em;
+	}
+
+	article{
+		float: left;
+	}
+	article section{
+		float: left;
+		width: 100%;
+	}
+	article section.row{
+		width: 104%;
+	}
+	img{
+		max-width: 100%;
+	}
+
+	a.hover, a.example{
+		background-color: black;
+		float: left;
+	}
+
+	a.example img{
+		width: 100%;
+		transition:opacity 300ms;
+	}
+
+	a.hover img, a.example:hover img{
+		opacity: 0.6;
+	}
+
+	.form-control{
+		border-radius: 1px;
+	}
+
+/*Button Styles*/
+.btn{
+	border-top-width: 0px;
+	border-right-width: 0px;
+	border-bottom-width: 2px;
+	border-left-width: 2px;
+}
+
+.btn-primary {
+	color: #1090C4;
+	background-color: #F5F5F5;
+	border-color: #B3B3B3;
+}
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open .dropdown-toggle.btn-primary {
+	color: #009EDF;
+	background-color: #E6E6E6;
+	border-color: #C4C4C4;
+}
+
+.btn-warning {
+	border-color: #C58325;
+}
+
+/*end Button Style*/
+
+/*Dropdown Style*/
+	.dropdown .h4{
+		float: left;
+	}
+
+	.dropdown .toggle {
+		font-size: 2em;
+		line-height: 18px;
+		text-decoration: none;
+		margin-left: 12px;
+	}
+	.dropdown-menu > li > a, 
+	.dropdown .h4{
+		text-transform: capitalize;
+	}
+
+/*end Dropdown Style*/
+
+/*Figure Style*/
+	figure {
+		float: left;
+		border: 1px solid #FFF;
+		border-radius: 3px;
+		overflow: hidden;
+	}
+	figcaption {
+		padding: 0.5em;
+		font-size: 0.8em;
+		background-color: #EEE;
+	}
+/*end Figure Style*/
+
+/*Table Style*/
+	.table {
+		border: 1px solid #EEE;
+		border-radius: 3px;
+		border-collapse: separate;
+	}
+	.table tr:nth-child(2n){
+		background-color: #EEE;
+	}
+/*end Table Style*/
+
+	.alpha{
+		padding-left: 0px;
+	}
+	.alpha-row {
+		margin-left: -15px;
+		margin-right: 30px;
+	}
+	.btn {
+		margin-bottom: 1em;
+		border-top-width:2px;
+		border-bottom-width:0px; 
+		width: 100%;
+	}
+	.btn-inverse{
+		color: #FFF;
+		background-color: #3D3434;
+		border-color: #332C2C;
+	}
+	.btn-inverse:hover{
+		color: #FFF;
+		background-color: #574B4B;
+	}
+
+/*Font Family Sections*/	
+	#typography section{
+		margin-bottom:0.5em;
+	}
+	
+	#typography select{
+		margin-top:0em;
+		margin-bottom:1em;
+	}
+
+	#typography option{
+		text-transform: capitalize;
+	}
+/*end Font Family Sections*/
+
+/*Headings*/
+	#headings .h1, 
+	#headings .h2, 
+	#headings .h3, 
+	#headings .h4, 
+	#headings .h5, 
+	#headings .h6{
+		font-family: inherit;
+		font-weight: inherit;
+		line-height: 32px;
+	}
+
+	#headings span{
+		font-size: 14px;
+	}
+/*endHeadings*/
+
+
+/*Paragraph*/
+	#paragraph p{
+		font-family: inherit;
+	}
+/*end Paragraph*/
+
+/* Styles for the Poetry */
+.linegroup p {
+font-family: 'PT Mono', courier, sans-serif;
+font-size: 0.9em;
+}
+
+.linegroup p strong{
+	font-family: courier, monospace, sans-serif;
+}
+/* end poetry style */
+
+/*Textbox*/
+	.textbox {
+		border: 1px solid #E0E0E0;
+		border-top-width: 3px;
+		border-radius: 3px;
+		padding: 5px 10px;
+		margin-bottom: 20px;
+		background-color: #FFF;
+	}
+/*endTextbox*/
+
+	.swatches{
+		width: 100%;
+	}
+	.swatches section > div{
+		margin-bottom: 2em;
+	}
+	.palette{
+		float: left;
+		clear: both;
+		height: 8em;
+		width: 100%;
+		margin-top: 0px;
+		margin-bottom: 0px;
+		padding: 1em 0.5em 0.5em;
+	}
+
+	.palette dt{
+		text-transform: uppercase;
+	}
+	.palette label .rgb{
+		font-weight: normal;
+	}
+	
+	#display p{
+		font-family: "Arial Black";
+	}
+	#primary p{
+		font-family: "Arial";
+	}
+	#secondary p{
+		font-family: "Times New Roman";
+	}
+
+	#images div{
+		margin-bottom: 15px;
+	}
