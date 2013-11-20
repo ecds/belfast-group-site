@@ -72,29 +72,47 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 	color: #333;
 }
 
+<<<<<<< HEAD
 
 .navbar-white .nav > li > a {
+=======
+.navbar-header .nav > li > a {
+>>>>>>> 4637c5a7fcd3c1c8e125ac05635144344c6530d9
 	text-transform: lowercase;
 	font-family: Arial,sans-serif;
 }
 
+<<<<<<< HEAD
 
 .navbar-white .nav > li > a.current,
 .navbar-white .nav > li > a.current:hover,
 .navbar-white .nav > li > a:hover, 
 .navbar-white .nav > li > a:focus{
+=======
+.navbar-header .nav > li > a.current,
+.navbar-header .nav > li > a.current:hover,
+.navbar-header .nav > li > a:hover, .navbar-header .nav > li > a:focus{
+>>>>>>> 4637c5a7fcd3c1c8e125ac05635144344c6530d9
 	background-color: #E5EEF1;
 	transition: background-color 0.2s ease-out;
 }
 
+<<<<<<< HEAD
 
 .navbar-white .nav > li > a.current{
+=======
+.navbar-header .nav > li > a.current{
+>>>>>>> 4637c5a7fcd3c1c8e125ac05635144344c6530d9
 	opacity: 0.7;
 	background-color: transparent;
 }
 
+<<<<<<< HEAD
 
 .navbar-white .nav > li > a.current:hover{
+=======
+.navbar-header .nav > li > a.current:hover{
+>>>>>>> 4637c5a7fcd3c1c8e125ac05635144344c6530d9
 	opacity: 1;
 }
 
@@ -129,7 +147,11 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 	.navbar-nav{
 		float: right;
 	}
+<<<<<<< HEAD
 	.navbar-white .nav > li > a {
+=======
+	.navbar-header .nav > li > a {
+>>>>>>> 4637c5a7fcd3c1c8e125ac05635144344c6530d9
 		padding-left:5px;
 		margin-left: 7px;
 		padding-right:5px;
@@ -137,7 +159,11 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 		padding-bottom: 15px;
 	}
 
+<<<<<<< HEAD
 	.navbar-white .nav > li:before{
+=======
+	.navbar-header .nav > li:before{
+>>>>>>> 4637c5a7fcd3c1c8e125ac05635144344c6530d9
 		content: '|';
 		float: left;
 		display: block;
@@ -145,7 +171,11 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 		padding-top: 15px;
 	}
 
+<<<<<<< HEAD
 	.navbar-white .nav > li:first-child:before{
+=======
+	.navbar-header .nav > li:first-child:before{
+>>>>>>> 4637c5a7fcd3c1c8e125ac05635144344c6530d9
 		content: '';
 	}
 	.section .lead {
