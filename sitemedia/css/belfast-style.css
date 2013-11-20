@@ -73,24 +73,25 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 	color: #333;
 }
 
-.nav > li > a {
+.navbar-white .nav > li > a {
 	text-transform: lowercase;
 	font-family: Arial,sans-serif;
 }
 
-.nav > li > a.current,
-.nav > li > a.current:hover,
-.nav > li > a:hover, .nav > li > a:focus{
+.navbar-white .nav > li > a.current,
+.navbar-white .nav > li > a.current:hover,
+.navbar-white .nav > li > a:hover, 
+.navbar-white .nav > li > a:focus{
 	background-color: #E5EEF1;
 	transition: background-color 0.2s ease-out;
 }
 
-.nav > li > a.current{
+.navbar-white .nav > li > a.current{
 	opacity: 0.7;
 	background-color: transparent;
 }
 
-.nav > li > a.current:hover{
+.navbar-white .nav > li > a.current:hover{
 	opacity: 1;
 }
 
@@ -100,6 +101,10 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 
 .form-search .searchform{
 	width: 100%;
+}
+
+.form-control{
+	border-radius: 1px;
 }
 
 @media (max-width: 768px) {
@@ -253,6 +258,8 @@ font-family: 'PT Mono', courier, sans-serif;
 }
 
 /** end poetry style **/
+
+
 
 @media print{
 	#poets figure{
