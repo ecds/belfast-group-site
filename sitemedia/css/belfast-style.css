@@ -1,6 +1,5 @@
 body {
-	padding-top: 50px; /* 50px is the height of the navbar - change this if the navbarn height changes */
-
+	padding-top: 50px; /* 50px is the height of the navbar - change this if the navbar height changes */
 	font-family: 'Droid Serif';
 }
 
@@ -73,10 +72,12 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 	color: #333;
 }
 
+
 .navbar-white .nav > li > a {
 	text-transform: lowercase;
 	font-family: Arial,sans-serif;
 }
+
 
 .navbar-white .nav > li > a.current,
 .navbar-white .nav > li > a.current:hover,
@@ -86,10 +87,12 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 	transition: background-color 0.2s ease-out;
 }
 
+
 .navbar-white .nav > li > a.current{
 	opacity: 0.7;
 	background-color: transparent;
 }
+
 
 .navbar-white .nav > li > a.current:hover{
 	opacity: 1;
@@ -126,7 +129,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 	.navbar-nav{
 		float: right;
 	}
-	.nav > li > a {
+	.navbar-white .nav > li > a {
 		padding-left:5px;
 		margin-left: 7px;
 		padding-right:5px;
@@ -134,7 +137,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 		padding-bottom: 15px;
 	}
 
-	.nav > li:before{
+	.navbar-white .nav > li:before{
 		content: '|';
 		float: left;
 		display: block;
@@ -142,7 +145,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 		padding-top: 15px;
 	}
 
-	.nav > li:first-child:before{
+	.navbar-white .nav > li:first-child:before{
 		content: '';
 	}
 	.section .lead {
@@ -187,7 +190,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 	margin: 80px 0;
 }
 .section {
-	overflow: hidden; 
+	overflow: hidden;
 }
 
 .section:first-child{
@@ -335,7 +338,7 @@ footer {
 }
 
 @media (max-width: 768px) {
-	
+
 	.container {margin: 0 15px;}
 	.section-divider {margin: 40px 0;}
 	.section-heading {font-size: 25px;}
