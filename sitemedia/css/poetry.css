@@ -1,0 +1,47 @@
+/* adjust anchor links so they fall below site fixed header */
+.poem {
+  padding-top: 60px;
+  margin-top: -60px;
+}
+a[name] {
+  text-decoration: none;
+  color: black;
+}
+
+.local-sidenav {
+    padding: 20px 0;
+}
+
+/* style active title in poetry table of contents (preliminary) */
+.local-sidenav .active {
+  background-color: #E6E6E6;
+  border-left: 1px solid gray;
+}
+.local-sidenav .active a {
+  color: black;
+}
+
+/* group sheet + poetry formatting */
+.epigraph {
+    font-style:italic;
+}
+.linegroup {
+   margin: 1em 0;
+}
+.linegroup p {
+    margin: 0;
+}
+.poem blockquote {
+    border-left: none;
+}
+
+.groupsheet-list p {
+    margin: 0;
+}
+.groupsheet-list li {
+    padding-bottom: 10px;
+}
+
+.description {
+    white-space: pre-line;
+}

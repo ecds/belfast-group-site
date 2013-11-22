@@ -1,5 +1,5 @@
 {% extends 'site_base.html' %}
-{% load tei %}
+{% load tei %} {% load static %}
 
 {% block page-subtitle %} | {{ document.title }}{% endblock %}
 
@@ -10,6 +10,8 @@
   <link rel="alternate" type="application/rdf+xml" href="{% url 'groupsheets:view' document.id %}RDF/"/>
   {# NOTE: not strictly an alternate (may contain multiple groupsheets), but close... #}
   <link rel="alternate" type="application/xml" href="{% url 'groupsheets:xml' document.document_name %}"/>
+  {# styles specific to the poetry #}
+  <link href="{% static 'css/poetry.css' %}" rel="stylesheet"/>
 {% endblock %}
 
 {% block body-attrs %}data-spy="scroll" data-target=".local-sidenav" data-offset-top="200"{% endblock %}
@@ -59,10 +61,12 @@
     {% for poem in document.poems %}
     {# NOTE: using ARK URL plus the poem id for poem URI #}
       <div class="poem" typeof="schema:CreativeWork" about="{{ document.ark}}#{{poem.id }}" id="{{ poem.id }}">
-        <a name="{{ poem.id }}"> </a>
-        {% if poem.title %}
-          <h3 property="schema:name">{{ poem.title }}</h3>
-        {% endif %}
+        <hr/>
+        <a name="{{ poem.id }}">
+          {% if poem.title %}
+            <h3 property="schema:name">{{ poem.title }}</h3>
+          {% endif %}
+        </a>
         {{ poem.body|format_tei }}
         {% if poem.byline %}
           <p class="byline">{{ poem.back|format_tei }}</p>
