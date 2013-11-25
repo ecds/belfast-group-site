@@ -1,7 +1,10 @@
 /* adjust anchor links so they fall below site fixed header */
 .poem {
-  padding-top: 60px;
-  margin-top: -60px;
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.poem hr {
+  margin: 0;
 }
 a[name] {
   text-decoration: none;
