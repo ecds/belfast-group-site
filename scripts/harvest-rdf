@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+
+from urlparse import urlparse
+import argparse
+
+from belfast.data.harvest import HarvestRdf
+
+# todo: move into a utils file
+
+
+def absolute_url(url):
+    # argparse type helper to validate url input
+    parsed_url = urlparse(url)
+    if not parsed_url.scheme or not parsed_url.netloc:
+        msg = 'An absolute URL is required'
+        raise argparse.ArgumentTypeError(msg)
+    return parsed_url.geturl()
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Harvest RDFa from a specified URL')
+    parser.add_argument('url', metavar='URL', type=absolute_url, nargs='+',
+                        help='URL where RDFa should be harvested')
+    parser.add_argument('--related', action='store_true',
+                        help='Also harvest RDFa from related urls')
+    parser.add_argument('-o', '--output', metavar='DIR',
+                        help='directory where harvested content should be saved',
+                        required=True)
+    parser.add_argument('-f', '--format', metavar='FORMAT', default='xml',
+                        help='output format (one of: %(choices)s; default is %(default)s)',
+                        choices=['xml', 'n3', 'turtle'])
+    # TODO: verbosity setting?
+    parser.add_argument('-v', '--verbosity', metavar='VERBOSITY', type=int,
+                        choices=[0, 1, 2], default=1,
+                        help='Verbosity level; 0=minimal, 1=normal, 2=verbose')
+    args = parser.parse_args()
+    HarvestRdf(args.url, output_dir=args.output, format=args.format,
+               find_related=args.related, verbosity=args.verbosity)

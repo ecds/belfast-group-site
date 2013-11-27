@@ -36,9 +36,10 @@ EXISTDB_SERVER_URL = "http://megaserver.example.com:8042/exist"
 EXISTDB_ROOT_COLLECTION = "/sample_collection"
 #EXISTDB_TEST_COLLECTION = "/test/sample"
 
-RDF_DATA_DIR = '/path/to/github/belfast-group-data/data/'
-# path to network file generated from rdf data via networkx (temporary?)
-GEXF_DATA = '/path/to/github/belfast-group-data/belfast-group-data.gexf'
+# path for the RDF berkeley db
+RDF_DATABASE = os.path.join(BASE_DIR, 'belfastrdf.bdb')
+# path to network file generated from rdf data via networkx
+GEXF_DATA = os.path.join(BASE_DIR, 'belfastgroup.gexf')
 
 
 CACHES = {

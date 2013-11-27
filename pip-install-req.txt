@@ -8,6 +8,11 @@ html5lib
 progressbar
 git+https://github.com/RDFLib/rdflib-sqlalchemy#egg=rdflib-sqlalchemy
 
+# additional rdf script reqs
+requests>=1.1
+BeautifulSoup4
+SPARQLWrapper
+
 # for graph matrices?
 numpy
 #scipy (?)

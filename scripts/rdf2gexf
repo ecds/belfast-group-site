@@ -1,0 +1,21 @@
+#!/usr/bin/env python
+
+import argparse
+
+# simple script to load rdf data and convert into a networkx graph,
+# then exported as GEXF for manual interaction with tools like Gephi
+
+from belfastdata.nx import Rdf2Gexf
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Generate a network graph file in GEXF format based on RDF'
+    )
+    parser.add_argument('files', metavar='FILE', nargs='+',
+                        help='files to be processed')
+    parser.add_argument('-o', '--output', metavar='OUTFILE',
+                        help='filename for GEXF to be generated',
+                        required=True)
+    args = parser.parse_args()
+    Rdf2Gexf(args.files, args.output)
