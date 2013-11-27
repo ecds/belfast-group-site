@@ -23,46 +23,6 @@ html, body {
 #footer {
     background-color: #f5f5f5;
 }
-/* adjust anchor links so they fall below site fixed header */
-a[name] {
-  padding-top: 50px;
-  margin-top: -50px;
-  display: inline-block; /* required for webkit browsers */
-  text-decoration: none;
-  color: black;
-}
-
-.local-sidenav {
-    padding: 20px 0;
-}
-
-/* group sheet + poetry formatting */
-.poem {
-    border-top: 1px solid gray;
-}
-.epigraph {
-    font-style:italic;
-}
-.linegroup {
-   margin: 1em 0;
-}
-.linegroup p {
-    margin: 0;
-}
-.poem blockquote {
-    border-left: none;
-}
-
-.groupsheet-list p {
-    margin: 0;
-}
-.groupsheet-list li {
-    padding-bottom: 10px;
-}
-
-.description {
-    white-space: pre-line;
-}
 
 /* Tablet  ------------------------- */
 @media (max-width: 767px) {
