@@ -14,7 +14,7 @@
     {% if filters %}
       <ul>
         {% for label, link in filters.iteritems %}
-        <li>{{ label }} <a class="small" href="{{ link }}"><i class="icon-remove-sign"></i></a></li>
+        <li>{{ label }} <a class="small" href="{{ link }}"><span class="glyphicon glyphicon-remove-sign"></span></a></li>
         {% endfor %}
     </ul>
     {% endif %}
