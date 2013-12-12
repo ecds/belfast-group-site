@@ -5,6 +5,7 @@ from eulexistdb.models import XmlModel
 import logging
 import rdflib
 from rdflib.collection import Collection as RdfCollection
+import time
 
 from belfast import rdfns
 from belfast.util import rdf_data, normalize_whitespace
@@ -132,7 +133,7 @@ class RdfGroupSheet(rdflib.resource.Resource):
         return self.value(rdfns.SCHEMA_ORG.URL)
 
     @property
-    def groupsheet_id(self):
+    def tei_id(self):
         if self.url:
             return id_from_ark(str(self.url.identifier))
 
@@ -168,13 +169,15 @@ class RdfGroupSheet(rdflib.resource.Resource):
                 titles.extend(RdfCollection(self.graph, bnode))
         return titles
 
+    # FIXME: should be able to do this more efficiently;
+    # set to return an rdf resource with a name...
+
     @property
     def sources(self):
         ''''Dictionary of archival collections that hold copies of this groupsheet.
         Key is URI,
         '''
         sources = {}
-
         # FIXME: for ormsby, this is displaying the series title in one case
         # rather than the collection title (subsubseries... )
 
@@ -212,31 +215,63 @@ class RdfGroupSheet(rdflib.resource.Resource):
                         sources[unicode(pcoll)] = name  # title/name ?
         return sources
 
+def groupsheet_by_url(url):
+    start = time.time()
+    # FIXME: could we just find by url? should be a groupsheet...
+    # could use triple instead of query
+    g = rdf_data()
+    uris = list(g.subjects(rdfns.SCHEMA_ORG.URL, rdflib.URIRef(url)))
+    logger.debug('Found %d group sheet for url %s in %.02f sec' % (
+                 len(uris), url, time.time() - start))
+    print uris
+    if uris:
+        return RdfGroupSheet(g, uris[0])
+    # print list(g.subjects(rdfns.SCHEMA_ORG.URL, rdflib.URIRef(url)))
+    # res = g.query('''
+    #     PREFIX schema: <%(schema)s>
+    #     PREFIX rdf: <%(rdf)s>
+    #     SELECT ?ms
+    #     WHERE {
+    #         ?ms rdf:type <%(bg)s> .
+    #         ?ms schema:URL <%(url)s>
+    #     }
+    #     ''' % {'schema': rdfns.SCHEMA_ORG, 'rdf': rdflib.RDF,
+    #            'bg': rdfns.BG.GroupSheet, 'url': url}
+    # )
+
+
+    # FIXME: none if empty
+
+
 
 def get_rdf_groupsheets(author=None, has_url=None):
     # query rdf data to get a list of belfast group sheets
     # optionally filter by author (takes a URI)
+    start = time.time()
     g = rdf_data()
     fltr = ''
     if author is not None:
-        fltr = '. ?ms schema:author <%s> ' % author
+        fltr = '. ?ms dc:creator <%s> ' % author
 
     if has_url is True:
         fltr += '. ?ms schema:URL ?url '
 
     res = g.query('''
         PREFIX schema: <%(schema)s>
+        PREFIX dc: <%(dc)s>
         PREFIX rdf: <%(rdf)s>
         SELECT DISTINCT ?ms
         WHERE {
             ?ms rdf:type <%(bg)s> .
-            ?ms schema:author ?author .
-            ?author schema:name ?name
+            ?ms dc:creator ?author .
+            ?author schema:familyName ?name
             %(filter)s
         } ORDER BY ?name
-        ''' % {'schema': rdfns.SCHEMA_ORG, 'rdf': rdflib.RDF,
-               'bg': rdfns.BG.GroupSheet, 'filter': fltr}
+        ''' % {'schema': rdfns.SCHEMA_ORG, 'dc': rdfns.DC,
+               'rdf': rdflib.RDF, 'bg': rdfns.BG.GroupSheet, 'filter': fltr}
     )
+                # ?author schema:familyName ?name
+                        # } ORDER BY ?name
 
     # } ORDER BY ?authorLast
     # FIXME:  only QUB has schema:familyName so that query restricts to them
@@ -245,6 +280,9 @@ def get_rdf_groupsheets(author=None, has_url=None):
     # skos:prefLabel is in VIAF data but not directly related to viaf entity
 
     # FIXME: restricting to ms with author loses one anonymous sheet
+
+    logger.debug('Found %d group sheets in %.02f sec' % (len(res),
+                 time.time() - start))
 
     gs = [RdfGroupSheet(g, r['ms']) for r in res]
     return gs

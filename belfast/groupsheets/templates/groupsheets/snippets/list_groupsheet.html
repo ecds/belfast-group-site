@@ -1,12 +1,12 @@
 {# snippet to display a single rdf groupsheet #}
 <p>
   {# FIXME: should list author if different than profile name (e.g. Brendan Kennelly poems on Heaney groupsheet) #}
-  {% if doc.author and not profile %} <b>{{ doc.author.last_name }}, {{ doc.author.first_name }}</b> {% endif %}
-{% for t in doc.title_list %}
+  {% if doc.author and not profile %} <b>{{ doc.author.lastname }}, {{ doc.author.firstname }}</b>
+  {% endif %}
+{% for t in doc.titles %}
 "{{ t }},"
 {% empty %}
-  {# Untitled{{ ' '|add:doc.genre|default:'' }}, #}
-  Untitled,
+  Untitled{{ ' '|add:doc.genre|default:'' }},
 {% endfor %}
 {% if doc.date %}{{ doc.date }}{% else %}no date{% endif %}.  {# TODO: format date for readability #}
 {# perhaps simply omit the no date since the majority are undated? #}
@@ -17,8 +17,8 @@
 {% endif %}
 {% if doc.sources %}
   <p><small>Source:         {# source archives with a copy of this group sheet #}
-    {% for src in doc.sources.all %}
-        <a href="{{ src.url }}">{{ src.name }}</a>{% if forloop.last %}. {% else %}; {% endif %}
+    {% for uri, name in doc.sources.iteritems %}
+        <a href="{{ uri }}">{{ name }}</a>{% if forloop.last %}. {% else %}; {% endif %}
         {% endfor %}</small>
   </p>
 {% endif %}

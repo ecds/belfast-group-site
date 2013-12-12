@@ -14,7 +14,7 @@
     {% if filters %}
       <ul>
         {% for label, link in filters.iteritems %}
-        <li>{{ label }} <a class="small" href="{{ link }}"><i class="icon-remove-sign"></i></a></li>
+        <li>{{ label }} <a class="small" href="{{ link }}"><span class="glyphicon glyphicon-remove-sign"></span></a></li>
         {% endfor %}
     </ul>
     {% endif %}
@@ -31,7 +31,7 @@
     {% if facets.authors %}
     <p><b>Author</b></p>
     <ul>
-        {% for author, total in facets.authors %}
+        {% for author, total in facets.authors.iteritems %}
         <li><a href="?author={{ author.slug }}{{ url_suffix }}">{{ author.name }}</a> ({{ total }})</li>
         {% endfor %}
     </ul>
@@ -40,8 +40,8 @@
     {% if facets.sources %}
     <p><b>Source</b></p>
     <ul>
-        {% for source in facets.sources %}  {# TODO: need to use short names here! #}
-        <li><a href="?source={{ source }}{{ url_suffix }}">{{ source }}</a> ({{ source.total_groupsheets }})</li>
+        {% for source, total in facets.sources.iteritems %}  {# TODO: need to use short names here! #}
+        <li><a href="?source={{ source }}{{ url_suffix }}">{{ source }}</a> ({{ total }})</li>
         {% endfor %}
     </ul>
     {% endif %}
@@ -52,7 +52,7 @@
 
     <h1 property="schema:name">Group Sheets</h1>
 
-    <p>Displaying {{ documents.count }} group sheets.</p>
+    <p>Displaying {{ documents|length }} group sheets.</p>
 
     <ul class="groupsheet-list">
         {% for doc in documents %}
