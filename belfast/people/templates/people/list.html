@@ -8,7 +8,12 @@
 <h1 property="schema:name">People associated with the Belfast Group</h1>
 <ul>
 {% for person in people %}
-    <li><a href="{% url 'people:profile' person.slug %}">{{ person.last_name }}, {{ person.first_name }}</a>
+    {# <li><a href="{% url 'people:profile' person.slug %}">{{ person.last_name }}, {{ person.first_name }}</a> #}
+    <li><a href="{{ person }}">
+        {% if person.lastname and person.firstname %}
+        {{ person.lastname }}, {{ person.firstname }}
+        {% else %} {{ person.name }}  <b>FIXME: (no first/last!)</b>
+        {% endif %} </a>
         {% comment %}  {# rels not in db yet #}
       {% if rels %}
         ({{ rels|join:', '}})

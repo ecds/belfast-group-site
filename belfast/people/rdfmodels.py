@@ -4,6 +4,9 @@ import rdflib
 import re
 import time
 
+from django.conf import settings
+from django.contrib.sites.models import Site
+
 from belfast import rdfns
 from belfast.util import rdf_data, network_data, cached_property
 
@@ -151,6 +154,11 @@ class RdfOrganization(RdfEntity):
 class RdfPerson(RdfEntity):
     _org_type = RdfOrganization
 
+    @property
+    def slug(self):
+        # all persons with profiles should have local, slug-based uris
+        return self.identifier.strip('/').split('/')[-1]
+
     @cached_property
     def dbpedia_uri(self):
         # same as
@@ -162,11 +170,17 @@ class RdfPerson(RdfEntity):
     def viaf_uri(self):
         if 'viaf.org' in self.identifier:
             return unicode(self.identifier)
+        # FIXME: not working? or not present?
+        for res in self.objects(rdflib.OWL.sameAs):
+            if 'viaf.org' in res.identifier:
+                return res.identifier
 
     @property
     def name(self):
         # NOTE: would be better if we could use preferredLabel somehow
-        return self.value(rdfns.SCHEMA_ORG.name)
+        l = self.graph.preferredLabel(self.identifier)
+        return l if l else self.value(rdfns.SCHEMA_ORG.name)
+
 
     name_re = re.compile('^((?P<last>[^ ]{2,}), (?P<first>[^.,( ]{2,}))[.,]?')
     _firstname = None
@@ -296,6 +310,30 @@ def BelfastGroup():
   return RdfOrganization(rdf_data(), rdfns.BELFAST_GROUP_URIREF)
 
 
+def profile_people():
+    g = rdf_data()
+    start = time.time()
+    current_site = Site.objects.get(id=settings.SITE_ID)
+    res = g.query('''
+        PREFIX schema: <%(schema)s>
+        PREFIX rdf: <%(rdf)s>
+        SELECT ?person
+        WHERE {
+          ?person rdf:type schema:Person .
+          ?person schema:familyName ?name .
+          FILTER regex(str(?person), "^http://%(site)s")
+        } ORDER BY ?name
+        ''' % {'schema': rdfns.SCHEMA_ORG, 'rdf': rdflib.RDF,
+               'site': current_site.domain}
+        )
+
+    logger.debug('Found %d people in %.02f sec' % (len(res),
+                 time.time() - start))
+    # people = [RdfPerson(g.get_context(r['person']), r['person']) for r in res]
+    people = [RdfPerson(g, r['person']) for r in res]
+    return people
+
+
 # deprecated; this is slow, use BelfastGroup.connected_people instead
 def get_belfast_people():
     g = rdf_data()
@@ -311,11 +349,6 @@ def get_belfast_people():
         WHERE {
             {
               ?person ?rel1 <%(bg)s> .
-              ?person rdf:type schema:Person
-            }
-            UNION
-            {
-              <%(bg)s> ?rel2 ?person .
               ?person rdf:type schema:Person
             }
             ?author schema:name ?name
