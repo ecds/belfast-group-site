@@ -6,7 +6,7 @@ from rdflib import collection as rdfcollection
 import re
 from django.utils.text import slugify
 
-from belfast.rdfns import BIBO, DC, SCHEMA_ORG, BG, BELFAST_GROUP_URI
+from belfast import rdfns
 
 
 def normalize_whitespace(s):
@@ -16,6 +16,7 @@ def normalize_whitespace(s):
 class SmushGroupSheets(object):
 
     # base identifier for 'smushed' ids
+    # FIXME: don't hardcode; base on configured site ?
     BELFASTGROUPSHEET = rdflib.Namespace("http://belfastgroup.library.emory.edu/groupsheets/md5/")
 
     def __init__(self, graph):
@@ -30,7 +31,7 @@ class SmushGroupSheets(object):
     def calculate_uri(self, uri, graph):
         # calculate a 'smushed' uri for a single groupsheet
         titles = []
-        title = graph.value(uri, DC.title)
+        title = graph.value(uri, rdfns.DC.title)
 
         # title is either a single literal OR an rdf sequence
         if title:
@@ -53,7 +54,7 @@ class SmushGroupSheets(object):
         # - slugify titles so we can ignore discrepancies in case and punctuation
         titles = sorted([slugify(t) for t in titles])
 
-        author = graph.value(uri, SCHEMA_ORG.author)
+        author = graph.value(uri, rdfns.SCHEMA_ORG.author)
         # blank node for the author is unreliable...
         if isinstance(author, rdflib.BNode):
             # This should mostly only occur in Queen's University Belfast,
@@ -61,8 +62,8 @@ class SmushGroupSheets(object):
             # Construct lastname, first for author identifier
             # (Assumes we are using a VIAF URI wherever possible, which
             # should be the case.)
-            last = graph.value(author, SCHEMA_ORG.familyName)
-            first = graph.value(author, SCHEMA_ORG.givenName)
+            last = graph.value(author, rdfns.SCHEMA_ORG.familyName)
+            first = graph.value(author, rdfns.SCHEMA_ORG.givenName)
             if last is not None and first is not None:
                 author = '%s, %s' % (last, first)
             else:
@@ -97,7 +98,7 @@ class SmushGroupSheets(object):
         # and assign local group sheet type
         # SO - simply find by our belfast group sheet type
 
-        ms = list(graph.subjects(predicate=rdflib.RDF.type, object=BG.GroupSheet))
+        ms = list(graph.subjects(predicate=rdflib.RDF.type, object=rdfns.BG.GroupSheet))
         # if no manuscripts are found, stop and do not update the file
         if len(ms) == 0:
             # possibly print out in a verbose mode if we add that
@@ -127,7 +128,7 @@ class SmushGroupSheets(object):
             orig_o = o
             s = new_uris.get(s, s)
             # don't convert a smushed URL (e.g., TEI groupsheet URL)
-            if not p == SCHEMA_ORG.URL:
+            if not p == rdfns.SCHEMA_ORG.URL:
                 o = new_uris.get(o, o)
 
             if orig_s != s or orig_o != o:
@@ -149,7 +150,7 @@ class IdentifyGroupSheets(object):
 
         for ctx in graph.contexts():
             # returns graphs
-            # print ctx
+            print 'context %s (%d triples)' % (ctx.identifier, len(ctx))
             # print len(ctx)
             # g = graph.get_context(ctx)
             self.process_graph(ctx)
@@ -175,19 +176,19 @@ class IdentifyGroupSheets(object):
         # first look for a manuscript with an author that directly
         # references the belfast group
         res = graph.query('''
-            PREFIX schema: <%(schema)s>
+            PREFIX dc: <%(dc)s>
             PREFIX rdf: <%(rdf)s>
             PREFIX bibo: <%(bibo)s>
             SELECT ?ms
             WHERE {
                 ?ms rdf:type bibo:Manuscript .
                 ?ms schema:mentions <%(belfast_group)s> .
-                ?ms schema:author ?auth
+                ?ms dc:creator ?auth
             }
-            ''' % {'schema': SCHEMA_ORG,
+            ''' % {'dc': rdfns.DC,
                    'rdf': rdflib.RDF,
-                   'bibo': BIBO,
-                   'belfast_group': BELFAST_GROUP_URI
+                   'bibo': rdfns.BIBO,
+                   'belfast_group': rdfns.BELFAST_GROUP_URI
                    }
             )
             # searching for all manuscript that 'mention' belfast group
@@ -196,9 +197,13 @@ class IdentifyGroupSheets(object):
 
         # if no matches, do a greedier search
         if len(res) == 0:
-
             # Find every manuscript mentioned in a document
             # that is *about* the belfast group
+
+            # This should find group sheets in EAD RDF:
+            # document (webpage) that is about the belfast group
+            # and also about a collection, which has manuscripts
+
             # TODO: will also need to find ms associated with / presented at BG
             # NOTE: need a way to filter non-belfast group content
             res = graph.query('''
@@ -208,22 +213,24 @@ class IdentifyGroupSheets(object):
                 SELECT ?ms
                 WHERE {
                     ?doc schema:about <%(belfast_group)s> .
-                    ?doc schema:mentions ?ms .
-                    ?ms rdf:type bibo:Manuscript .
+                    ?doc schema:about ?coll .
+                    ?coll schema:mentions ?ms .
+                    ?ms rdf:type bibo:Manuscript
                 }
-                ''' % {'schema': SCHEMA_ORG,
+                ''' % {'schema': rdfns.SCHEMA_ORG,
                        'rdf': rdflib.RDF,
-                       'bibo': BIBO,
-                       'belfast_group': BELFAST_GROUP_URI
+                       'bibo': rdfns.BIBO,
+                       'belfast_group': rdfns.BELFAST_GROUP_URI
                        }
             )
             # TODO: how to filter out non-group sheet irish misc content?
             # FIXME: not finding group sheets in irishmisc! (no titles?)
 
+
         # if no manuscripts are found, stop and do not update the file
         if len(res) == 0:
             # possibly print out in a verbose mode if we add that
-            # print 'No groupsheets found in %s' % filename
+            # print 'No groupsheets found in %s' % graph.identifier
             return
 
         print 'Found %d groupsheet%s in %s' % \
@@ -232,7 +239,7 @@ class IdentifyGroupSheets(object):
         for r in res:
             # add a new triple with groupsheet type
             # FIXME: does this need to be added to master graph?
-            graph.add((r['ms'], rdflib.RDF.type, BG.GroupSheet))
+            graph.add((r['ms'], rdflib.RDF.type, rdfns.BG.GroupSheet))
 
         #print 'Replacing %s' % filename
         # with open(filename, 'w') as datafile:
@@ -263,7 +270,7 @@ class InferConnections(object):
         # g = rdflib.Graph()
         # g.parse(filename, format=rdf_format)
 
-        ms = list(graph.subjects(predicate=rdflib.RDF.type, object=BG.GroupSheet))
+        ms = list(graph.subjects(predicate=rdflib.RDF.type, object=rdfns.BG.GroupSheet))
         # if no manuscripts are found, skip
         if len(ms) == 0:
             return
@@ -277,19 +284,14 @@ class InferConnections(object):
                     ?ms schema:author ?author .
                     ?ms rdf:type bg:GroupSheet
                 }
-                ''' % {'schema': SCHEMA_ORG,
+                ''' % {'schema': rdfns.SCHEMA_ORG,
                        'rdf': rdflib.RDF,
-                       'bg': BG}
+                       'bg': rdfns.BG}
         )
-        modified = False
         for r in res:
             # triple to indicate the author is affiliated with BG
-            bg_assoc = (r['author'], SCHEMA_ORG.affiliation, rdflib.URIRef(BELFAST_GROUP_URI))
+            bg_assoc = (r['author'], rdfns.SCHEMA_ORG.affiliation, rdflib.URIRef(rdfns.BELFAST_GROUP_URI))
             if bg_assoc not in graph:
-                # modified = True
                 graph.add(bg_assoc)
 
-        # if modified:
-        #     with open(filename, 'w') as datafile:
-        #         g.serialize(datafile, format=rdf_format)
 
