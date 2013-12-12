@@ -46,46 +46,13 @@ _rdf_data = None
 
 def rdf_data():
     global _rdf_data
-    if _rdf_data is not None:
-        return _rdf_data
+    if _rdf_data is None:
+        _rdf_data = rdflib.ConjunctiveGraph('Sleepycat')
+        _rdf_data.open(settings.RDF_DATABASE)
+    return _rdf_data
 
-    start = time.time()
-    cache_key = 'BELFAST_RDF_GRAPH'
-    timeout = 60 * 60 * 24
-    graph = cache.get(cache_key)
-    if graph is None:
 
-        graph = rdflib.Graph()
-        filecount = 0
-        errcount = 0
-        # TODO: log time it takes to parse and load, totalnumber of files
-        for infile in glob.iglob(path.join(settings.RDF_DATA_DIR, '*.xml')):
-            try:
-                graph.parse(infile)
-                filecount += 1
-            except Exception as err:
-                logger.error('Failed to parse file %s: %s' % (infile, err))
-                errcount += 1
-
-        for infile in glob.iglob(path.join(settings.RDF_DATA_DIR, '*', '*.xml')):
-            try:
-                graph.parse(infile)
-                filecount += 1
-            except Exception as err:
-                logger.error('Failed to parse file %s: %s' % (infile, err))
-                errcount += 1
-
-        logger.debug('Loaded %d RDF documents in %.02f sec (%d errors)' % \
-                     (filecount, time.time() - start, errcount))
-
-        cache.set(cache_key, graph, timeout)
-    else:
-        logger.debug('Loaded RDF data from cache in %.02f sec' % \
-                     (time.time() - start))
-
-    _rdf_data = graph
-    return graph
-
+# FIXME: lastmodified stuff probably out of date...
 
 def network_data_lastmodified():
     # last modification time for nx network data, based on the gexf file
