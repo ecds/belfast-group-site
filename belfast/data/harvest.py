@@ -50,7 +50,6 @@ class HarvestRdf(object):
                        Bar(), ETA()]
             progress = ProgressBar(widgets=widgets,
                                    maxval=len(self.URL_QUEUE)).start()
-            processed = 0
         else:
             progress = None
 
@@ -84,9 +83,19 @@ class HarvestRdf(object):
             # FIXME: this is 2013-09-09
             # but
             try:
-                response = requests.get(url, headers={'if-modified-since': last_modified})
+                response = requests.get(url, headers={'if-modified-since': last_modified},
+                                        allow_redirects=False)
+                # if this is a redirect, don't follow but add the real
+                # url to the queue; this avoids an issue where related
+                # links are generated relative to the initial url rather
+                #  than the actual, resolved url
+                if response.status_code in [requests.codes.moved,
+                                            requests.codes.see_other,
+                                            requests.codes.found]:
+                    self.URL_QUEUE.add(response.headers['location'])
+                    return
 
-                if response.status_code == requests.codes.not_modified:
+                elif response.status_code == requests.codes.not_modified:
                     # print '%s not modified since last harvested' % url
                     return  # nothing to do
                 else:
@@ -98,13 +107,18 @@ class HarvestRdf(object):
                 self.errors += 1
                 return
 
-
                 # last_modified = g.value(g.identifier, SCHEMA_ORG.dateModified)
                 # TODO: use g.set(triple) to replace
 
         else:
             try:
-                response = requests.get(url)
+                response = requests.get(url, allow_redirects=False)
+                if response.status_code in [requests.codes.moved,
+                                            requests.codes.see_other,
+                                            requests.codes.found]:
+                    self.URL_QUEUE.add(response.headers['location'])
+                    return
+
             except Exception as err:
                 print 'Error attempting to load %s - %s' % (url, err)
                 self.errors += 1
@@ -129,6 +143,7 @@ class HarvestRdf(object):
         except Exception as err:
             print 'Error attempting to parse %s - %s' % (url, err)
             self.errors += 1
+            self.graph.remove_context(g)
             return
 
         triple_count = len(data)
