@@ -13,7 +13,6 @@ from belfast.util import network_data, rdf_data,  \
 from belfast.rdfns import BELFAST_GROUP_URI
 from belfast.groupsheets.rdfmodels import RdfGroupSheet
 from belfast.people.rdfmodels import RdfOrganization
-from belfast.people.models import Place
 from belfast.network.util import annotate_graph
 
 
@@ -71,7 +70,7 @@ def _network_graph(min_degree=1, **kwargs):
     return graph
 
 
-@last_modified(rdf_nx_lastmod)
+# @last_modified(rdf_nx_lastmod)
 def full_js(request, mode):
     # mode options:
     #  full (node & link data) or adjacency (adjacency matrix)
@@ -97,7 +96,7 @@ def full_js(request, mode):
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
-@last_modified(rdf_nx_lastmod)
+# @last_modified(rdf_nx_lastmod)
 def full_gexf(request):
     # generate same network graph as gexf for download/use in tools like gephi
     graph = _network_graph()
@@ -108,26 +107,26 @@ def full_gexf(request):
     return response
 
 
-@last_modified(rdf_nx_lastmod)
+# @last_modified(rdf_nx_lastmod)
 def force_graph(request):
     # force directed graph of entire network
     return render(request, 'network/graph.html')
 
 
-@last_modified(rdf_nx_lastmod)
+# @last_modified(rdf_nx_lastmod)
 def chord_diagram(request):
     # circular chord chart of entire network
     return render(request, 'network/chord.html')
 
 
-@last_modified(rdf_nx_lastmod)
+# @last_modified(rdf_nx_lastmod)
 def group_people(request):
     # graph of just people directly connected to the belfast group
     return render(request, 'network/bg.html',
                   {'bg_uri': BELFAST_GROUP_URI})
 
 
-@last_modified(rdf_nx_lastmod)
+# @last_modified(rdf_nx_lastmod)
 def group_people_js(request):
     belfast_group = RdfOrganization(network_data().copy(), BELFAST_GROUP_URI)
     ego_graph = belfast_group.ego_graph(radius=1, types=['Person', 'Organization'])
@@ -146,7 +145,7 @@ def map(request):
     return render(request, 'network/map.html')
 
 
-@last_modified(rdf_lastmod)
+# @last_modified(rdf_lastmod)
 def map_js(request):
     places = Place.objects.all()
     markers = []
