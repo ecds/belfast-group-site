@@ -99,6 +99,7 @@ class QUB(object):
             msnode = rdflib.BNode()
             g.add((coll, rdfns.SCHEMA_ORG.mentions, msnode))
             g.add((msnode, rdflib.RDF.type, rdfns.BIBO.Manuscript))
+            graph.add((msnode, rdflib.RDF.type, rdfns.BG.GroupSheet))
 
             content = list(div.stripped_strings)
             first_line = content[0]
@@ -118,7 +119,7 @@ class QUB(object):
                     author = rdflib.BNode()
 
                 # relate person to manuscript as author, include name information
-                g.add((msnode, rdfns.SCHEMA_ORG.author, author))
+                g.add((msnode, rdfns.DC.creator, author))
                 g.add((author, rdfns.rdflib.RDF.type, rdfns.SCHEMA_ORG.Person))
                 g.add((author, rdfns.SCHEMA_ORG.name, rdflib.Literal(full_name)))
                 g.add((author, rdfns.SCHEMA_ORG.familyName, rdflib.Literal(last_name)))
