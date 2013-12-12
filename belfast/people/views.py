@@ -11,7 +11,6 @@ from belfast import rdfns
 from belfast.util import rdf_data, rdf_data_lastmodified, \
     network_data_lastmodified
 from belfast.groupsheets.rdfmodels import get_rdf_groupsheets
-from belfast.people.models import Person
 from belfast.people.rdfmodels import BelfastGroup, get_belfast_people, profile_people, RdfPerson
 from belfast.network.util import annotate_graph
 

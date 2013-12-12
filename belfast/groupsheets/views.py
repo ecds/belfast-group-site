@@ -10,7 +10,6 @@ import urllib
 
 from belfast import rdfns
 from belfast.groupsheets.forms import KeywordSearchForm
-from belfast.groupsheets.models import GroupSheet, ArchivalCollection
 from belfast.groupsheets.rdfmodels import TeiGroupSheet, TeiDocument, \
     get_rdf_groupsheets, groupsheet_by_url
 from belfast.util import rdf_data_lastmodified, network_data_lastmodified
