@@ -1,6 +1,4 @@
-import os
 import hashlib
-import codecs
 import rdflib
 from rdflib import collection as rdfcollection
 import re
