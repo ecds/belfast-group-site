@@ -139,19 +139,21 @@ class Command(BaseCommand):
             InferConnections(graph)
             # TODO: groupsheet owner based on source collection
 
-        if all_steps or options['gexf']:
-            # generate gexf
-            self.stdout.write('-- Generating network graph and saving as GEXF')
-            Rdf2Gexf(graph, settings.GEXF_DATA)
-
         # TODO: create rdf profiles with local uris; get rid of person db model
         if all_steps or options['local_uris']:
             self.stdout.write('-- Generating local URIs based on the data')
             self.local_uris(graph)
 
+        if all_steps or options['gexf']:
+            # generate gexf
+            self.stdout.write('-- Generating network graph and saving as GEXF')
+            Rdf2Gexf(graph, settings.GEXF_DATA)
+
         graph.close()
 
     def local_uris(self, graph):
+        # FIXME: this should probably happen as part of the *smushing* step
+        # and should definitely happen *before* the nx graph is generated
         current_site = Site.objects.get(id=settings.SITE_ID)
         # generate local uris for persons who will have profile pages on the site
 
