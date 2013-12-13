@@ -7,9 +7,11 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from eulexistdb import testutil
 from lxml import etree
+from mock import patch
+import rdflib
 
 from belfast.groupsheets.rdfmodels import TeiGroupSheet, Contents, \
-    Poem, id_from_ark
+    Poem, id_from_ark, RdfGroupSheet, get_rdf_groupsheets
 from belfast.groupsheets.forms import KeywordSearchForm
 from belfast.groupsheets.templatetags.tei import format_tei
 
@@ -70,6 +72,37 @@ class TeiGroupSheetTest(testutil.TestCase):
         self.assertEqual(self.groupsheet2.id,
                          id_from_ark(self.groupsheet2.ark))
         self.assertEqual(None, id_from_ark('http://pid.emory.edu/ark:/bogus/123'))
+
+
+class RdfGroupSheetTest(testutil.TestCase):
+    # sample RDF for testing RDF GroupSheet logic
+    rdfxml = path.join(FIXTURE_DIR, 'groupsheetrdf.xml')
+
+    def setUp(self):
+        # load the fixture file as a generic tei document
+        self.graph = rdflib.Graph()
+        self.graph.parse(self.rdfxml)
+
+    @patch('belfast.groupsheets.rdfmodels.rdf_data')
+    def test_get_rdf_groupsheets(self, mockrdf_data):
+
+        # TODO: test rdf data clean/convert on basic fixture data
+        # - at least one sample like ead harvest, one qub, one tei groupsheet
+        #  -- test de-dupe across datasets / smushing
+        # - test rdfgroupsheet model logic on a cleaned up version
+        # (either by the scripts or static)
+
+        # - not finding anything here because doesn't have correct type
+
+        mockrdf_data.return_value = self.graph
+        gs = get_rdf_groupsheets()
+        print gs
+
+
+    def test_fields(self):
+        # self.groupsheet = RdfGroupSheet(self.graph, rdflib.BNode('N3bee8d11b25544e68cf8bca84a30c218'))
+        groupsheet = RdfGroupSheet(self.graph, 'N3bee8d11b25544e68cf8bca84a30c218')
+        self.assertEqual('1965-04-27', groupsheet.date)
 
 
 class KeywordSearchFormTest(testutil.TestCase):
