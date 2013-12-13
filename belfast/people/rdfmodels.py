@@ -141,6 +141,13 @@ class RdfOrganization(RdfEntity):
     pass
 
 
+class DBpediaEntity(RdfEntity):
+
+    description = rdfmap.Value(rdfns.DBPEDIA_OWL.abstract)     # FIXME: how to specify language?
+    wikipedia_url = rdfmap.Value(rdfns.FOAF.isPrimaryTopicOf)
+    thumbnail = rdfmap.Value(rdfns.DBPEDIA_OWL.thumbnail)
+
+
 class RdfPerson(RdfEntity):
     _org_type = RdfOrganization
 
@@ -155,6 +162,11 @@ class RdfPerson(RdfEntity):
         for res in self.objects(rdflib.OWL.sameAs):
             if 'dbpedia.org' in res.identifier:
                 return res.identifier
+
+    @property
+    def dbpedia(self):
+        if self.dbpedia_uri is not None:
+            return DBpediaEntity(self.graph, self.dpedia_uri)
 
     @cached_property
     def viaf_uri(self):
