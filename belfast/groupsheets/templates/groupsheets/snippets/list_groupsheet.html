@@ -17,8 +17,8 @@
 {% endif %}
 {% if doc.sources %}
   <p><small>Source:         {# source archives with a copy of this group sheet #}
-    {% for uri, name in doc.sources.iteritems %}
-        <a href="{{ uri }}">{{ name }}</a>{% if forloop.last %}. {% else %}; {% endif %}
+    {% for s in doc.sources %}
+        <a href="{{ s }}">{{ s.name }}</a>{% if forloop.last %}. {% else %}; {% endif %}
         {% endfor %}</small>
   </p>
 {% endif %}

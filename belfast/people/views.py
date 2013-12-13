@@ -43,7 +43,7 @@ def profile(request, id):
     )
     g = rdf_data()
     person = RdfPerson(g, rdflib.URIRef(uri))
-    groupsheets = get_rdf_groupsheets(author=uri)
+    groupsheets = get_rdf_groupsheets(author=uri) # TODO: move to rdfperson class
     # for t in g.triples((rdflib.URIRef(uri), None, None)):
     #     print t
 

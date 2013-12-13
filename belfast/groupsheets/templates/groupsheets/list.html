@@ -41,7 +41,7 @@
     <p><b>Source</b></p>
     <ul>
         {% for source, total in facets.sources.iteritems %}  {# TODO: need to use short names here! #}
-        <li><a href="?source={{ source }}{{ url_suffix }}">{{ source }}</a> ({{ total }})</li>
+        <li><a href="?source={{ source }}{{ url_suffix }}">{{ source.name }}</a> ({{ total }})</li>
         {% endfor %}
     </ul>
     {% endif %}

@@ -12,7 +12,7 @@ from belfast.util import network_data, rdf_data,  \
     rdf_data_lastmodified, network_data_lastmodified
 from belfast.rdfns import BELFAST_GROUP_URI
 from belfast.groupsheets.rdfmodels import RdfGroupSheet
-from belfast.people.rdfmodels import RdfOrganization
+from belfast.people.rdfmodels import RdfOrganization, find_places
 from belfast.network.util import annotate_graph
 
 
@@ -147,7 +147,8 @@ def map(request):
 
 # @last_modified(rdf_lastmod)
 def map_js(request):
-    places = Place.objects.all()
+    places = find_places()
+    # places = Place.objects.all()
     markers = []
     for pl in places:
         # lat/long required in db, so shouldn't need to skip

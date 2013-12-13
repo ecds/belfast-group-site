@@ -52,8 +52,8 @@
       {% endif %}
 
       <p><strong>Source{{ sources|pluralize }}</strong>:
-        {% for uri, name in sources.iteritems %}
-        <a href="{{ uri }}">{{ name }}</a>{% if not forloop.last %}; {% endif %}
+        {% for src in sources %}
+        <a href="{{ src }}">{{ src.name }}</a>{% if not forloop.last %}; {% endif %}
         {% endfor %}
       </p>
     </div>

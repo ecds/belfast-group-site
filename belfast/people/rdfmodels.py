@@ -8,6 +8,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 
 from belfast import rdfns
+from belfast.data import descriptors as rdfmap
 from belfast.util import rdf_data, network_data, cached_property
 
 logger = logging.getLogger(__name__)
@@ -20,10 +21,12 @@ class RdfEntity(rdflib.resource.Resource):
     _person_type = rdflib.resource.Resource
     _org_type = rdflib.resource.Resource
 
-    @property
-    def name(self):
-        # NOTE: would be better if we could use preferredLabel somehow
-        return self.value(rdfns.SCHEMA_ORG.name)
+
+
+    # @property
+    # def name(self):
+    #     # NOTE: would be better if we could use preferredLabel somehow
+    #     return self.value(rdfns.SCHEMA_ORG.name)
 
     @property
     def nx_node_id(self):
@@ -123,28 +126,15 @@ class RdfEntity(rdflib.resource.Resource):
 
 class RdfLocation(RdfEntity):
 
-    @property
-    def name(self):
-        return self.value(rdfns.SCHEMA_ORG.name)
+    name = rdfmap.Value(rdfns.SCHEMA_ORG.name)
+    latitude = rdfmap.Value(rdfns.GEO.lat, rdflib.XSD.double)
+    longitude = rdfmap.Value(rdfns.GEO.long, rdflib.XSD.double)
 
     def __unicode__(self):
         return self.value(rdfns.GN.name) \
             or self.graph.preferredLabel(self) \
             or self.value(rdfns.DBPPROP.name) \
             or self.name or self.identifier
-
-    @property
-    def latitude(self):
-        val = self.value(rdfns.GEO.lat)
-        if val is not None:
-            return float(unicode(val))
-
-    @property
-    def longitude(self):
-        val = self.value(rdfns.GEO.long)
-        if val is not None:
-            return float(unicode(val))
-
 
 
 class RdfOrganization(RdfEntity):
@@ -181,6 +171,8 @@ class RdfPerson(RdfEntity):
         l = self.graph.preferredLabel(self.identifier)
         return l if l else self.value(rdfns.SCHEMA_ORG.name)
 
+
+    # TODO: move into data clean-up; assume already cleaned at this point
 
     name_re = re.compile('^((?P<last>[^ ]{2,}), (?P<first>[^.,( ]{2,}))[.,]?')
     _firstname = None
@@ -232,37 +224,19 @@ class RdfPerson(RdfEntity):
         else:
             return self.name
 
-    @property
-    def birthdate(self):
-        # TODO: convert to date type
-        return self.value(rdfns.SCHEMA_ORG.birthDate)
+    birthdate = rdfmap.Value(rdfns.SCHEMA_ORG.birthDate)
+    birthplace = rdfmap.Resource(rdfns.DBPEDIA_OWL.birthPlace, RdfLocation)
+
+    occupation = rdfmap.List(rdfns.SCHEMA_ORG.jobTitle)
+    same_as = rdfmap.List(rdflib.OWL.sameAs)
+    description = rdfmap.Value(rdfns.SCHEMA_ORG.description)
+
+    work_locations = rdfmap.ResourceList(rdfns.SCHEMA_ORG.workLocation, RdfLocation)
+    home_locations = rdfmap.ResourceList(rdfns.SCHEMA_ORG.homeLocation, RdfLocation)
 
     @property
-    def birthplace(self):
-        place = self.value(rdfns.DBPEDIA_OWL.birthPlace)
-        if place:
-            return RdfLocation(self.graph, place.identifier)
-
-    @property
-    def occupation(self):
-        'list of occupations via http://schema.org/jobTitle property'
-        return list(self.objects(rdfns.SCHEMA_ORG.jobTitle))
-
-    @property
-    def same_as(self):
-        return list(self.objects(rdflib.OWL.sameAs))
-
-    @property
-    def description(self):
-        'http://schema.org/description, if available'
-        return self.value(rdfns.SCHEMA_ORG.description).strip()
-
-    @cached_property
     def locations(self):
-        place_uris = list(self.objects(rdfns.SCHEMA_ORG.workLocation))
-        place_uris.extend(list(self.objects(rdfns.SCHEMA_ORG.homeLocation)))
-        place_uris = set(p.identifier for p in place_uris)
-        return [RdfLocation(self.graph, p) for p in place_uris]
+        return self.work_locations + self.home_locations
 
     @cached_property
     def short_id(self):

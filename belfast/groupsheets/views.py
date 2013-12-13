@@ -94,9 +94,10 @@ def list(request):
     # TODO: support source filter; make more django-like
 
     filter_source = request.GET.get('source', None)
-    if filter_source is not None:
-        results = results.filter(sources__name=filter_source)
-        url_args['source'] = filter_source
+    # TODO
+    # if filter_source is not None:
+    #     results = results.filter(sources__name=filter_source)
+    #     url_args['source'] = filter_source
 
     # results = results.order_by('author__last_name').all()
 
@@ -123,11 +124,11 @@ def list(request):
     sources = {}
     if filter_source is None:
         for r in results:
-            for s, name in r.sources.iteritems():
-                if name not in sources:
-                    sources[name] = 1
+            for s in r.sources:
+                if s not in sources:
+                    sources[s] = 1
                 else:
-                    sources[name] += 1
+                    sources[s] += 1
 
     # TODO: sort by count
     # FIXME: make facets empty dict to indicate nothing to show?

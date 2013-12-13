@@ -8,6 +8,7 @@ from rdflib.collection import Collection as RdfCollection
 import time
 
 from belfast import rdfns
+from belfast.data import descriptors as rdfmap
 from belfast.util import rdf_data, normalize_whitespace
 from belfast.people.rdfmodels import RdfPerson
 
@@ -112,26 +113,26 @@ class TeiGroupSheet(XmlModel):
 
 # TBD: how do groupsheet and people apps share rdf models?
 
+class RdfArchivalCollection(rdflib.resource.Resource):
+    '''RDF :class:`~rdflib.resource.Resource` for an archival collection. '''
+    name = rdfmap.Value(rdfns.SCHEMA_ORG.name)
+    # TODO: document rdf type
+
 class RdfGroupSheet(rdflib.resource.Resource):
+    '''RDF :class:`~rdflib.resource.Resource`) for a Belfast Group Sheet.'''
+    # TODO: document rdf type
 
     # simple single-value properties
+    date = rdfmap.Value(rdfns.DC.date)
+    'date of groupsheet if known; dc:date'
+    num_pages = rdfmap.Value(rdfns.BIBO.numPages)
+    'number of pages in this groupsheet, if known; bibo:numPages'
+    genre = rdfmap.Value(rdfns.SCHEMA_ORG.genre)
+    'genre of the groupsheet content if known; schema.org/genre'
+    url = rdfmap.Value(rdfns.SCHEMA_ORG.URL)
+    'url for the groupsheet if digital edition is available; schema.org/URL'
 
-    @property
-    def date(self):
-        return self.value(rdfns.DC.date)
-
-    @property
-    def num_pages(self):
-        return self.value(rdfns.BIBO.numPages)
-
-    @property
-    def genre(self):
-        return self.value(rdfns.SCHEMA_ORG.genre)
-
-    @property
-    def url(self):
-        return self.value(rdfns.SCHEMA_ORG.URL)
-
+    # TODO: store this somewhere...
     @property
     def tei_id(self):
         if self.url:
@@ -172,8 +173,13 @@ class RdfGroupSheet(rdflib.resource.Resource):
     # FIXME: should be able to do this more efficiently;
     # set to return an rdf resource with a name...
 
+    sources = rdfmap.ResourceList(rdfns.SCHEMA_ORG.mentions, RdfArchivalCollection,
+                                  is_object=False)
+
+    # should be sufficient, but make sure this works for all cases
+
     @property
-    def sources(self):
+    def old_sources(self):
         ''''Dictionary of archival collections that hold copies of this groupsheet.
         Key is URI,
         '''
@@ -223,25 +229,10 @@ def groupsheet_by_url(url):
     uris = list(g.subjects(rdfns.SCHEMA_ORG.URL, rdflib.URIRef(url)))
     logger.debug('Found %d group sheet for url %s in %.02f sec' % (
                  len(uris), url, time.time() - start))
-    print uris
+    # FIXME: what to do if there are multiple?
+    # type is expected to be rdfns.BG.GroupSheet
     if uris:
         return RdfGroupSheet(g, uris[0])
-    # print list(g.subjects(rdfns.SCHEMA_ORG.URL, rdflib.URIRef(url)))
-    # res = g.query('''
-    #     PREFIX schema: <%(schema)s>
-    #     PREFIX rdf: <%(rdf)s>
-    #     SELECT ?ms
-    #     WHERE {
-    #         ?ms rdf:type <%(bg)s> .
-    #         ?ms schema:URL <%(url)s>
-    #     }
-    #     ''' % {'schema': rdfns.SCHEMA_ORG, 'rdf': rdflib.RDF,
-    #            'bg': rdfns.BG.GroupSheet, 'url': url}
-    # )
-
-
-    # FIXME: none if empty
-
 
 
 def get_rdf_groupsheets(author=None, has_url=None):
