@@ -1,26 +1,36 @@
 ## descriptors for RDF
 # intended for use with rdflib.resource.Resource
 import rdflib
+from rdflib.collection import Collection
+
+from belfast.util import normalize_whitespace
 
 # rename to rdfmap?
 
 # consider taking multiple predicates (assume OR; perhaps also assume order for single)
 
+# refer to
+# http://www.openvest.com/trac/browser/rdfalchemy/trunk/rdfalchemy/descriptors.py
+# TODO: cache results in obj.__dict__ ? or is rdf lookup fast enough that's unnecessary?
+
+
 class Value(object):
     """A data descriptor that gets rdf a single value.
     """
 
-    def __init__(self, predicate, datatype=None):
+    def __init__(self, predicate, datatype=None, normalize=False):
         self.predicate = predicate
         self.datatype = datatype
+        self.normalize = normalize
 
     def __get__(self, obj, objtype=None):
         val = obj.value(self.predicate)
         if self.datatype is not None:
-            val = rdflib.Literal(val, datatype=self.datatype)
-            return val.toPython()
-        else:
-            return val
+            val = rdflib.Literal(val, datatype=self.datatype).toPython()
+
+        if self.normalize:
+            val = normalize_whitespace(val)
+        return val
 
 
 class Resource(object):
@@ -55,6 +65,23 @@ class ResourceList(object):
                 for o in meth(self.predicate)]
 
 
+class Sequence(object):
+
+    def __init__(self, predicate):
+        self.predicate = predicate
+
+    def __get__(self, obj, obtype):
+        # convert from resource to standard blank node
+        # since collection doesn't seem to handle resource
+        bnode = rdflib.BNode(obj.value(self.predicate))
+        # create a collection to allow treating as a list
+        # return Collection(self.graph, bnode)
+        titles = []
+        # create a collection to allow treating as a list
+        titles.extend(Collection(self.graph, bnode))
+        return titles
+
+
 class List(object):
 
     data = []
@@ -63,7 +90,6 @@ class List(object):
         self.predicate = predicate
 
     def __get__(self, obj, objtype=None):  # objtype is class of object, e.g. RdfPerson
-        # FIXME: why does this work on the class but not as descriptor?!
         self.data = list(obj.objects(rdflib.URIRef(self.predicate)))
         print self.data
         return self.data

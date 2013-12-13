@@ -3,6 +3,8 @@
   {# FIXME: should list author if different than profile name (e.g. Brendan Kennelly poems on Heaney groupsheet) #}
   {% if doc.author and not profile %} <b>{{ doc.author.lastname }}, {{ doc.author.firstname }}</b>
   {% endif %}
+  title = {{ doc.title }}
+  title list = {{ doc.title_list }}
 {% for t in doc.titles %}
 "{{ t }},"
 {% empty %}

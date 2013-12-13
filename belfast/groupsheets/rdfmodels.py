@@ -115,12 +115,14 @@ class TeiGroupSheet(XmlModel):
 
 class RdfArchivalCollection(rdflib.resource.Resource):
     '''RDF :class:`~rdflib.resource.Resource` for an archival collection. '''
+    rdf_type = rdfns.ARCH.Collection
+    'expected rdf:type for this class'
     name = rdfmap.Value(rdfns.SCHEMA_ORG.name)
-    # TODO: document rdf type
+
 
 class RdfGroupSheet(rdflib.resource.Resource):
     '''RDF :class:`~rdflib.resource.Resource`) for a Belfast Group Sheet.'''
-    # TODO: document rdf type
+    rdf_type = rdfns.BG.GroupSheet
 
     # simple single-value properties
     date = rdfmap.Value(rdfns.DC.date)
@@ -151,8 +153,14 @@ class RdfGroupSheet(rdflib.resource.Resource):
             pers = RdfPerson(self.graph, author_uri.identifier)
             return pers
 
+    # single title
+    title = rdfmap.Value(rdfns.DC.title)
+
+    # title list
+    title_list = rdfmap.Sequence(rdfns.DC.title)
+
     @property
-    def titles(self):
+    def old_titles(self):
         titles = []
         # title is either a single literal OR an rdf sequence
         if self.value(rdfns.DC.title) is not None:
