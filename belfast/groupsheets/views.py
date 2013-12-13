@@ -68,7 +68,7 @@ def teixml(request, name):
 
 # TODO: based on db, how to calculate last modified?
 #@last_modified(rdf_lastmod)  # for now, list is based on rdf
-def list(request):
+def list_groupsheets(request):
     # without filters, find all group sheets
     # results = GroupSheet.objects.all()
     url_args = {}
