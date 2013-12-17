@@ -5,7 +5,7 @@
 
 import argparse
 
-from belfast.data.qub import QUB
+from belfast.rdf.qub import QUB
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

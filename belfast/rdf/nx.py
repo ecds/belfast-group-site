@@ -6,7 +6,7 @@ import rdflib
 from rdflib.collection import Collection as RdfCollection
 
 from belfast.rdfns import SCHEMA_ORG, DC
-from belfast.data.clean import normalize_whitespace
+from belfast.rdf.clean import normalize_whitespace
 
 # first-pass attempt to generate weighted network based on
 # type of rdf relation
