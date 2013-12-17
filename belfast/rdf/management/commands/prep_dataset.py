@@ -14,11 +14,11 @@ from django.contrib.sites.models import Site
 from django.utils.text import slugify
 
 from belfast import rdfns
-from belfast.data.harvest import HarvestRdf, Annotate # HarvestRelated
-from belfast.data.qub import QUB
-from belfast.data.clean import SmushGroupSheets, IdentifyGroupSheets, \
+from belfast.rdf.harvest import HarvestRdf, Annotate # HarvestRelated
+from belfast.rdf.qub import QUB
+from belfast.rdf.clean import SmushGroupSheets, IdentifyGroupSheets, \
     InferConnections
-from belfast.data.nx import Rdf2Gexf
+from belfast.rdf.nx import Rdf2Gexf
 
 # FIXME: belfast.data app probably shouldn't rely on belfast.people...
 from belfast.people.rdfmodels import BelfastGroup, get_belfast_people, RdfPerson
@@ -75,7 +75,7 @@ class Command(BaseCommand):
     # using local dev urls for now
     harvest_urls.extend(['http://localhost:8000/groupsheets/%s/' % i for i in tei_ids])
 
-    QUB_input = os.path.join(settings.BASE_DIR, 'data', 'fixtures', 'QUB_ms1204.html')
+    QUB_input = os.path.join(settings.BASE_DIR, 'rdf', 'fixtures', 'QUB_ms1204.html')
     # FIXME: can we find a better url for the Queen's Belfast Group collection ?
     QUB_URL = 'http://www.qub.ac.uk/directorates/InformationServices/TheLibrary/FileStore/Filetoupload,312673,en.pdf'
 

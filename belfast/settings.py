@@ -130,7 +130,7 @@ INSTALLED_APPS = [
     'belfast.groupsheets',
     'belfast.people',
     'belfast.network',
-    'belfast.data',
+    'belfast.rdf',
 ]
 
 #TINYMCE_FILEBROWSER = True
