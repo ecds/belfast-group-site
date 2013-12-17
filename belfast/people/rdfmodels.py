@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 
 from belfast import rdfns
-from belfast.rdf import descriptors as rdfmap
+from belfast.rdf import rdfmap
 from belfast.util import rdf_data, network_data, cached_property
 
 logger = logging.getLogger(__name__)

@@ -8,7 +8,7 @@ from rdflib.collection import Collection as RdfCollection
 import time
 
 from belfast import rdfns
-from belfast.data import descriptors as rdfmap
+from belfast.rdf import rdfmap
 from belfast.util import rdf_data, normalize_whitespace
 from belfast.people.rdfmodels import RdfPerson
 
