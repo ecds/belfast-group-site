@@ -2,6 +2,8 @@ Django
 django-tinymce
 eulexistdb
 rdflib
+# for sleepycat/berkeleydb persistence
+bsddb3
 networkx
 eulcommon
 html5lib
