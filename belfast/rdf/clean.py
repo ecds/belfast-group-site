@@ -11,6 +11,97 @@ def normalize_whitespace(s):
     return unicode(re.sub(r'\s+', u' ', s.strip(), flags=re.UNICODE))
 
 
+class IdentifyGroupSheets(object):
+
+    total = 0
+    def __init__(self, graph, verbosity=1):
+
+        self.verbosity = verbosity
+
+        # iterate over all contexts in a conjunctive graph and process each one
+        for ctx in graph.contexts():
+            self.total += self.process_graph(ctx)
+
+    def process_graph(self, graph):
+        found = 0
+
+        # identify belfast group sheets and label them with our local
+        # belfast group sheet type
+
+        # some collections include group sheets mixed with other content
+        # (irishmisc, ormsby)
+        # first look for a manuscript with an author that directly
+        # references the belfast group
+        res = graph.query('''
+            PREFIX dc: <%(dc)s>
+            PREFIX rdf: <%(rdf)s>
+            PREFIX bibo: <%(bibo)s>
+            SELECT ?ms
+            WHERE {
+                ?ms rdf:type bibo:Manuscript .
+                ?ms schema:mentions <%(belfast_group)s> .
+                ?ms dc:creator ?auth
+            }
+            ''' % {'dc': rdfns.DC,
+                   'rdf': rdflib.RDF,
+                   'bibo': rdfns.BIBO,
+                   'belfast_group': rdfns.BELFAST_GROUP_URI
+                   }
+            )
+            # searching for all manuscript that 'mention' belfast group
+            # NOTE: schema:mentions NOT the right relation here;
+            # needs to be fixed in findingaids and then here
+
+        # if no matches, do a greedier search
+        if len(res) == 0:
+            # Find every manuscript mentioned in a document
+            # that is *about* the belfast group
+
+            # This should find group sheets in EAD RDF:
+            # document (webpage) that is about the belfast group
+            # and also about a collection, which has manuscripts
+
+            # TODO: will also need to find ms associated with / presented at BG
+            # NOTE: need a way to filter non-belfast group content
+            res = graph.query('''
+                PREFIX schema: <%(schema)s>
+                PREFIX rdf: <%(rdf)s>
+                PREFIX bibo: <%(bibo)s>
+                SELECT ?ms
+                WHERE {
+                    ?doc schema:about <%(belfast_group)s> .
+                    ?doc schema:about ?coll .
+                    ?coll schema:mentions ?ms .
+                    ?ms rdf:type bibo:Manuscript
+                }
+                ''' % {'schema': rdfns.SCHEMA_ORG,
+                       'rdf': rdflib.RDF,
+                       'bibo': rdfns.BIBO,
+                       'belfast_group': rdfns.BELFAST_GROUP_URI
+                       }
+            )
+            # TODO: how to filter out non-group sheet irish misc content?
+            # FIXME: not finding group sheets in irishmisc! (no titles?)
+
+
+        # if no manuscripts are found, stop and do not update the file
+        if len(res) == 0:
+            # Report nothing found in verbose mode
+            if self.verbosity > 1:
+                print 'No groupsheets found in %s' % graph.identifier
+            return 0
+
+        if self.verbosity >= 1:
+            print 'Found %d groupsheet%s in %s' % \
+                (len(res), 's' if len(res) != 1 else '', graph.identifier)
+
+        for r in res:
+            # add a new triple with groupsheet type in the current context
+            graph.add((r['ms'], rdflib.RDF.type, rdfns.BG.GroupSheet))
+            found += 1
+
+        return found
+
 class SmushGroupSheets(object):
 
     # base identifier for 'smushed' ids
@@ -119,98 +210,6 @@ class SmushGroupSheets(object):
                 # if changed remove old version, add new version
                 graph.remove((orig_s, p, orig_o))
                 graph.add((s, p, o))
-
-
-class IdentifyGroupSheets(object):
-
-    total = 0
-    def __init__(self, graph, verbosity=1):
-
-        self.verbosity = verbosity
-
-        # iterate over all contexts in a conjunctive graph and process each one
-        for ctx in graph.contexts():
-            self.total += self.process_graph(ctx)
-
-    def process_graph(self, graph):
-        found = 0
-
-        # identify belfast group sheets and label them with our local
-        # belfast group sheet type
-
-        # some collections include group sheets mixed with other content
-        # (irishmisc, ormsby)
-        # first look for a manuscript with an author that directly
-        # references the belfast group
-        res = graph.query('''
-            PREFIX dc: <%(dc)s>
-            PREFIX rdf: <%(rdf)s>
-            PREFIX bibo: <%(bibo)s>
-            SELECT ?ms
-            WHERE {
-                ?ms rdf:type bibo:Manuscript .
-                ?ms schema:mentions <%(belfast_group)s> .
-                ?ms dc:creator ?auth
-            }
-            ''' % {'dc': rdfns.DC,
-                   'rdf': rdflib.RDF,
-                   'bibo': rdfns.BIBO,
-                   'belfast_group': rdfns.BELFAST_GROUP_URI
-                   }
-            )
-            # searching for all manuscript that 'mention' belfast group
-            # NOTE: schema:mentions NOT the right relation here;
-            # needs to be fixed in findingaids and then here
-
-        # if no matches, do a greedier search
-        if len(res) == 0:
-            # Find every manuscript mentioned in a document
-            # that is *about* the belfast group
-
-            # This should find group sheets in EAD RDF:
-            # document (webpage) that is about the belfast group
-            # and also about a collection, which has manuscripts
-
-            # TODO: will also need to find ms associated with / presented at BG
-            # NOTE: need a way to filter non-belfast group content
-            res = graph.query('''
-                PREFIX schema: <%(schema)s>
-                PREFIX rdf: <%(rdf)s>
-                PREFIX bibo: <%(bibo)s>
-                SELECT ?ms
-                WHERE {
-                    ?doc schema:about <%(belfast_group)s> .
-                    ?doc schema:about ?coll .
-                    ?coll schema:mentions ?ms .
-                    ?ms rdf:type bibo:Manuscript
-                }
-                ''' % {'schema': rdfns.SCHEMA_ORG,
-                       'rdf': rdflib.RDF,
-                       'bibo': rdfns.BIBO,
-                       'belfast_group': rdfns.BELFAST_GROUP_URI
-                       }
-            )
-            # TODO: how to filter out non-group sheet irish misc content?
-            # FIXME: not finding group sheets in irishmisc! (no titles?)
-
-
-        # if no manuscripts are found, stop and do not update the file
-        if len(res) == 0:
-            # Report nothing found in verbose mode
-            if self.verbosity > 1:
-                print 'No groupsheets found in %s' % graph.identifier
-            return 0
-
-        if self.verbosity >= 1:
-            print 'Found %d groupsheet%s in %s' % \
-                (len(res), 's' if len(res) != 1 else '', graph.identifier)
-
-        for r in res:
-            # add a new triple with groupsheet type in the current context
-            graph.add((r['ms'], rdflib.RDF.type, rdfns.BG.GroupSheet))
-            found += 1
-
-        return found
 
 
 class InferConnections(object):
