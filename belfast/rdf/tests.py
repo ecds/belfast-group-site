@@ -3,8 +3,10 @@ from django.conf import settings
 from django.test import TestCase
 import rdflib
 
-from belfast.rdf.qub import QUB
 from belfast import rdfns
+from belfast.rdf.clean import IdentifyGroupSheets
+from belfast.rdf.qub import QUB
+
 
 class QUBTest(TestCase):
 
@@ -95,3 +97,26 @@ class QUBTest(TestCase):
         self.assertEqual('1966-03-22', str(graph.value(uri, rdfns.DC.date)))
 
         # TODO: test anonymous groupsheet handling?
+
+
+class IdentfiyGroupSheetTest(TestCase):
+
+    input = os.path.join(settings.BASE_DIR, 'rdf', 'fixtures', 'groupsheet.xml')
+
+    def test_identify(self):
+        graph = rdflib.ConjunctiveGraph()
+        graph.parse(self.input)
+
+        identifier = IdentifyGroupSheets(graph, verbosity=0)
+        # only one groupsheet in the fixture
+        self.assertEqual(1, identifier.total)
+
+        groupsheets = list(graph.subjects(predicate=rdflib.RDF.type, object=rdfns.BG.GroupSheet))
+        expected = 1
+        found = len(groupsheets)
+        self.assertEqual(expected, found,
+            'expected %d but found %d groupsheets identified in test RDF data')
+
+
+
+

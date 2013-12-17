@@ -144,30 +144,20 @@ class SmushGroupSheets(object):
 
 class IdentifyGroupSheets(object):
 
-    def __init__(self, graph):
+    total = 0
+    def __init__(self, graph, verbosity=1):
 
+        self.verbosity = verbosity
+
+        # iterate over all contexts in a conjunctive graph and process each one
         for ctx in graph.contexts():
-            # returns graphs
-            print 'context %s (%d triples)' % (ctx.identifier, len(ctx))
-            # print len(ctx)
-            # g = graph.get_context(ctx)
-            self.process_graph(ctx)
-
-        # for f in files:
-        #     self.process_file(f)
-
-    # def process_file(self, filename):
+            self.total += self.process_graph(ctx)
 
     def process_graph(self, graph):
+        found = 0
+
         # identify belfast group sheets and label them with our local
         # belfast group sheet type
-
-        # infer rdf format from file extension
-        # filebase, rdf_format = os.path.splitext(filename)
-        # rdf_format = rdf_format.strip('.')
-
-        # g = rdflib.Graph()
-        # g.parse(filename, format=rdf_format)
 
         # some collections include group sheets mixed with other content
         # (irishmisc, ormsby)
@@ -231,17 +221,16 @@ class IdentifyGroupSheets(object):
             # print 'No groupsheets found in %s' % graph.identifier
             return
 
-        print 'Found %d groupsheet%s in %s' % \
-            (len(res), 's' if len(res) != 1 else '', graph.identifier)
+        if self.verbosity >= 1:
+            print 'Found %d groupsheet%s in %s' % \
+                (len(res), 's' if len(res) != 1 else '', graph.identifier)
 
         for r in res:
-            # add a new triple with groupsheet type
-            # FIXME: does this need to be added to master graph?
+            # add a new triple with groupsheet type in the current context
             graph.add((r['ms'], rdflib.RDF.type, rdfns.BG.GroupSheet))
+            found += 1
 
-        #print 'Replacing %s' % filename
-        # with open(filename, 'w') as datafile:
-        #     g.serialize(datafile, format=rdf_format)
+        return found
 
 
 class InferConnections(object):
