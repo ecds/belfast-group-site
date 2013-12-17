@@ -17,13 +17,11 @@ class SmushGroupSheets(object):
     # FIXME: don't hardcode; base on configured site ?
     BELFASTGROUPSHEET = rdflib.Namespace("http://belfastgroup.library.emory.edu/groupsheets/md5/")
 
-    def __init__(self, graph):
+    def __init__(self, graph, verbosity=1):
+        self.verbosity = verbosity
 
+        # iterate over all contexts in a conjunctive graph and process each one
         for ctx in graph.contexts():
-            # returns graphs
-            # print ctx
-            # print len(ctx)
-            # g = graph.get_context(ctx)
             self.process_graph(ctx)
 
     def calculate_uri(self, uri, graph):
@@ -83,14 +81,6 @@ class SmushGroupSheets(object):
         # build a dictionary of "smushed" URIs for belfast group sheets
         # for this document
         new_uris = {}
-        # print 'graph has %d triples before processing' % len(graph)
-
-        # infer rdf format from file extension
-        # filebase, rdf_format = os.path.splitext(filename)
-        # rdf_format = rdf_format.strip('.')
-
-        # g = rdflib.Graph()
-        # g.parse(filename, format=rdf_format)
 
         # smushing should be done after infer/identify group sheets
         # and assign local group sheet type
@@ -99,13 +89,14 @@ class SmushGroupSheets(object):
         ms = list(graph.subjects(predicate=rdflib.RDF.type, object=rdfns.BG.GroupSheet))
         # if no manuscripts are found, stop and do not update the file
         if len(ms) == 0:
-            # possibly print out in a verbose mode if we add that
-            #print 'No groupsheets found in %s' % filename
+            if self.verbosity > 1:
+                print 'No groupsheets found in %s' % graph.identifier
             return
 
-        # TEMP / sanity check
-        print 'Found %d groupsheet%s in %s' % \
-            (len(ms), 's' if len(ms) != 1 else '', graph.identifier)
+        # report number of groupsheets found in context, as a sanity check
+        if self.verbosity >= 1:
+            print 'Found %d groupsheet%s in %s' % \
+                (len(ms), 's' if len(ms) != 1 else '', graph.identifier)
 
         for m in ms:
             # FIXME: only calculate a new uri for blank nodes?
@@ -113,11 +104,6 @@ class SmushGroupSheets(object):
             newURI = self.calculate_uri(m, graph)
             if newURI is not None:
                 new_uris[m] = newURI
-
-        # output = rdflib.Graph()
-        # # bind namespace prefixes from the input graph
-        # for prefix, ns in graph.namespaces():
-        #     output.bind(prefix, ns)
 
         # iterate over all triples in the old graph and convert
         # any uris in the new_uris dictionary to the smushed identifier
@@ -133,13 +119,6 @@ class SmushGroupSheets(object):
                 # if changed remove old version, add new version
                 graph.remove((orig_s, p, orig_o))
                 graph.add((s, p, o))
-
-        # NOTE: currently replaces the starting file.  Might not be ideal,
-        # but may actually be reasonable for the currently intended use.
-        # print 'Replacing %s' % filename
-        # with open(filename, 'w') as datafile:
-        #     output.serialize(datafile, format=rdf_format)
-        # print 'graph has %d triples after processing' % len(graph)
 
 
 class IdentifyGroupSheets(object):
@@ -217,9 +196,10 @@ class IdentifyGroupSheets(object):
 
         # if no manuscripts are found, stop and do not update the file
         if len(res) == 0:
-            # possibly print out in a verbose mode if we add that
-            # print 'No groupsheets found in %s' % graph.identifier
-            return
+            # Report nothing found in verbose mode
+            if self.verbosity > 1:
+                print 'No groupsheets found in %s' % graph.identifier
+            return 0
 
         if self.verbosity >= 1:
             print 'Found %d groupsheet%s in %s' % \

@@ -4,26 +4,29 @@ from django.test import TestCase
 import rdflib
 
 from belfast import rdfns
-from belfast.rdf.clean import IdentifyGroupSheets
+from belfast.rdf.clean import IdentifyGroupSheets, SmushGroupSheets
 from belfast.rdf.qub import QUB
+
+
+qub_test_input = os.path.join(settings.BASE_DIR, 'rdf', 'fixtures', 'QUB_ms1204_test.html')
+rdf_groupsheet_input = os.path.join(settings.BASE_DIR, 'rdf', 'fixtures', 'groupsheet.n3')
+# rdf_groupsheet_input = os.path.join(settings.BASE_DIR, 'rdf', 'fixtures', 'groupsheet.xml')
 
 
 class QUBTest(TestCase):
 
-    input = os.path.join(settings.BASE_DIR, 'rdf', 'fixtures', 'QUB_ms1204_test.html')
-
     def test_rdf_conversion(self):
         # generate rdf from test input and then inspect the result
         graph = rdflib.ConjunctiveGraph()
-        QUB(self.input, verbosity=0, graph=graph, url=QUB.QUB_BELFAST_COLLECTION)
+        QUB(qub_test_input, verbosity=0, graph=graph, url=QUB.QUB_BELFAST_COLLECTION)
         # NOTE: currently not testing top-level collection info
 
         groupsheets = list(graph.subjects(predicate=rdflib.RDF.type, object=rdfns.BG.GroupSheet))
-        self.assertEqual(3, len(groupsheets),
+        self.assertEqual(4, len(groupsheets),
             'converted RDF should have 3 groupsheets for test input')
 
         people = list(graph.subjects(predicate=rdflib.RDF.type, object=rdfns.SCHEMA_ORG.Person))
-        self.assertEqual(3, len(people),
+        self.assertEqual(4, len(people),
             'converted RDF should have three people for test input')
 
         # order in rdf not guaranteed, so identify by last name
@@ -38,6 +41,11 @@ class QUBTest(TestCase):
         self.assertEqual('http://viaf.org/viaf/91907300', str(uri))
         self.assertEqual('Philip', str(graph.value(uri, rdfns.SCHEMA_ORG.givenName)))
         self.assertEqual('Philip Hobsbaum', str(graph.value(uri, rdfns.SCHEMA_ORG.name)))
+
+        uri = people_by_name['Heaney']
+        self.assertEqual('http://viaf.org/viaf/109557338', str(uri))
+        self.assertEqual('Seamus', str(graph.value(uri, rdfns.SCHEMA_ORG.givenName)))
+        self.assertEqual('Seamus Heaney', str(graph.value(uri, rdfns.SCHEMA_ORG.name)))
 
         uri = people_by_name['Bond']
         self.assert_('viaf.org' not in str(uri))
@@ -99,13 +107,12 @@ class QUBTest(TestCase):
         # TODO: test anonymous groupsheet handling?
 
 
-class IdentfiyGroupSheetTest(TestCase):
-
-    input = os.path.join(settings.BASE_DIR, 'rdf', 'fixtures', 'groupsheet.xml')
+class IdentifyGroupSheetTest(TestCase):
 
     def test_identify(self):
         graph = rdflib.ConjunctiveGraph()
-        graph.parse(self.input)
+        cg = graph.get_context('file://%s' % rdf_groupsheet_input)
+        cg.parse(rdf_groupsheet_input, format='n3')
 
         identifier = IdentifyGroupSheets(graph, verbosity=0)
         # only one groupsheet in the fixture
@@ -118,5 +125,38 @@ class IdentfiyGroupSheetTest(TestCase):
             'expected %d but found %d groupsheets identified in test RDF data')
 
 
+class SmushGroupSheetsTest(TestCase):
+
+    def test_smush(self):
+        graph = rdflib.ConjunctiveGraph()
+        # fixture data based on ead harvest
+        cg = graph.get_context('file://%s' % rdf_groupsheet_input)
+        cg.parse(rdf_groupsheet_input, format='n3')
+        # before smushing, harvested groupsheets must be identified
+        IdentifyGroupSheets(graph, verbosity=0)
+
+        unsmushed_gs = list(graph.subjects(predicate=rdflib.RDF.type, object=rdfns.BG.GroupSheet))
+        for uri in unsmushed_gs:
+            self.assert_(isinstance(uri, rdflib.BNode),
+                'unsmushed groupsheet URIs are expected to be blank nodes')
+
+        SmushGroupSheets(graph, verbosity=0)
+        smushed_gs = list(graph.subjects(predicate=rdflib.RDF.type, object=rdfns.BG.GroupSheet))
+        for uri in smushed_gs:
+            self.assert_(not isinstance(uri, rdflib.BNode),
+                'smushed groupsheet URIs should NOT be blank nodes')
+
+        # TODO: should be testing that the smushing actually works, and
+        # rdf about the same groupsheet from different sources gets de-duped
+
+        # TODO: also test smushing with TEI-based groupsheet rdf
+
+        # FIXME: for some reason, test on smushing QUB data is not working
+        # - does not find title/author for groupsheet nodes for some reason (?!?)
+        # (something about combination of test data graphs?)
+        # but this seems to be working fine with the actual data
+        # TODO: test smushing qub data
+        # add test qub groupsheets to test graph
+        # QUB(qub_test_input, verbosity=0, graph=graph, url=QUB.QUB_BELFAST_COLLECTION)
 
 
