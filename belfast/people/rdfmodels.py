@@ -138,7 +138,12 @@ class RdfLocation(RdfEntity):
 
 
 class RdfOrganization(RdfEntity):
-    pass
+
+    @property
+    def name(self):
+        # TODO: make common to base class?
+        l = self.graph.preferredLabel(self.identifier)
+        return l if l else self.value(rdfns.SCHEMA_ORG.name)
 
 
 class DBpediaEntity(RdfEntity):
