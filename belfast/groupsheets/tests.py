@@ -74,6 +74,7 @@ class TeiGroupSheetTest(testutil.TestCase):
         self.assertEqual(None, id_from_ark('http://pid.emory.edu/ark:/bogus/123'))
 
 
+@unittest.skip   # skip until cleaned & prepped fixture is ready
 class RdfGroupSheetTest(testutil.TestCase):
     # sample RDF for testing RDF GroupSheet logic
     rdfxml = path.join(FIXTURE_DIR, 'groupsheetrdf.xml')
