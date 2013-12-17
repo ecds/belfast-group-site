@@ -9,7 +9,7 @@ from belfast.rdf.qub import QUB
 
 
 qub_test_input = os.path.join(settings.BASE_DIR, 'rdf', 'fixtures', 'QUB_ms1204_test.html')
-rdf_groupsheet_input = os.path.join(settings.BASE_DIR, 'rdf', 'fixtures', 'groupsheet.n3')
+rdf_groupsheet_input = os.path.join(settings.BASE_DIR, 'rdf', 'fixtures', 'groupsheet.xml')
 # rdf_groupsheet_input = os.path.join(settings.BASE_DIR, 'rdf', 'fixtures', 'groupsheet.xml')
 
 
@@ -112,7 +112,7 @@ class IdentifyGroupSheetTest(TestCase):
     def test_identify(self):
         graph = rdflib.ConjunctiveGraph()
         cg = graph.get_context('file://%s' % rdf_groupsheet_input)
-        cg.parse(rdf_groupsheet_input, format='n3')
+        cg.parse(rdf_groupsheet_input)
 
         identifier = IdentifyGroupSheets(graph, verbosity=0)
         # only one groupsheet in the fixture
@@ -131,7 +131,7 @@ class SmushGroupSheetsTest(TestCase):
         graph = rdflib.ConjunctiveGraph()
         # fixture data based on ead harvest
         cg = graph.get_context('file://%s' % rdf_groupsheet_input)
-        cg.parse(rdf_groupsheet_input, format='n3')
+        cg.parse(rdf_groupsheet_input)
         # before smushing, harvested groupsheets must be identified
         IdentifyGroupSheets(graph, verbosity=0)
 
