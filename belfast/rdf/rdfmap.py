@@ -27,6 +27,8 @@ class Value(object):
         val = obj.value(self.predicate)
         if self.datatype is not None:
             val = rdflib.Literal(val, datatype=self.datatype).toPython()
+        elif isinstance(val, rdflib.Literal):
+            val = val.toPython()
 
         if self.normalize:
             val = normalize_whitespace(val)
@@ -82,7 +84,7 @@ class Sequence(object):
         return titles
 
 
-class List(object):
+class ValueList(object):
 
     data = []
 
@@ -90,8 +92,9 @@ class List(object):
         self.predicate = predicate
 
     def __get__(self, obj, objtype=None):  # objtype is class of object, e.g. RdfPerson
-        self.data = list(obj.objects(rdflib.URIRef(self.predicate)))
-        print self.data
+        # TODO: share datatype logic, whitespace normalization with value
+        self.data = [o.toPython() if isinstance(o, rdflib.Literal) else o
+                     for o in obj.objects(rdflib.URIRef(self.predicate))]
         return self.data
 
     # @property

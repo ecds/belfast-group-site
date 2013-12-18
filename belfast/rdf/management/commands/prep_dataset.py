@@ -17,7 +17,7 @@ from belfast import rdfns
 from belfast.rdf.harvest import HarvestRdf, Annotate # HarvestRelated
 from belfast.rdf.qub import QUB
 from belfast.rdf.clean import SmushGroupSheets, IdentifyGroupSheets, \
-    InferConnections
+    InferConnections, ProfileUris
 from belfast.rdf.nx import Rdf2Gexf
 
 # FIXME: belfast.data app probably shouldn't rely on belfast.people...
@@ -42,8 +42,6 @@ class Command(BaseCommand):
             help='Smush groupsheet URIs'),
         make_option('-c', '--connect', action='store_true',
             help='Infer and make connections implicit in the data'),
-        make_option('-l', '--local-uris', action='store_true',
-            help='Generate local URIs and add them to the graph based on existing data'),
         make_option('-g', '--gexf', action='store_true',
             help='Generate GEXF network graph data'),
         make_option('-x', '--clear', action='store_true',
@@ -87,7 +85,7 @@ class Command(BaseCommand):
         all_steps = not any([options['harvest'], options['queens'],
                              options['related'], options['smush'],
                              options['gexf'], options['identify'],
-                             options['connect'], options['local_uris']])
+                             options['connect']])
 
         # initialize graph persistence
         graph = rdflib.ConjunctiveGraph('Sleepycat')
@@ -130,8 +128,9 @@ class Command(BaseCommand):
 
         if all_steps or options['smush']:
             # smush any groupsheets in the data
-            self.stdout.write('-- Smushing groupsheet URIs')
+            self.stdout.write('-- Smushing groupsheet URIs and generating local profile URIs')
             SmushGroupSheets(graph)
+            ProfileUris(graph)
 
         if all_steps or options['connect']:
             # infer connections
@@ -139,98 +138,10 @@ class Command(BaseCommand):
             InferConnections(graph)
             # TODO: groupsheet owner based on source collection
 
-        # TODO: create rdf profiles with local uris; get rid of person db model
-        if all_steps or options['local_uris']:
-            self.stdout.write('-- Generating local URIs based on the data')
-            self.local_uris(graph)
-
         if all_steps or options['gexf']:
             # generate gexf
             self.stdout.write('-- Generating network graph and saving as GEXF')
             Rdf2Gexf(graph, settings.GEXF_DATA)
 
         graph.close()
-
-    def local_uris(self, graph):
-        # FIXME: this should probably happen as part of the *smushing* step
-        # and should definitely happen *before* the nx graph is generated
-        current_site = Site.objects.get(id=settings.SITE_ID)
-        # generate local uris for persons who will have profile pages on the site
-
-        # contexts(triple=None) # contexts by triple
-        # for person in get_belfast_people():
-        #     print person
-
-        # return
-
-
-        # NOTE: possibly iterate through people referenced in QUB first
-        # should give us a good first-pass at good versions of names
-        # and help clean up blank nodes for people without viaf/dbpedia ids
-        # gqub = graph.get_context(self.QUB_URL)
-
-
-        # local URIs for people in the group
-        new_uris = {}
-        # qub = graph.get_context(self.QUB_URL)
-        for ctx in graph.contexts():
-        # for ctx in [qub]:
-            ctx_uris = {}
-            for subject in ctx.subjects(rdflib.RDF.type, rdfns.SCHEMA_ORG.Person):
-                person = RdfPerson(graph, subject)
-                if not person.name:
-                    print '** ERROR: no name for ', subject
-                    continue
-                # FIXME: utility method?
-                uri = 'http://%s%s' % (
-                    current_site.domain,
-                    reverse('people:profile', args=[slugify(person.name)])
-                    )
-
-                print subject, ' ', person.name, ' ', uri
-                # skip if already converted
-                if uri == str(subject):
-                    continue
-
-                uriref = rdflib.URIRef(uri)
-                # "smush" - convert all author identifiers to local uris
-                # convert bnodes to local URIs so we can group authors
-                # bnodes should only be converted in current context
-                ctx_uris[subject] = uriref
-                # other uris should be converted throughout the graph
-                if not isinstance(subject, rdflib.BNode):
-                    new_uris[subject] = uriref
-
-                # set type to person (FIXME: redundant once smushed?)
-                # ctx.add((uriref, rdflib.namespace.RDF.type, rdfns.SCHEMA_ORG.Person))
-                # add preferred label for local use
-                # FIXME: ensure name is firstname lastname and not all caps
-                name = (uriref, rdflib.namespace.SKOS.preferredLabel, person.name)
-                if name not in graph:
-                    ctx.add(name)
-
-                # check if not in graph already somewhere?
-                if person.viaf_uri:
-                    ctx.add((uriref, rdflib.OWL.sameAs, rdflib.URIRef(person.viaf_uri)))
-                if person.dbpedia_uri:
-                    ctx.add((uriref, rdflib.OWL.sameAs, rdflib.URIRef(person.dbpedia_uri)))
-
-
-            # iterate over all triples in the old graph and convert
-            # any uris in the new_uris dictionary to the smushed identifier
-            # FIXME: copied from clean.py ; make re-usable function?
-            for s, p, o in ctx:
-                orig_s = s
-                orig_o = o
-                s = ctx_uris.get(s, s)
-                o = ctx_uris.get(o, o)
-
-                if orig_s != s or orig_o != o:
-                    # if changed remove old version, add new version
-                    ctx.remove((orig_s, p, orig_o))
-                    ctx.add((s, p, o))
-
-
-
-
 

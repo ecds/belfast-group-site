@@ -244,8 +244,8 @@ class RdfPerson(RdfEntity):
     birthdate = rdfmap.Value(rdfns.SCHEMA_ORG.birthDate)
     birthplace = rdfmap.Resource(rdfns.DBPEDIA_OWL.birthPlace, RdfLocation)
 
-    occupation = rdfmap.List(rdfns.SCHEMA_ORG.jobTitle)
-    same_as = rdfmap.List(rdflib.OWL.sameAs)
+    occupation = rdfmap.ValueList(rdfns.SCHEMA_ORG.jobTitle)
+    same_as = rdfmap.ValueList(rdflib.OWL.sameAs)
     description = rdfmap.Value(rdfns.SCHEMA_ORG.description)
 
     work_locations = rdfmap.ResourceList(rdfns.SCHEMA_ORG.workLocation, RdfLocation)

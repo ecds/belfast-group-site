@@ -1,10 +1,12 @@
 import os
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.test import TestCase
 import rdflib
 
 from belfast import rdfns
-from belfast.rdf.clean import IdentifyGroupSheets, SmushGroupSheets
+from belfast.rdf.clean import IdentifyGroupSheets, SmushGroupSheets, \
+    Person, person_names, ProfileUris
 from belfast.rdf.qub import QUB
 
 
@@ -139,12 +141,19 @@ class SmushGroupSheetsTest(TestCase):
         for uri in unsmushed_gs:
             self.assert_(isinstance(uri, rdflib.BNode),
                 'unsmushed groupsheet URIs are expected to be blank nodes')
+        gs1 = unsmushed_gs[0]
+        property_count = len(list(graph.triples((gs1, None, None))))
 
         SmushGroupSheets(graph, verbosity=0)
         smushed_gs = list(graph.subjects(predicate=rdflib.RDF.type, object=rdfns.BG.GroupSheet))
         for uri in smushed_gs:
             self.assert_(not isinstance(uri, rdflib.BNode),
                 'smushed groupsheet URIs should NOT be blank nodes')
+
+        gs1 = smushed_gs[0]
+        self.assertEqual(property_count,
+                         len(list(graph.triples((gs1, None, None)))),
+                         'groupsheet should have the same number of RDF statements after smushing')
 
         # TODO: should be testing that the smushing actually works, and
         # rdf about the same groupsheet from different sources gets de-duped
@@ -158,5 +167,109 @@ class SmushGroupSheetsTest(TestCase):
         # TODO: test smushing qub data
         # add test qub groupsheets to test graph
         # QUB(qub_test_input, verbosity=0, graph=graph, url=QUB.QUB_BELFAST_COLLECTION)
+
+class PersonTest(TestCase):
+
+    def test_properties(self):
+        # construct some simple rdf about a fictional person for testing
+        g = rdflib.Graph()
+        uri = 'http://example.net/people/joe-schmoe'
+        uriref = rdflib.URIRef(uri)
+        names = {'fname': 'Joe', 'lname': 'Schmoe'}
+        fullname = '%(fname)s %(lname)s' % names
+        g.add((uriref, rdfns.SCHEMA_ORG.name, rdflib.Literal(fullname)))
+        g.add((uriref, rdfns.SCHEMA_ORG.givenName,
+               rdflib.Literal('%(fname)s' % names)))
+        g.add((uriref, rdfns.SCHEMA_ORG.familyName,
+               rdflib.Literal('%(lname)s' % names)))
+        lastname_first = '%(lname)s, %(fname)s' % names
+        g.add((uriref, rdfns.FOAF.name, rdflib.Literal(lastname_first)))
+        full_initial = '%(fname)s A. %(lname)s' % names
+        g.add((uriref, rdfns.FOAF.name, rdflib.Literal(full_initial)))
+
+        p = Person(g, uriref)
+        self.assertEqual(names['fname'], p.s_first_name)
+        self.assertEqual(names['lname'], p.s_last_name)
+        self.assert_(fullname in p.s_names)
+        self.assert_(lastname_first in p.f_names)
+        self.assert_(full_initial in p.f_names)
+
+
+    def test_person_names(self):
+        g = rdflib.Graph()
+        uri = 'http://example.net/people/joe-schmoe'
+        uriref = rdflib.URIRef(uri)
+        names = {'fname': 'Joe', 'lname': 'Schmoe'}
+        # store triples for easy removal
+        fname_triple = (uriref, rdfns.SCHEMA_ORG.givenName,
+                        rdflib.Literal('%(fname)s' % names))
+        g.add(fname_triple)
+        lname_triple = (uriref, rdfns.SCHEMA_ORG.familyName,
+               rdflib.Literal('%(lname)s' % names))
+        g.add(lname_triple)
+        # full name
+        lastname_first = '%(lname)s, %(fname)s A.' % names
+        g.add((uriref, rdfns.SCHEMA_ORG.name, rdflib.Literal(lastname_first)))
+        g.add((uriref, rdfns.FOAF.name, rdflib.Literal('Mc%s' % lastname_first)))
+
+        first, last = person_names(g, uriref)
+        # given/family names should be used if present
+        self.assertEqual(names['fname'], first)
+        self.assertEqual(names['lname'], last)
+
+        g.remove(fname_triple)
+        g.remove(lname_triple)
+        # schema.org name used in preference to foaf name
+        first, last = person_names(g, uriref)
+        self.assertEqual(names['fname'], first)
+        self.assertEqual(names['lname'], last)
+
+        g.remove((uriref, rdfns.SCHEMA_ORG.name, rdflib.Literal(lastname_first)))
+        # foaf name used if schema.org not present
+        first, last = person_names(g, uriref)
+        self.assertEqual(names['fname'], first)
+        self.assertEqual('Mc%s' % names['lname'], last)
+
+        # returns none if it can't figure out a name
+        g.remove((uriref, rdfns.FOAF.name, rdflib.Literal('Mc%s' % lastname_first)))
+        first, last = person_names(g, uriref)
+        self.assertEqual(None, first)
+        self.assertEqual(None, last)
+
+class ProfileUrisTest(TestCase):
+
+    def test_local_uris(self):
+        graph = rdflib.ConjunctiveGraph()
+        # add test qub groupsheets to test graph
+        QUB(qub_test_input, verbosity=0, graph=graph, url=QUB.QUB_BELFAST_COLLECTION)
+        # print graph.serialize(pretty=True)
+        # store people uris before modification
+        people = list(graph.subjects(predicate=rdflib.RDF.type, object=rdfns.SCHEMA_ORG.Person))
+        current_site = Site.objects.get(id=settings.SITE_ID)
+
+        # fixture data based on ead harvest
+        # cg = graph.get_context('file://%s' % rdf_groupsheet_input)
+        # cg.parse(rdf_groupsheet_input)
+        ProfileUris(graph)
+        # print graph.serialize(pretty=True)
+        local_uris = list(graph.subjects(predicate=rdflib.RDF.type, object=rdfns.SCHEMA_ORG.Person))
+        for uri in local_uris:
+            self.assert_(current_site.domain in str(uri),
+                'local uri %s should be based on current site domain %s' %
+                (uri, current_site.domain))
+            self.assertNotEqual(None, graph.value(uri, rdflib.namespace.SKOS.preferredLabel),
+                'preferredLabel should be set for people with local uris')
+            self.assert_((uri, rdflib.RDF.type, rdfns.SCHEMA_ORG.Person) in graph,
+                'schema.org/Person type should be associated with local uri')
+            # Heaney & Hobsbaum should have VIAF ids
+            lastname = str(graph.value(uri, rdfns.SCHEMA_ORG.familyName))
+            if lastname in ['Hobsbaum', 'Heaney']:
+                same_as = list(graph.objects(uri, rdflib.OWL.sameAs))
+                self.assertEqual(1, len(same_as),
+                    'persons with VIAF ids should have one sameAs relation')
+                self.assert_('viaf.org' in same_as[0])
+
+
+
 
 
