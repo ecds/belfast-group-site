@@ -43,7 +43,8 @@ def build():
     '''Run a full local build/test cycle.'''
     all_deps()
     test()
-    doc()
+    # TODO: sphinx docs not set up yet; enable once they are
+    # doc()
 
 
 ##
