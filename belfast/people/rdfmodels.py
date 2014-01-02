@@ -21,7 +21,13 @@ class RdfEntity(rdflib.resource.Resource):
     _person_type = rdflib.resource.Resource
     _org_type = rdflib.resource.Resource
 
+    rdf_types =  rdfmap.ValueList(rdflib.RDF.type)
+    # should be usable to confirm resource is expected type;
+    # (similar to requisite content models check in eulfedora)
 
+    def __repr__(self):
+        # custom repr more readable than the default for rdflib resource
+        return '<%s %s>' % (self.__class__.__name__, str(self))
 
     # @property
     # def name(self):
@@ -137,6 +143,7 @@ class RdfLocation(RdfEntity):
             or self.name or self.identifier
 
 
+
 class RdfOrganization(RdfEntity):
 
     @property
@@ -182,12 +189,13 @@ class RdfPerson(RdfEntity):
             if 'viaf.org' in res.identifier:
                 return res.identifier
 
+    _name = rdfmap.Value(rdfns.SCHEMA_ORG.name)
+
     @property
     def name(self):
         # NOTE: would be better if we could use preferredLabel somehow
         l = self.graph.preferredLabel(self.identifier)
-        return l if l else self.value(rdfns.SCHEMA_ORG.name)
-
+        return l if l else self._name
 
     # TODO: move into data clean-up; assume already cleaned at this point
 

@@ -3,12 +3,10 @@
   {# FIXME: should list author if different than profile name (e.g. Brendan Kennelly poems on Heaney groupsheet) #}
   {% if doc.author and not profile %} <b>{{ doc.author.lastname }}, {{ doc.author.firstname }}</b>
   {% endif %}
-  title = {{ doc.title }}
-  title list = {{ doc.title_list }}
-{% for t in doc.titles %}
+{% for t in doc.title_list %}  {# list of titles if multiple #}
 "{{ t }},"
-{% empty %}
-  Untitled{{ ' '|add:doc.genre|default:'' }},
+{% empty %} {# single title if we have one, or untitled + genre if available #}
+  {% if doc.title %}"{{ doc.title }}"{% else %}{{ 'Untitled '|add:doc.genre|default:'' }}{% endif %},
 {% endfor %}
 {% if doc.date %}{{ doc.date }}{% else %}no date{% endif %}.  {# TODO: format date for readability #}
 {# perhaps simply omit the no date since the majority are undated? #}

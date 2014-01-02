@@ -42,12 +42,14 @@ def profile(request, id):
         reverse('people:profile', args=[id])
     )
     g = rdf_data()
-    person = RdfPerson(g, rdflib.URIRef(uri))
+    uriref = rdflib.URIRef(uri)
+    # check that the generated URI is actually a person in our rdf dataset;
+    # if not, 404
+    if not (uriref, rdflib.RDF.type, rdfns.SCHEMA_ORG.Person) in g:
+        raise Http404
+    person = RdfPerson(g, uriref)
     groupsheets = get_rdf_groupsheets(author=uri) # TODO: move to rdfperson class
-    # for t in g.triples((rdflib.URIRef(uri), None, None)):
-    #     print t
 
-    # person = get_object_or_404(Person, slug=id)
     return render(request, 'people/profile.html',
                   {'person': person, 'groupsheets': groupsheets})
 
