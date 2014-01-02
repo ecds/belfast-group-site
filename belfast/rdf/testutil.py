@@ -34,8 +34,8 @@ try:
             print >> sys.stderr, "Removing test RDF Database: %s" % settings.RDF_DATABASE
             shutil.rmtree(settings.RDF_DATABASE)
             if self.stored_rdf_database is not None:
-                print >> sys.stderr, "Restoring RDF Database: %s" \
-                    % self.stored_rdf_database
+                # print >> sys.stderr, "Restoring RDF Database: %s" \
+                #     % self.stored_rdf_database
                 settings.RDF_DATABASE = self.stored_rdf_database
 
         def help(self):
