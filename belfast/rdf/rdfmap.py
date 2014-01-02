@@ -68,6 +68,8 @@ class ResourceList(object):
 
 
 class Sequence(object):
+    '''RDF descriptor for accessing values contained in an rdf sequence
+    as a python list.'''
 
     def __init__(self, predicate):
         self.predicate = predicate
@@ -78,11 +80,12 @@ class Sequence(object):
         bnode = rdflib.BNode(obj.value(self.predicate))
         # create a collection to allow treating as a list
         # return Collection(self.graph, bnode)
-        titles = []
+        terms = []
         # create a collection to allow treating as a list
-        titles.extend(Collection(self.graph, bnode))
-        return titles
+        terms.extend(Collection(obj.graph, bnode))
 
+        return [t.toPython() if isinstance(t, rdflib.Literal) else t
+                     for t in terms]
 
 class ValueList(object):
 
