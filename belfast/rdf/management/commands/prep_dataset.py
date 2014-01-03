@@ -9,20 +9,12 @@ import shutil
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.core.urlresolvers import reverse
-from django.contrib.sites.models import Site
-from django.utils.text import slugify
 
-from belfast import rdfns
 from belfast.rdf.harvest import HarvestRdf, Annotate # HarvestRelated
 from belfast.rdf.qub import QUB
 from belfast.rdf.clean import SmushGroupSheets, IdentifyGroupSheets, \
     InferConnections, ProfileUris
 from belfast.rdf.nx import Rdf2Gexf
-
-# FIXME: belfast.data app probably shouldn't rely on belfast.people...
-from belfast.people.rdfmodels import BelfastGroup, get_belfast_people, RdfPerson
-
 
 class Command(BaseCommand):
     '''Harvest and prep Belfast Group RDF dataset'''
@@ -39,7 +31,7 @@ class Command(BaseCommand):
         make_option('-i', '--identify', action='store_true',
             help='Identify group sheets'),
         make_option('-s', '--smush', action='store_true',
-            help='Smush groupsheet URIs'),
+            help='Smush groupsheet URIs and generate local profile URIs'),
         make_option('-c', '--connect', action='store_true',
             help='Infer and make connections implicit in the data'),
         make_option('-g', '--gexf', action='store_true',
@@ -67,7 +59,7 @@ class Command(BaseCommand):
                'longley1_10316', 'simmons1_1035', 'simmons1_1069',
                'hobsbaum1_1047']
 
-    # for now, harvest from test FA site
+    # harvest from production EmoryFindingAids site
     harvest_urls = ['http://findingaids.library.emory.edu/documents/%s/' % e
                     for e in eadids]
     # using local dev urls for now
@@ -122,7 +114,7 @@ class Command(BaseCommand):
             # HarvestRelated(graph)   # old harvest , which is pulling too much data
 
         if all_steps or options['identify']:
-            # smush any groupsheets in the data
+            # identify groupsheets in the data and add local groupsheet type if not present
             self.stdout.write('-- Identifying groupsheets')
             IdentifyGroupSheets(graph)
 
