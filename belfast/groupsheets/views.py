@@ -84,11 +84,11 @@ def list_groupsheets(request):
         url_args['author'] = filter_author
         # TODO: utility method for this
         current_site = get_current_site(request)
-        uri = 'http://%s%s' % (
+        author_uri = 'http://%s%s' % (
             current_site.domain,
             reverse('people:profile', args=[filter_author])
         )
-        filters['author'] = uri
+        filters['author'] = author_uri
 
     filter_source = request.GET.get('source', None)
     if filter_source is not None:
@@ -143,13 +143,21 @@ def list_groupsheets(request):
     if filter_digital is not None:
         args = url_args.copy()
         del args['edition']
-        filters['digital edition'] = '?' + urllib.urlencode(args)
+        filter_args = urllib.urlencode(args)
+        filters['digital edition'] = '?' + filter_args if filter_args else ''
     if filter_author is not None:
         args = url_args.copy()
         del args['author']
+        # pull author display name from results
+        # TODO: init rdfperson and use that label instead?
         if results:
-            # pull author display name from results
-            filters[results[0].author.name] = '?' + urllib.urlencode(args)
+            for a in results[0].author_list:
+                # groupsheets may have multiple authors, so make sure
+                # we get the correct label for the active filter
+                if str(a.identifier) == author_uri:
+                    filters[a.name] = '?' + urllib.urlencode(args)
+                    break
+
     if filter_source is not None:
         args = url_args.copy()
         del args['source']

@@ -4,12 +4,11 @@ from eulexistdb.manager import Manager
 from eulexistdb.models import XmlModel
 import logging
 import rdflib
-from rdflib.collection import Collection as RdfCollection
 import time
 
 from belfast import rdfns
 from belfast.rdf import rdfmap
-from belfast.util import rdf_data, normalize_whitespace
+from belfast.util import rdf_data
 from belfast.people.rdfmodels import RdfPerson
 
 
@@ -148,92 +147,19 @@ class RdfGroupSheet(rdflib.resource.Resource):
 
     # more complex properties: aggregate, other resources
 
-    @property
-    def author(self):
-        author_uri = self.value(rdfns.DC.creator) or \
-            self.value(rdfns.SCHEMA_ORG.author)
+    # single author
+    author = rdfmap.Resource(rdfns.DC.creator, RdfPerson)
+    # author list - a very few groupsheets have multiple authors
+    author_list = rdfmap.ResourceList(rdfns.DC.creator, RdfPerson)
 
-        if author_uri is not None:
-            # returns an rdflib Resource, so use identifier to re-init
-            # TODO: see if there is a way to auto-init as rdfperson obj
-            pers = RdfPerson(self.graph, author_uri.identifier)
-            return pers
-
-    # single title
+    # single title as literal value
     title = rdfmap.Value(rdfns.DC.title)
-
-    # title list
+    # title list as rdf:sequence
     title_list = rdfmap.Sequence(rdfns.DC.title)
-
-    @property
-    def old_titles(self):
-        titles = []
-        # title is either a single literal OR an rdf sequence
-        if self.value(rdfns.DC.title) is not None:
-            title = self.value(rdfns.DC.title)
-            # single literal
-            if isinstance(title, rdflib.Literal):
-                titles.append(normalize_whitespace(title))
-
-            # otherwise, assuming node is an rdf sequence
-            else:
-                # convert from resource to standard blank node
-                # since collection doesn't seem to handle resource
-                bnode = rdflib.BNode(title)
-                # create a collection to allow treating as a list
-                titles.extend(RdfCollection(self.graph, bnode))
-        return titles
-
-    # FIXME: should be able to do this more efficiently;
-    # set to return an rdf resource with a name...
 
     sources = rdfmap.ResourceList(rdfns.SCHEMA_ORG.mentions, RdfArchivalCollection,
                                   is_object=False)
 
-    # should be sufficient, but make sure this works for all cases
-
-    @property
-    def old_sources(self):
-        ''''Dictionary of archival collections that hold copies of this groupsheet.
-        Key is URI,
-        '''
-        sources = {}
-        # FIXME: for ormsby, this is displaying the series title in one case
-        # rather than the collection title (subsubseries... )
-
-        # TODO: refactor this so it is simpler
-
-        for coll in self.graph.subjects(rdfns.SCHEMA_ORG.mentions, self.identifier):
-            if (coll, rdflib.RDF.type, rdfns.ARCH.Collection) in self.graph:
-                name = self.graph.value(coll, rdfns.SCHEMA_ORG.name)
-                # if a blank node (i.e. irishmisc), get the webpage with a url
-                if isinstance(coll, rdflib.BNode):
-                    for pcoll in self.graph.subjects(rdfns.SCHEMA_ORG.about, coll):
-                        if (pcoll, rdflib.RDF.type, rdfns.SCHEMA_ORG.WebPage) in self.graph:
-                            name = self.graph.value(pcoll, rdfns.SCHEMA_ORG.name).strip()
-                            sources[unicode(pcoll)] = name  # title/name ?
-
-                else:
-                    sources[unicode(coll)] = name  # title/name ?
-            else:
-                # NOTE: may want to use transitive subjects here (?)
-                # FIXME: https: vs http: uri may be an issue!
-                for pcoll in self.graph.subjects(rdfns.DC.hasPart, coll):
-                    # find the *document* that describes the collection
-                    # (but is not itself a collection), because the document
-                    # is the thing we can link to.
-
-                    # NOTE: looking for ARCH.Collection seems to generate
-                    # redundant sources, one without a resolvable URI.
-                    # Ignore the collection for now and only use the webpage.
-
-                    # if (pcoll, rdflib.RDF.type, rdfns.ARCH.Collection) in self.graph \
-                    #    or (pcoll, rdflib.RDF.type, rdfns.SCHEMA_ORG.WebPage) in self.graph:
-                    if (pcoll, rdflib.RDF.type, rdfns.SCHEMA_ORG.WebPage) in self.graph:
-                        # do we need to check webpage that is ABOUT a collection?
-                        name = self.graph.value(pcoll, rdfns.SCHEMA_ORG.name).strip()
-                        sources[unicode(pcoll)] = name  # title/name ?
-        return sources
 
 def groupsheet_by_url(url):
     start = time.time()
