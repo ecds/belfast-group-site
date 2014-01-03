@@ -90,16 +90,15 @@ def list_groupsheets(request):
         )
         filters['author'] = uri
 
+    filter_source = request.GET.get('source', None)
+    if filter_source is not None:
+        url_args['source'] = filter_source
+        # TODO: preferred label / slugs / local identifier for these?
+        # currently arg is the uri
+        filters['source'] = filter_source
+
     results = get_rdf_groupsheets(**filters)
     # TODO: support source filter; make more django-like
-
-    filter_source = request.GET.get('source', None)
-    # TODO
-    # if filter_source is not None:
-    #     results = results.filter(sources__name=filter_source)
-    #     url_args['source'] = filter_source
-
-    # results = results.order_by('author__last_name').all()
 
     # generate labels/totals for 'facet' filters
     digital_count = None
@@ -107,8 +106,7 @@ def list_groupsheets(request):
     if filter_digital is None:
         digital_count = len([r for r in results if r.url])
 
-
-    # # filter to group sheets by author
+    # filter to group sheets by author
     authors = {}
     if filter_author is None:
         # find authors and calculate totals relative to filtered groupsheets to be returned
@@ -117,8 +115,6 @@ def list_groupsheets(request):
                 authors[r.author] = 1
             else:
                 authors[r.author] += 1
-
-    # TODO: needs to be order by count
 
     # filter to group sheets by source
     sources = {}
@@ -130,7 +126,10 @@ def list_groupsheets(request):
                 else:
                     sources[s] += 1
 
-    # TODO: sort by count
+    # generate lists of dicts for easy sorting in django template
+    authors = [{'author': k, 'total': v} for k, v in authors.iteritems()]
+    sources = [{'source': k, 'total': v} for k, v in sources.iteritems()]
+
     # FIXME: make facets empty dict to indicate nothing to show?
     facets = {'digital': digital_count, 'authors': authors, 'sources': sources}
     url_suffix = ''
@@ -148,11 +147,20 @@ def list_groupsheets(request):
     if filter_author is not None:
         args = url_args.copy()
         del args['author']
-        filters[results[0].author.name] = '?' + urllib.urlencode(args)
+        if results:
+            # pull author display name from results
+            filters[results[0].author.name] = '?' + urllib.urlencode(args)
     if filter_source is not None:
         args = url_args.copy()
         del args['source']
-        filters[filter_source] = '?' + urllib.urlencode(args)
+        if results:
+            # pull source name from results (TODO: shorter labels)
+            for s in results[0].sources:
+                # groupsheets may have multiple sources, so make sure
+                # we get the correct label
+                if str(s.identifier) == filter_source:
+                    filters[s.name] = '?' + urllib.urlencode(args)
+                    break
 
     return render(request, 'groupsheets/list.html',
                   {'documents': results, 'facets': facets,

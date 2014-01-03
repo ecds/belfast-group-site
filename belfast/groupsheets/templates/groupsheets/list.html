@@ -31,8 +31,8 @@
     {% if facets.authors %}
     <p><b>Author</b></p>
     <ul>
-        {% for author, total in facets.authors.iteritems %}
-        <li><a href="?author={{ author.slug }}{{ url_suffix }}">{{ author.name }}</a> ({{ total }})</li>
+        {% for f in facets.authors|dictsortreversed:"total" %}
+        <li><a href="?author={{ f.author.slug }}{{ url_suffix }}">{{ f.author.name }}</a> ({{ f.total }})</li>
         {% endfor %}
     </ul>
     {% endif %}
@@ -40,8 +40,8 @@
     {% if facets.sources %}
     <p><b>Source</b></p>
     <ul>
-        {% for source, total in facets.sources.iteritems %}  {# TODO: need to use short names here! #}
-        <li><a href="?source={{ source }}{{ url_suffix }}">{{ source.name }}</a> ({{ total }})</li>
+        {% for s in facets.sources|dictsortreversed:"total" %}  {# TODO: need to use short names here! #}
+        <li><a href="?source={{ s.source.identifier }}{{ url_suffix }}">{{ s.source.name }}</a> ({{ s.total }})</li>
         {% endfor %}
     </ul>
     {% endif %}
@@ -52,7 +52,7 @@
 
     <h1 property="schema:name">Group Sheets</h1>
 
-    <p>Displaying {{ documents|length }} group sheets.</p>
+    <p>Displaying {{ documents|length }} group sheet{{ documents|pluralize }}.</p>
 
     <ul class="groupsheet-list">
         {% for doc in documents %}

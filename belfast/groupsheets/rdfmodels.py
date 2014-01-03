@@ -119,6 +119,12 @@ class RdfArchivalCollection(rdflib.resource.Resource):
     'expected rdf:type for this class'
     name = rdfmap.Value(rdfns.SCHEMA_ORG.name)
 
+    # FIXME: copied from belfast.people.rdfmodels; share from belfast.rdf somewhere?
+    def __repr__(self):
+        # custom repr more readable than the default for rdflib resource
+        return '<%s %s>' % (self.__class__.__name__, str(self))
+
+
 
 class RdfGroupSheet(rdflib.resource.Resource):
     '''RDF :class:`~rdflib.resource.Resource`) for a Belfast Group Sheet.'''
@@ -243,7 +249,7 @@ def groupsheet_by_url(url):
         return RdfGroupSheet(g, uris[0])
 
 
-def get_rdf_groupsheets(author=None, has_url=None):
+def get_rdf_groupsheets(author=None, has_url=None, source=None):
     # query rdf data to get a list of belfast group sheets
     # optionally filter by author (takes a URI)
     start = time.time()
@@ -255,22 +261,28 @@ def get_rdf_groupsheets(author=None, has_url=None):
     if has_url is True:
         fltr += '. ?ms schema:URL ?url '
 
-    res = g.query('''
-        PREFIX schema: <%(schema)s>
-        PREFIX dc: <%(dc)s>
-        PREFIX rdf: <%(rdf)s>
-        SELECT DISTINCT ?ms
-        WHERE {
-            ?ms rdf:type <%(bg)s> .
-            ?ms dc:creator ?author .
-            ?author schema:familyName ?name
-            %(filter)s
-        } ORDER BY ?name
-        ''' % {'schema': rdfns.SCHEMA_ORG, 'dc': rdfns.DC,
-               'rdf': rdflib.RDF, 'bg': rdfns.BG.GroupSheet, 'filter': fltr}
-    )
-                # ?author schema:familyName ?name
-                        # } ORDER BY ?name
+    if source is not None:
+        fltr += '. <%s> schema:mentions ?ms' % source
+
+    query = '''
+PREFIX schema: <%(schema)s>
+PREFIX dc: <%(dc)s>
+PREFIX rdf: <%(rdf)s>
+SELECT DISTINCT ?ms
+WHERE {
+    ?ms rdf:type <%(bg)s> .
+    ?ms dc:creator ?author .
+    ?author schema:familyName ?name
+    %(filter)s
+} ORDER BY ?name
+''' % {'schema': rdfns.SCHEMA_ORG, 'dc': rdfns.DC,
+               'rdf': rdflib.RDF, 'bg': rdfns.BG.GroupSheet,
+               'filter': fltr}
+
+        # ?author schema:familyName ?name
+        # } ORDER BY ?name
+    logger.debug(query)
+    res = g.query(query)
 
     # } ORDER BY ?authorLast
     # FIXME:  only QUB has schema:familyName so that query restricts to them
