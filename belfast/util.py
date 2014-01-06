@@ -41,15 +41,15 @@ def rdf_dburi_from_settings():
         return rdflib.Literal('mysql+mysqldb://%(USER)s:%(PASSWORD)s@%(HOST)s:%(PORT)s/%(NAME)s?charset=utf8' % \
                               dbconfig)
 
-_rdf_data = None
+# _rdf_data = None
 
 
 def rdf_data():
-    global _rdf_data
-    if _rdf_data is None:
-        _rdf_data = rdflib.ConjunctiveGraph('Sleepycat')
-        _rdf_data.open(settings.RDF_DATABASE)
-    return _rdf_data
+    # global _rdf_data
+    # if _rdf_data is None:
+    data = rdflib.ConjunctiveGraph('Sleepycat')
+    data.open(settings.RDF_DATABASE)
+    return data
 
 
 # FIXME: lastmodified stuff probably out of date...
