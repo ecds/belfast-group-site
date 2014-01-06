@@ -188,6 +188,8 @@ def get_rdf_groupsheets(author=None, has_url=None, source=None):
         fltr += '. ?ms schema:URL ?url '
 
     if source is not None:
+        # FIXME: why does this filter not work when we're pulling source list from the graph?
+        # TODO: filter results after querying if this doesn't work
         fltr += '. <%s> schema:mentions ?ms' % source
 
     query = '''
@@ -210,13 +212,8 @@ WHERE {
     logger.debug(query)
     res = g.query(query)
 
-    # } ORDER BY ?authorLast
-    # FIXME:  only QUB has schema:familyName so that query restricts to them
-    # TODO: clean up data so we have lastnames for all authors
-
-    # skos:prefLabel is in VIAF data but not directly related to viaf entity
-
-    # FIXME: restricting to ms with author loses one anonymous sheet
+    # FIXME: restricting to ms with author loses one anonymous sheet;
+    # how to make optional?
 
     logger.debug('Found %d group sheets in %.02f sec' % (len(res),
                  time.time() - start))
