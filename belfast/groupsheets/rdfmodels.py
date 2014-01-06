@@ -188,27 +188,23 @@ def get_rdf_groupsheets(author=None, has_url=None, source=None):
         fltr += '. ?ms schema:URL ?url '
 
     if source is not None:
-        # FIXME: why does this filter not work when we're pulling source list from the graph?
-        # TODO: filter results after querying if this doesn't work
         fltr += '. <%s> schema:mentions ?ms' % source
 
     query = '''
-PREFIX schema: <%(schema)s>
-PREFIX dc: <%(dc)s>
-PREFIX rdf: <%(rdf)s>
-SELECT DISTINCT ?ms
-WHERE {
-    ?ms rdf:type <%(bg)s> .
-    ?ms dc:creator ?author .
-    ?author schema:familyName ?name
-    %(filter)s
-} ORDER BY ?name
-''' % {'schema': rdfns.SCHEMA_ORG, 'dc': rdfns.DC,
+        PREFIX schema: <%(schema)s>
+        PREFIX dc: <%(dc)s>
+        PREFIX rdf: <%(rdf)s>
+        SELECT DISTINCT ?ms
+        WHERE {
+            ?ms rdf:type <%(bg)s> .
+            ?ms dc:creator ?author .
+            ?author schema:familyName ?name
+            %(filter)s
+        } ORDER BY ?name
+        ''' % {'schema': rdfns.SCHEMA_ORG, 'dc': rdfns.DC,
                'rdf': rdflib.RDF, 'bg': rdfns.BG.GroupSheet,
                'filter': fltr}
 
-        # ?author schema:familyName ?name
-        # } ORDER BY ?name
     logger.debug(query)
     res = g.query(query)
 

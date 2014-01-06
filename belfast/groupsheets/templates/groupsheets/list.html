@@ -37,7 +37,8 @@
     <p><b>Source</b></p>
     <ul>
         {% for s in facets.sources|dictsortreversed:"total" %}  {# TODO: need to use short names here! #}
-        <li><a href="?source={{ s.source.identifier }}{{ url_suffix }}">{{ s.source.name }}</a> ({{ s.total }})</li>
+        <li><a href="?source={{ s.source.identifier|urlencode }}{{ url_suffix }}">{{ s.source.name }}</a> ({{ s.total }})</li>
+        {# NOTE: urlencode required since collection URIs include #anchors which otherwise get lost #}
         {% endfor %}
     </ul>
     {% endif %}
