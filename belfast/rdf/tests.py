@@ -92,7 +92,6 @@ class QUBTest(TestCase):
         # croskery: 3 titles, date, 3 pages, short stories.
         uri = groupsheets_by_author['Croskery']
         rdf_types = list(graph.objects(uri, rdflib.RDF.type))
-        # FIXME: blank node?
         title = graph.value(uri, rdfns.DC.title)
         # multiple titles; should be an rdf sequence
         self.assert_(isinstance(title, rdflib.BNode))

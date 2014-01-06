@@ -90,9 +90,6 @@ class IdentifyGroupSheets(object):
                        'belfast_group': rdfns.BELFAST_GROUP_URI
                        }
             )
-            # TODO: how to filter out non-group sheet irish misc content?
-            # FIXME: not finding group sheets in irishmisc! (no titles?)
-
 
         # if no manuscripts are found, stop and do not update the file
         if len(res) == 0:
@@ -114,9 +111,9 @@ class IdentifyGroupSheets(object):
 
 class SmushGroupSheets(object):
 
-    # base identifier for 'smushed' ids
-    # FIXME: don't hardcode; base on configured site ?
-    BELFASTGROUPSHEET = rdflib.Namespace("http://belfastgroup.library.emory.edu/groupsheets/md5/")
+    # base identifier for 'smushed' ids, based on configured site domain
+    BELFASTGROUPSHEET = rdflib.Namespace("http://%s/groupsheets/md5/" % \
+        Site.objects.get(id=settings.SITE_ID).domain)
 
     def __init__(self, graph, verbosity=1):
         self.verbosity = verbosity
@@ -279,8 +276,6 @@ def person_names(graph, uri):
     return (firstname, lastname)
 
 
-# FIXME: something about the changes to this logic made today have broken it !!! :(
-
 class ProfileUris(object):
     '''Generate local uris for persons associated with the belfast group,
     who will have profile pages on the site; smush or add relations to
@@ -425,9 +420,7 @@ class ProfileUris(object):
                 # they occur, throughout the graph
                 fullgraph_uris[subject] = uriref
 
-            # FIXME: dbpedia rel should already be in graph somewhere via viaf?
-            # if person.dbpedia_uri:
-            #     ctx.add((uriref, rdflib.OWL.sameAs, rdflib.URIRef(person.dbpedia_uri)))
+            # NOTE: dbpedia rel will be harvested via VIAF
 
         # after processing people in this context, convert all uris
         smush(self.full_graph, fullgraph_uris)

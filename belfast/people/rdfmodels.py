@@ -1,7 +1,6 @@
 import logging
 import networkx as nx
 import rdflib
-import re
 import time
 
 from django.conf import settings
@@ -9,30 +8,18 @@ from django.contrib.sites.models import Site
 
 from belfast import rdfns
 from belfast.rdf import rdfmap
+from belfast.rdf.models import RdfResource
 from belfast.util import rdf_data, network_data, cached_property
 
 logger = logging.getLogger(__name__)
 
 
 
-class RdfEntity(rdflib.resource.Resource):
+class RdfEntity(RdfResource):
     # base class with common functionality for person, org
 
     _person_type = rdflib.resource.Resource
     _org_type = rdflib.resource.Resource
-
-    rdf_types =  rdfmap.ValueList(rdflib.RDF.type)
-    # should be usable to confirm resource is expected type;
-    # (similar to requisite content models check in eulfedora)
-
-    def __repr__(self):
-        # custom repr more readable than the default for rdflib resource
-        return '<%s %s>' % (self.__class__.__name__, str(self))
-
-    # @property
-    # def name(self):
-    #     # NOTE: would be better if we could use preferredLabel somehow
-    #     return self.value(rdfns.SCHEMA_ORG.name)
 
     @property
     def nx_node_id(self):
@@ -145,12 +132,9 @@ class RdfLocation(RdfEntity):
 
 
 class RdfOrganization(RdfEntity):
-
-    @property
-    def name(self):
-        # TODO: make common to base class?
-        l = self.graph.preferredLabel(self.identifier)
-        return l if l else self.value(rdfns.SCHEMA_ORG.name)
+    # specify expected rdf type?
+    pass
+    # inherits standard name property
 
 
 class DBpediaEntity(RdfEntity):
@@ -168,14 +152,6 @@ class RdfPerson(RdfEntity):
         # all persons with profiles should have local, slug-based uris
         return self.identifier.strip('/').split('/')[-1]
 
-    _name = rdfmap.Value(rdfns.SCHEMA_ORG.name)
-
-    @property
-    def name(self):
-        # NOTE: would be better if we could use preferredLabel somehow
-        l = self.graph.preferredLabel(self.identifier)
-        return l if l else self._name
-
     # NOTE: group sheet authors and other people with profiles on this site
     # should have first/last names added to the rdf data by the dataprep process
 
@@ -191,10 +167,6 @@ class RdfPerson(RdfEntity):
         else:
             return self.name
 
-    birthdate = rdfmap.Value(rdfns.SCHEMA_ORG.birthDate)
-    birthplace = rdfmap.Resource(rdfns.DBPEDIA_OWL.birthPlace, RdfLocation)
-
-    occupation = rdfmap.ValueList(rdfns.SCHEMA_ORG.jobTitle)
     same_as = rdfmap.ValueList(rdflib.OWL.sameAs, transitive=True)
 
     @property
@@ -214,6 +186,10 @@ class RdfPerson(RdfEntity):
             if 'viaf.org' in uri:
                 return uri
 
+    birthdate = rdfmap.Value(rdfns.SCHEMA_ORG.birthDate)
+    birthplace = rdfmap.Resource(rdfns.DBPEDIA_OWL.birthPlace, RdfLocation)
+
+    occupation = rdfmap.ValueList(rdfns.SCHEMA_ORG.jobTitle)
     description = rdfmap.Value(rdfns.SCHEMA_ORG.description)
 
     work_locations = rdfmap.ResourceList(rdfns.SCHEMA_ORG.workLocation, RdfLocation)
@@ -263,39 +239,6 @@ def profile_people():
     people = [RdfPerson(g, r['person']) for r in res]
     return people
 
-
-# deprecated; this is slow, use BelfastGroup.connected_people instead
-def get_belfast_people():
-    g = rdf_data()
-    # FIXME: possibly more efficient to use nx / ego graph?
-    # i.e., equivalent of connected_people for RdfOrganization instance
-
-    start = time.time()
-    # query for persons one relation removed from the belfast group
-    res = g.query('''
-        PREFIX schema: <%(xsd)s>
-        PREFIX rdf: <%(rdf)s>
-        SELECT DISTINCT ?person
-        WHERE {
-            {
-              ?person ?rel1 <%(bg)s> .
-              ?person rdf:type schema:Person
-            }
-            ?author schema:name ?name
-        } ORDER BY ?name
-        ''' % {'xsd': rdflib.XSD, 'rdf': rdflib.RDF,
-               'bg': rdfns.BELFAST_GROUP_URI}
-    )
-    logger.debug('Found %d people in %.02f sec' % (len(res),
-                 time.time() - start))
-
-#            FILTER EXISTS {?person ?p <%(bg)s>}
-# { ?book dc10:title  ?title } UNION { ?book dc11:title  ?title }
-    #    ?person schema:affiliation <%s> .
-    #    ?person schema:memberOf <%s> .
-
-    people = [RdfPerson(g, r['person']) for r in res]
-    return people
 
 def find_places():
     g = rdf_data()

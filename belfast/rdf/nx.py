@@ -61,10 +61,10 @@ class Rdf2Gexf(object):
             for triple in cx.triples((None, None, None)):
                 subj, pred, obj = triple
 
+                # NOTE: skipping rdf sequences here because treating
+                # as normal triples makes for weird results
                 if pred == rdflib.RDF.first or pred == rdflib.RDF.rest:
                     continue
-                # FIXME: iterating through all triples results in
-                # rdf sequences (first/rest) being handled weirdly...
 
                 # make sure subject and object are added to the graph as nodes,
                 # if appropriate

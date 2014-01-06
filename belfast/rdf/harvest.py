@@ -77,14 +77,11 @@ class HarvestRdf(object):
                    '' if self.errors == 1 else 's')
 
     def harvest_rdf(self, url):
-        # TODO: skolemize bnodes ?
 
         g = self.graph.get_context(url)
         if g and len(g):
             last_modified = g.value(g.identifier, SCHEMA_ORG.dateModified)
-            # TODO: use g.set(triple) to replace
-            # FIXME: this is 2013-09-09
-            # but
+            # TODO: use g.set(triple) to replace; may need to adjust date formats
             try:
                 response = requests.get(url, headers={'if-modified-since': last_modified},
                                         allow_redirects=False)
@@ -286,7 +283,6 @@ class Annotate(object):
                     if data.status_code == requests.codes.ok:
                         g.parse(data=data.content)
 
-                        # FIXME: how do we keep this in the same context? does it matter?
                         lat = g.value(uri, rdfns.GEO.lat)
                         lon = g.value(uri, rdfns.GEO.long)
                         if lat:

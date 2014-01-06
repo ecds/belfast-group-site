@@ -104,7 +104,6 @@ class QUB(object):
             content = list(div.stripped_strings)
             first_line = content[0]
             # first line should start with the author's name (if known)
-            # FIXME: a few have multiple authors
             name_match = self.NAME_REGEX.match(first_line)
             if name_match:
                 last_name = name_match.group('last').strip()

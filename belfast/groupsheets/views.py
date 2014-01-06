@@ -130,7 +130,6 @@ def list_groupsheets(request):
     authors = [{'author': k, 'total': v} for k, v in authors.iteritems()]
     sources = [{'source': k, 'total': v} for k, v in sources.iteritems()]
 
-    # FIXME: make facets empty dict to indicate nothing to show?
     facets = {'digital': digital_count, 'authors': authors, 'sources': sources}
     url_suffix = ''
     url_suffix = urllib.urlencode(url_args)

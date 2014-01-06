@@ -43,6 +43,7 @@ def _network_graph(min_degree=1, **kwargs):
         # use groupsheets to infer a connection between the author
         # of the groupsheet and the group itself
         # FIXME: this needs to be in data prep/clean, NOT here
+        # TODO: should be handled in prep now; confirm and then remove this logic
         if graph.node[n]['type'] == 'BelfastGroupSheet':
 
             sheet = RdfGroupSheet(rdfgraph, rdflib.URIRef(n))

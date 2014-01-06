@@ -111,6 +111,8 @@ class ValueList(object):
     #     # data in list form - basis for several other list-y functions
     #     return list(obj.objects(self.predicate))
 
+    # NOTE: list methods pretty much copied from xmlmap; probably needs testing/revision
+
     def __str__(self):
         return str(self.data)
 

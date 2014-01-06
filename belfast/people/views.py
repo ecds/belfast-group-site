@@ -11,7 +11,7 @@ from belfast import rdfns
 from belfast.util import rdf_data, rdf_data_lastmodified, \
     network_data_lastmodified
 from belfast.groupsheets.rdfmodels import get_rdf_groupsheets
-from belfast.people.rdfmodels import BelfastGroup, get_belfast_people, profile_people, RdfPerson
+from belfast.people.rdfmodels import BelfastGroup, profile_people, RdfPerson
 from belfast.network.util import annotate_graph
 
 
@@ -26,7 +26,6 @@ def rdf_nx_lastmod(request, *args, **kwargs):
 # @last_modified(rdf_lastmod)  # for now, list is based on rdf
 def list(request):
     # display a list of people one remove from belfast group
-    # people = get_belfast_people()
     people = profile_people()
     # people = BelfastGroup().connected_people
     # people = Person.objects.order_by('last_name').all()
