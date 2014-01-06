@@ -197,48 +197,11 @@ class RdfPerson(RdfEntity):
         l = self.graph.preferredLabel(self.identifier)
         return l if l else self._name
 
-    # TODO: move into data clean-up; assume already cleaned at this point
+    # NOTE: group sheet authors and other people with profiles on this site
+    # should have first/last names added to the rdf data by the dataprep process
 
-    name_re = re.compile('^((?P<last>[^ ]{2,}), (?P<first>[^.,( ]{2,}))[.,]?')
-    _firstname = None
-    _lastname = None
-
-    def _calculate_first_last_name(self):
-        for name in self.objects(rdfns.FOAF.name):
-            match = self.name_re.match(unicode(name))
-            if match:
-                name_info = match.groupdict()
-                self._firstname = name_info['first']
-                self._lastname = name_info['last']
-                # stop after we get the first name we can use (?)
-                # note that for ciaran carson only one variant has the accent...
-                break
-
-    @property
-    def lastname(self):
-        if self._lastname is not None:
-            return self._lastname
-        val = self.value(rdfns.SCHEMA_ORG.familyName)
-        if val is not None:
-            return val
-        self._calculate_first_last_name()
-        return self._lastname
-
-
-    @property
-    def firstname(self):
-        if self._firstname is not None:
-            return self._firstname
-        fname = self.value(rdfns.SCHEMA_ORG.givenName)
-        if fname is not None:
-            return fname
-        self._calculate_first_last_name()
-        return self._firstname
-
-# (u'Carson, Ciaran Irish poet and novelist, born 1948'), rdflib.term.Literal(u'Ciaran Carson'), rdflib.term.Literal(u'Carson, Ciaran, 1948-'), rdflib.term.Literal(u'Carson, Ciaran.'), rdflib.term.Literal(u'Carson, Ciaran'), rdflib.term.Literal(u'Carson, Ciar\xe1n (1948- ).')]
-# error: no first/last name for http://viaf.org/viaf/85621766 - na
-
-        return fname
+    lastname = rdfmap.Value(rdfns.SCHEMA_ORG.familyName)
+    firstname = rdfmap.Value(rdfns.SCHEMA_ORG.givenName)
 
     @property
     def fullname(self):
@@ -262,16 +225,6 @@ class RdfPerson(RdfEntity):
     @property
     def locations(self):
         return self.work_locations + self.home_locations
-
-    @cached_property
-    def short_id(self):
-        uri = unicode(self)
-        baseid = uri.rstrip('/').split('/')[-1]
-        if 'viaf.org' in uri:
-            idtype = 'viaf'
-        elif 'dbpedia.org' in uri:
-            idtype = 'dbpedia'
-        return '%s:%s' % (idtype, baseid)
 
     @cached_property
     def dbpedia_description(self):
