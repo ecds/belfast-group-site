@@ -292,7 +292,7 @@ class ProfileUris(object):
 
         self.full_graph = graph
         # iterate over all contexts in a conjunctive graph and process each one
-        for ctx in graph.contexts():
+        for ctx in list(graph.contexts()):  # store before iterating in case of changes
             self.process_graph(ctx)
 
         # TODO: consider keeping track of total number of replacements to assist with testing

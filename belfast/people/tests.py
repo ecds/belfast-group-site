@@ -49,7 +49,7 @@ class PeopleViewsTest(TestCase):
             response, 'Born %s' % self.person.birthdate,
             msg_prefix='birthdate should be included if present')
         self.assertContains(
-            response, self.person.dbpedia_description,
+            response, self.person.dbpedia.description,
             msg_prefix='dbpedia description should be included on profile')
         self.assertContains(
             response, '<p><b>Occupation:</b> %s</p>' % self.person.occupation[0],
@@ -121,7 +121,7 @@ class RdfPersonTest(TestCase):
 
     def test_dbpedia_description(self):
         self.assertEqual('Michael Longley, CBE (born 27 July 1939) is a Northern Irish poet from Belfast.',
-                         unicode(self.person.dbpedia_description))
+                         unicode(self.person.dbpedia.description))
 
     @patch('belfast.people.rdfmodels.network_data')
     @patch('belfast.people.rdfmodels.rdf_data')

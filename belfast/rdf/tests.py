@@ -56,8 +56,8 @@ class QUBTest(TestCase):
 
         uri = people_by_name['Croskery']
         self.assert_('viaf.org' not in str(uri))
-        self.assertEqual('Lynette', str(graph.value(uri, rdfns.SCHEMA_ORG.givenName)))
-        self.assertEqual('Lynette Croskery', str(graph.value(uri, rdfns.SCHEMA_ORG.name)))
+        self.assertEqual('Lynette M.', str(graph.value(uri, rdfns.SCHEMA_ORG.givenName)))
+        self.assertEqual('Lynette M. Croskery', str(graph.value(uri, rdfns.SCHEMA_ORG.name)))
         # NOTE: input actually has Croskery, Lynette M.
         # do we care about the middle initial?
 
@@ -242,16 +242,10 @@ class ProfileUrisTest(TestCase):
         graph = rdflib.ConjunctiveGraph()
         # add test qub groupsheets to test graph
         QUB(qub_test_input, verbosity=0, graph=graph, url=QUB.QUB_BELFAST_COLLECTION)
-        # print graph.serialize(pretty=True)
-        # store people uris before modification
-        people = list(graph.subjects(predicate=rdflib.RDF.type, object=rdfns.SCHEMA_ORG.Person))
         current_site = Site.objects.get(id=settings.SITE_ID)
 
         # fixture data based on ead harvest
-        # cg = graph.get_context('file://%s' % rdf_groupsheet_input)
-        # cg.parse(rdf_groupsheet_input)
         ProfileUris(graph)
-        # print graph.serialize(pretty=True)
         local_uris = list(graph.subjects(predicate=rdflib.RDF.type, object=rdfns.SCHEMA_ORG.Person))
         for uri in local_uris:
             self.assert_(current_site.domain in str(uri),
