@@ -234,6 +234,10 @@ class Annotate(object):
 
         self.places()
 
+    # harvest only the bare minimum
+    # for places, we need lat/long (and maybe authoritative name?)
+    # for viaf people, we need dbpedia same as and possibly foaf names
+
     def places(self):
         start = datetime.now()
         res = self.graph.query('''
@@ -248,12 +252,9 @@ class Annotate(object):
             ''' % {'schema': SCHEMA_ORG, 'rdf': rdflib.RDF,
                    'geo': GEO}
         )
-        logger.info('find places without lat/long took %s' % (datetime.now() - start))
+        logger.info('Found %d places without lat/long in %s' % \
+                    (len(res), datetime.now() - start))
 
-        places = list(self.graph.subjects(predicate=rdflib.RDF.type, object=SCHEMA_ORG.Place))
-        print '%d places' % len(places)
-
-        # for p in places:
         for r in res:
             uri = r['uri']
             if not uri.startswith('http:'):
@@ -261,7 +262,6 @@ class Annotate(object):
                 continue
 
             if not self.graph.value(uri, GEO.lat):
-                print uri
                 try:
                     g = rdflib.Graph()
                     data = requests.get(uri, headers={'accept': 'application/rdf+xml'})
@@ -271,7 +271,6 @@ class Annotate(object):
                         # FIXME: how do we keep this in the same context? does it matter?
                         lat = g.value(uri, GEO.lat)
                         lon = g.value(uri, GEO.long)
-                        print 'lat long = ', lat, lon
                         if lat:
                             self.graph.add((uri, GEO.lat, lat))
                         if lon:
