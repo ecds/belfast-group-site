@@ -26,12 +26,12 @@ class Command(BaseCommand):
         make_option('-H', '--harvest', action='store_true', help='Harvest RDFa'),
         make_option('-q', '--queens', action='store_true',
             help='Convert Queens University Belfast collection to RDF'),
-        make_option('-r', '--related', action='store_true',
-            help='Harvest related RDF from VIAF, GeoNames, and DBpedia'),
         make_option('-i', '--identify', action='store_true',
             help='Identify group sheets'),
         make_option('-s', '--smush', action='store_true',
             help='Smush groupsheet URIs and generate local profile URIs'),
+        make_option('-r', '--related', action='store_true',
+            help='Harvest related RDF from VIAF, GeoNames, and DBpedia'),
         make_option('-c', '--connect', action='store_true',
             help='Infer and make connections implicit in the data'),
         make_option('-g', '--gexf', action='store_true',
@@ -95,6 +95,7 @@ class Command(BaseCommand):
 
         if all_steps or options['harvest']:
             self.stdout.write('-- Harvesting RDF from EmoryFindingAids related to the Belfast Group')
+            # inaccurate; also harvesting tei from local site
 
             HarvestRdf(self.harvest_urls,
                        find_related=True, verbosity=0,
@@ -103,15 +104,6 @@ class Command(BaseCommand):
         if all_steps or options['queens']:
             self.stdout.write('-- Converting Queens University Belfast Group collection description to RDF')
             QUB(self.QUB_input, verbosity=0, graph=graph, url=self.QUB_URL)
-
-        # FIXME: still needs some work
-        if all_steps or options['related']:
-            # FIXME: no longer quite accurate or what we need;
-            # to keep rdf dataset as small as possible, should *only* grab attributes
-            # we actually need to run the site
-            self.stdout.write('-- Annotating graph with related information from VIAF, GeoNames, and DBpedia')
-            Annotate(graph)
-            # HarvestRelated(graph)   # old harvest , which is pulling too much data
 
         if all_steps or options['identify']:
             # identify groupsheets in the data and add local groupsheet type if not present
@@ -123,6 +115,10 @@ class Command(BaseCommand):
             self.stdout.write('-- Smushing groupsheet URIs and generating local profile URIs')
             SmushGroupSheets(graph)
             ProfileUris(graph)
+
+        if all_steps or options['related']:
+            self.stdout.write('-- Annotating graph with related information from VIAF, GeoNames, and DBpedia')
+            Annotate(graph)
 
         if all_steps or options['connect']:
             # infer connections
