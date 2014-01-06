@@ -1,7 +1,9 @@
 import hashlib
+import logging
 import rdflib
 from rdflib import collection as rdfcollection
 import re
+import time
 
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -10,6 +12,9 @@ from django.utils.text import slugify
 
 from belfast import rdfns
 from belfast.rdf import rdfmap
+from belfast.util import rdf_data
+
+logger = logging.getLogger(__name__)
 
 
 def normalize_whitespace(s):
@@ -115,6 +120,7 @@ class SmushGroupSheets(object):
 
     def __init__(self, graph, verbosity=1):
         self.verbosity = verbosity
+        self.full_graph = graph
 
         # iterate over all contexts in a conjunctive graph and process each one
         for ctx in graph.contexts():
@@ -195,31 +201,15 @@ class SmushGroupSheets(object):
                 (len(ms), 's' if len(ms) != 1 else '', graph.identifier)
 
         for m in ms:
-            # FIXME: only calculate a new uri for blank nodes?
-            # TODO: handle TEI-based rdf with ARK pid urls
             newURI = self.calculate_uri(m, graph)
             if newURI is not None:
                 new_uris[m] = newURI
 
         smush(graph, new_uris)
-        # # iterate over all triples in the old graph and convert
-        # # any uris in the new_uris dictionary to the smushed identifier
-        # for s, p, o in graph:
-        #     orig_s = s
-        #     orig_o = o
-        #     s = new_uris.get(s, s)
-        #     # don't convert a smushed URL (e.g., TEI groupsheet URL)
-        #     if not p == rdfns.SCHEMA_ORG.URL:
-        #         o = new_uris.get(o, o)
-
-        #     if orig_s != s or orig_o != o:
-        #         # if changed remove old version, add new version
-        #         graph.remove((orig_s, p, orig_o))
-        #         graph.add((s, p, o))
 
 
 def smush(graph, urimap):
-    '''Ierate over all triples in a graph and convert any
+    '''Iterate over all triples in a graph and convert any
     URIs in the specified dictionary key to the new identifier in the
     corresponding value.'''
 
@@ -257,24 +247,39 @@ def person_names(graph, uri):
     # uri could be a uriref or bnode; don't convert since we don't know which
     p = Person(graph, uri)
 
-    name_re = re.compile('^((?P<last>[^ ]{2,}), (?P<first>[^.,( ]{2,}))[.,]?')
+    # look for lastname, firstname first - more reliable for splitting names correctly
+    # - firstname could include . in the case of initials
+    lastnamefirst_re = re.compile('^((?P<last>[^ ]{2,}), (?P<first>[^,( ]{2,}))[.,]?')
+    firstnamelast_re = re.compile('^((?P<first>[^ ]{2,}) (?P<last>[^,( ]{2,}))$')
     firstname = p.s_first_name
     lastname = p.s_last_name
 
     if not all([firstname, lastname]):
         names = p.s_names + p.f_names
         for name in names:
-            match = name_re.match(unicode(name))
+            match = lastnamefirst_re.match(normalize_whitespace(name))
             if match:
                 name_info = match.groupdict()
                 firstname = name_info['first']
                 lastname = name_info['last']
-                # stop after we get the first name we can use (?)
+                # stop after we get the first name we can use
                 # note that for ciaran carson only one variant has the accent...
                 break
 
+        # if we couldn't find a lastname, firstname version look for firstname last
+        if not all([firstname, lastname]):
+            for name in names:
+                match = firstnamelast_re.match(normalize_whitespace(name))
+                if match:
+                    name_info = match.groupdict()
+                    firstname = name_info['first']
+                    lastname = name_info['last']
+                    break
+
     return (firstname, lastname)
 
+
+# FIXME: something about the changes to this logic made today have broken it !!! :(
 
 class ProfileUris(object):
     '''Generate local uris for persons associated with the belfast group,
@@ -290,19 +295,6 @@ class ProfileUris(object):
         for ctx in graph.contexts():
             self.process_graph(ctx)
 
-        # FIXME: we only want to generate local uris for people associated
-        # with the belfast group
-
-        # NOTE: possibly iterate through people referenced in QUB first
-        # should give us a good first-pass at good versions of names
-        # and help clean up blank nodes for people without viaf/dbpedia ids
-        # gqub = graph.get_context(self.QUB_URL)
-        # qub = graph.get_context(self.QUB_URL)
-
-        # TODO: keep track of replaced uris globally (?)
-        # - non-blank-node uris may be referenced in multiple contexts...
-        # new_uris = {}
-
         # TODO: consider keeping track of total number of replacements to assist with testing
         # (might be inflated due to blank nodes across contexts...)
 
@@ -314,50 +306,132 @@ class ProfileUris(object):
         )
         return uri
 
+    def belfast_group_people(self, graph):
+        # NOTE: if we adjust the script so inferred connections are added first
+        # the second query alone would probably be sufficient
+        # (adds affiliation rel for all groupsheet authors)
+
+        # sparql query to find groupsheet authors
+        query = '''
+            PREFIX schema: <%(schema)s>
+            PREFIX dc: <%(dc)s>
+            PREFIX rdf: <%(rdf)s>
+            SELECT DISTINCT ?author
+            WHERE {
+                ?ms rdf:type <%(bg)s> .
+                ?ms dc:creator ?author .
+                FILTER regex(str(?author), "^(?!http://%(local_domain)s)")
+            }''' % {'schema': rdfns.SCHEMA_ORG, 'dc': rdfns.DC,
+                    'rdf': rdflib.RDF, 'bg': rdfns.BG.GroupSheet,
+                    'local_domain': self.current_site.domain}
+        start = time.time()
+        res = graph.query(query)
+        if res:
+            logger.debug('Found %d group sheets author(s) in %.02f sec' % (len(res),
+                time.time() - start))
+        people = set([r['author'] for r in res])
+
+        start = time.time()
+        # query to find people with any rdf relation to the belfast group
+        query = '''
+            PREFIX schema: <%(schema)s>
+            PREFIX rdf: <%(rdf)s>
+            SELECT DISTINCT ?person
+            WHERE {
+                ?person rdf:type <schema:Person> .
+                ?person ?rel <%(bg_uri)s>
+                FILTER regex(str(?author), "^(?!http://%(local_domain)s)")
+            }''' % {'schema': rdfns.SCHEMA_ORG,
+                    'rdf': rdflib.RDF, 'bg_uri': rdfns.BELFAST_GROUP_URI,
+                    'local_domain': self.current_site.domain}
+        res = graph.query(query)
+        if res:
+            logger.debug('Found %d people connected to the Belfast Group in %.02f sec' % (len(res),
+                time.time() - start))
+        people |= set([r['people'] for r in res])
+
+        return people
+
     def process_graph(self, graph):
-        # local URIs for people in the group
+        # generate local URIs for people in the group, and make sure we have
+        # first and last names for everyone (where possible)
 
         ctx_uris = {}
-        for subject in graph.subjects(rdflib.RDF.type, rdfns.SCHEMA_ORG.Person):
+        fullgraph_uris = {}
+        people = self.belfast_group_people(graph)
+        # nothing to do in this graph context; stop processing
+        if not people:
+            return
+        # report number of people found in context, as a sanity check
+        if self.verbosity >= 1:
+            print 'Found %d %s in %s' % \
+                (len(people), 'people' if len(people) != 1 else 'person',
+                 graph.identifier)
 
-            firstname, lastname = person_names(graph, subject)
-            if firstname is None and lastname is None:
-                if self.verbosity >= 1:
-                    print 'Names could not be determined for %s' % subject
-                # for now, skip if names couldn't be found
-                continue
 
-            full_name = '%s %s' % (firstname, lastname)
-            uri = self.local_person_uri(full_name)
+        for subject in people:
+            uriref = None
+            # FIXME: should not be necessary if we clean up as we go...
+            # Check the full graph if already converted to a local uri
+            same_as = list(self.full_graph.subjects(predicate=rdflib.OWL.sameAs, object=subject))
+            if same_as:
 
-            # skip if already converted ??
-            if uri == str(subject):
-                continue
+                for uri in same_as:
+                    if self.current_site.domain in str(same_as):
+                        uriref = uri
+                        break
 
-            uriref = rdflib.URIRef(uri)
+            # if existing sameAs local uri was not found, generate local uri + add names
+            if uriref is None:
+                firstname, lastname = person_names(graph, subject)
+                if firstname is None and lastname is None:
+                    if self.verbosity >= 1:
+                        print 'Names could not be determined for %s' % subject
+
+                    # for now, skip if names couldn't be found
+                    continue
+
+                full_name = '%s %s' % (firstname, lastname)
+                uri = self.local_person_uri(full_name)
+
+                # skip if already converted ??
+                if uri == str(subject):
+                    continue
+
+                uriref = rdflib.URIRef(uri)
+
+                # set type to person (FIXME: redundant once smushed?)
+                # ctx.add((uriref, rdflib.namespace.RDF.type, rdfns.SCHEMA_ORG.Person))
+                # add full name as preferred label for local use
+                name_triples = [
+                    (uriref, rdflib.namespace.SKOS.preferredLabel, rdflib.Literal(full_name)),
+                    (uriref, rdfns.SCHEMA_ORG.givenName, rdflib.Literal(firstname)),
+                    (uriref, rdfns.SCHEMA_ORG.familyName, rdflib.Literal(lastname))
+                ]
+                # if names are not yet present in theg raph, add to current context
+                for name in name_triples:
+                    if name not in self.full_graph:
+                        graph.add(name)
+
             # "smush" - convert all author identifiers to local uris
             # convert bnodes to local URIs so we can group authors
             # bnodes should only be converted in current context
             ctx_uris[subject] = uriref
-            # other uris should be converted throughout the graph
-            # if not isinstance(subject, rdflib.BNode):
-            # new_uris[subject] = uriref
-
-            # set type to person (FIXME: redundant once smushed?)
-            # ctx.add((uriref, rdflib.namespace.RDF.type, rdfns.SCHEMA_ORG.Person))
-            # add full name as preferred label for local use
-            name = (uriref, rdflib.namespace.SKOS.preferredLabel, rdflib.Literal(full_name))
-            # if not present anywhere in the graph, add to current context
-            if name not in self.full_graph:
-                graph.add(name)
 
             # if original subject uri was not a blank node, add a sameAs rel
             if not isinstance(subject, rdflib.BNode):
                 graph.add((uriref, rdflib.OWL.sameAs, subject))
-            # FIXME: dbpedia rel might already be in graph somewhere via viaf?
+                # proper URIs (e.g. VIAF ids) should be converted anywhere
+                # they occur, throughout the graph
+                fullgraph_uris[subject] = uriref
+
+            # FIXME: dbpedia rel should already be in graph somewhere via viaf?
             # if person.dbpedia_uri:
             #     ctx.add((uriref, rdflib.OWL.sameAs, rdflib.URIRef(person.dbpedia_uri)))
-            smush(graph, ctx_uris)
+
+        # after processing people in this context, convert all uris
+        smush(self.full_graph, fullgraph_uris)
+        smush(graph, ctx_uris)
 
 
 class InferConnections(object):
@@ -365,25 +439,9 @@ class InferConnections(object):
     def __init__(self, graph):
 
         for ctx in graph.contexts():
-            # returns graphs
-            # print ctx
-            # print len(ctx)
-            # g = graph.get_context(ctx)
             self.process_graph(ctx)
 
-        # for f in files:
-        #     self.process_file(f)
-
-    # def process_file(self, filename):
     def process_graph(self, graph):
-
-        # infer rdf format from file extension
-        # filebase, rdf_format = os.path.splitext(filename)
-        # rdf_format = rdf_format.strip('.')
-
-        # g = rdflib.Graph()
-        # g.parse(filename, format=rdf_format)
-
         ms = list(graph.subjects(predicate=rdflib.RDF.type, object=rdfns.BG.GroupSheet))
         # if no manuscripts are found, skip
         if len(ms) == 0:
