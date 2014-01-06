@@ -9,12 +9,15 @@ import sys
 from urlparse import urlparse
 import logging
 
+from django.conf import settings
+from django.contrib.sites.models import Site
+
 try:
     from progressbar import ProgressBar, Bar, Percentage, ETA, SimpleProgress
 except ImportError:
     ProgressBar = None
 
-from belfast.rdfns import DC, SCHEMA_ORG, GEO
+from belfast import rdfns
 
 
 logger = logging.getLogger(__name__)
@@ -185,7 +188,7 @@ class HarvestRdf(object):
             orig_url = rdflib.URIRef(url)
 
             # find all sub parts of the current url (e.g., series and indexes)
-            for subj, obj in data.subject_objects(predicate=DC.hasPart):
+            for subj, obj in data.subject_objects(predicate=rdfns.DC.hasPart):
                 if subj == orig_url or \
                    (subj, rdflib.OWL.sameAs, rdflib.URIRef(url)) in data:
                     related_url = unicode(obj)
@@ -195,7 +198,7 @@ class HarvestRdf(object):
                         queued += 1
 
             # follow all related link relations
-            for subj, obj in data.subject_objects(predicate=SCHEMA_ORG.relatedLink):
+            for subj, obj in data.subject_objects(predicate=rdfns.SCHEMA_ORG.relatedLink):
                 # Technically, we may only want related links where
                 # the subject is the current URL...
                 # Currently, findingaids rdfa is putting that relation on the
@@ -228,17 +231,23 @@ class HarvestRdf(object):
 
 
 class Annotate(object):
-
-    def __init__(self, graph):
-        self.graph = graph
-
-        self.places()
-
     # harvest only the bare minimum
     # for places, we need lat/long (and maybe authoritative name?)
     # for viaf people, we need dbpedia same as and possibly foaf names
+    # for dbpedia people, get: description, wikipedia url; thumbnail?
+
+    def __init__(self, graph):
+        self.graph = graph
+        self.current_site = Site.objects.get(id=settings.SITE_ID)
+
+        self.places()
+        self.viaf_people()
+        self.dbpedia_people()
 
     def places(self):
+        # not sure what graph context makes the most sense, so grouping by source
+        context = self.graph.get_context('http://geonames.org/')
+
         start = datetime.now()
         res = self.graph.query('''
             PREFIX schema: <%(schema)s>
@@ -249,19 +258,28 @@ class Annotate(object):
                 ?uri rdf:type schema:Place .
                 FILTER NOT EXISTS {?uri geo:lat ?lat}
             }
-            ''' % {'schema': SCHEMA_ORG, 'rdf': rdflib.RDF,
-                   'geo': GEO}
+            ''' % {'schema': rdfns.SCHEMA_ORG, 'rdf': rdflib.RDF,
+                   'geo': rdfns.GEO}
         )
         logger.info('Found %d places without lat/long in %s' % \
                     (len(res), datetime.now() - start))
 
-        for r in res:
-            uri = r['uri']
+        uris = [r['uri'] for r in res]
+
+        if len(uris) >= 5 and ProgressBar and os.isatty(sys.stderr.fileno()):
+            widgets = [Percentage(), ' (', SimpleProgress(), ')',
+                       Bar(), ETA()]
+            progress = ProgressBar(widgets=widgets, maxval=len(uris)).start()
+            processed = 0
+        else:
+            progress = None
+
+        for uri in uris:
             if not uri.startswith('http:'):
-            # if isinstance(p, rdflib.BNode):
+                # skip (should be able to check for bnode type instead?)
                 continue
 
-            if not self.graph.value(uri, GEO.lat):
+            if not self.graph.value(uri, rdfns.GEO.lat):
                 try:
                     g = rdflib.Graph()
                     data = requests.get(uri, headers={'accept': 'application/rdf+xml'})
@@ -269,17 +287,182 @@ class Annotate(object):
                         g.parse(data=data.content)
 
                         # FIXME: how do we keep this in the same context? does it matter?
-                        lat = g.value(uri, GEO.lat)
-                        lon = g.value(uri, GEO.long)
+                        lat = g.value(uri, rdfns.GEO.lat)
+                        lon = g.value(uri, rdfns.GEO.long)
                         if lat:
-                            self.graph.add((uri, GEO.lat, lat))
+                            context.add((uri, rdfns.GEO.lat, lat))
                         if lon:
-                            self.graph.add((uri, GEO.long, lon))
+                            context.add((uri, rdfns.GEO.long, lon))
 
                 except Exception as err:
                     print 'Error loading %s : %s' % (uri, err)
 
+            if progress:
+                processed += 1
+                progress.update(processed)
 
+        if progress:
+            progress.finish()
+
+    def viaf_people(self):
+        # not sure what graph context makes the most sense, so grouping by source
+        context = self.graph.get_context('http://viaf.org/')
+
+        # find VIAF uris for people with local uris
+        start = datetime.now()
+        res = self.graph.query('''
+            PREFIX schema: <%(schema)s>
+            PREFIX rdf: <%(rdf)s>
+            PREFIX owl: <%(owl)s>
+            SELECT DISTINCT ?viaf
+            WHERE {
+                ?uri rdf:type schema:Person .
+                ?uri owl:sameAs ?viaf
+                FILTER regex(str(?uri), "^http://%(domain)s")
+                FILTER regex(str(?viaf), "^http://viaf.org")
+            }
+            ''' % {'schema': rdfns.SCHEMA_ORG, 'rdf': rdflib.RDF,
+                   'owl': rdflib.OWL, 'domain': self.current_site.domain}
+        )
+        logger.info('Found %d VIAF person(s) in %s' % \
+                    (len(res), datetime.now() - start))
+
+        uris = [r['viaf'] for r in res]
+
+        if len(uris) >= 5 and ProgressBar and os.isatty(sys.stderr.fileno()):
+            widgets = [Percentage(), ' (', SimpleProgress(), ')',
+                       Bar(), ETA()]
+            progress = ProgressBar(widgets=widgets, maxval=len(uris)).start()
+            processed = 0
+        else:
+            progress = None
+
+        for uri in uris:
+            names = list(self.graph.subjects(uri, rdfns.FOAF.name))
+            if names:
+                # skipping; info has already been harvested
+                continue
+
+            # Use requests with content negotiation to load the data
+            data = requests.get(str(uri), headers={'accept': 'application/rdf+xml'})
+
+            if data.status_code == requests.codes.ok:
+                tmpgraph = rdflib.Graph()
+                tmpgraph.parse(data=data.content)
+
+                names = tmpgraph.query('''
+                    PREFIX foaf: <%(foaf)s>
+                    SELECT ?name
+                    WHERE {
+                       <%(uri)s> foaf:name ?name
+                    }
+                    ''' % {'foaf': rdfns.FOAF, 'uri': uri})
+                    # NOTE: viaf names don't seem to be tagged by language
+                    # (restricting to language returns nothing)
+                    #     FILTER (lang(?name) = 'en')
+
+                    # NOTE: may need to restrict to names we know we need...
+                for n in names:
+                    context.add((uri, rdfns.FOAF.name, n['name']))
+
+                for obj in tmpgraph.objects(uri, rdflib.OWL.sameAs):
+                    if 'dbpedia.org' in unicode(obj):
+                        context.add((uri, rdflib.OWL.sameAs, obj))
+
+            if progress:
+                processed += 1
+                progress.update(processed)
+
+        if progress:
+            progress.finish()
+
+
+    def dbpedia_people(self):
+        # not sure what graph context makes the most sense, so grouping by source
+        context = self.graph.get_context('http://dbpedia.org/')
+
+        dbpedia_sparql = SPARQLWrapper.SPARQLWrapper("http://dbpedia.org/sparql")
+
+        start = datetime.now()
+        # find dbedia uris referenced by local uris
+        res = self.graph.query('''
+            PREFIX schema: <%(schema)s>
+            PREFIX rdf: <%(rdf)s>
+            PREFIX owl: <%(owl)s>
+            SELECT DISTINCT ?dbp
+            WHERE {
+                ?uri rdf:type schema:Person .
+                ?uri owl:sameAs ?viaf .
+                ?viaf owl:sameAs ?dbp
+                FILTER regex(str(?uri), "^http://%(domain)s")
+                FILTER regex(str(?dbp), "^http://dbpedia.org")
+            }
+            ''' % {'schema': rdfns.SCHEMA_ORG, 'rdf': rdflib.RDF,
+                   'owl': rdflib.OWL, 'domain': self.current_site.domain}
+        )
+        logger.info('Found %d DBpedia person(s) in %s' % \
+                    (len(res), datetime.now() - start))
+
+        uris = [unicode(r['dbp']).encode('ascii', 'ignore') for r in res]
+
+        if len(uris) >= 5 and ProgressBar and os.isatty(sys.stderr.fileno()):
+            widgets = [Percentage(), ' (', SimpleProgress(), ')',
+                       Bar(), ETA()]
+            progress = ProgressBar(widgets=widgets, maxval=len(uris)).start()
+            processed = 0
+        else:
+            progress = None
+
+        for uri in uris:
+
+            wikipedia_url = self.graph.value(uri, rdfns.FOAF.isPrimaryTopicOf)
+            if wikipedia_url:
+                # skipping; info has already been harvested
+                # (every dbpedia page should have a link to its corresponding wikipedia url)
+                continue
+
+            try:
+                dbpedia_sparql.setQuery(u'DESCRIBE <%s>' % uri)
+                # NOTE: DESCRIBE <uri> is the simplest query that's
+                # close to what we want and returns a response that
+                # can be easily converted to an rdflib graph, but it generates
+                # too many results for records like United States, England
+                dbpedia_sparql.setReturnFormat(SPARQLWrapper.RDF)
+
+                # convert to rdflib graph, then filter out any triples
+                # where our uri is not the subject
+                tmp_graph =  dbpedia_sparql.query().convert()
+
+                for predicate in [rdfns.DBPEDIA_OWL.abstract, rdfns.FOAF.isPrimaryTopicOf]: #,
+                                  # rdfns.DBPEDIA_OWL.thumbnail]:
+                    objects = list(tmp_graph.objects(uri, predicate))
+                    if objects:
+                        # if something returns multiple values (i.e. abstract)
+                        # find the one in english
+                        if len(objects) > 1:
+                            for o in objects:
+                                if o.language == 'en':
+                                    obj = o
+                                    break
+                        else:
+                            obj = objects[0]
+
+                        context.add((uri, predicate, obj))
+
+
+            except Exception as err:
+                print 'Error getting DBpedia data for %s : %s' % (uri, err)
+
+            if progress:
+                processed += 1
+                progress.update(processed)
+
+        if progress:
+            progress.finish()
+
+
+
+# old/deprecated version
 class HarvestRelated(object):
 
     # sources to be harvested
