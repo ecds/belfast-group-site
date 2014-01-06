@@ -91,13 +91,19 @@ class ValueList(object):
 
     data = []
 
-    def __init__(self, predicate):
+    def __init__(self, predicate, transitive=False):
         self.predicate = predicate
+        self.transitive = transitive
 
     def __get__(self, obj, objtype=None):  # objtype is class of object, e.g. RdfPerson
         # TODO: share datatype logic, whitespace normalization with value
+        if self.transitive:
+            meth = obj.graph.transitive_objects
+        else:
+            meth = obj.graph.objects
+
         self.data = [o.toPython() if isinstance(o, rdflib.Literal) else o
-                     for o in obj.objects(rdflib.URIRef(self.predicate))]
+                     for o in meth(obj.identifier, rdflib.URIRef(self.predicate))]
         return self.data
 
     # @property
