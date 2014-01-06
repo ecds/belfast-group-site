@@ -168,27 +168,6 @@ class RdfPerson(RdfEntity):
         # all persons with profiles should have local, slug-based uris
         return self.identifier.strip('/').split('/')[-1]
 
-    @cached_property
-    def dbpedia_uri(self):
-        # same as
-        for res in self.objects(rdflib.OWL.sameAs):
-            if 'dbpedia.org' in res.identifier:
-                return res.identifier
-
-    @property
-    def dbpedia(self):
-        if self.dbpedia_uri is not None:
-            return DBpediaEntity(self.graph, self.dpedia_uri)
-
-    @cached_property
-    def viaf_uri(self):
-        if 'viaf.org' in self.identifier:
-            return unicode(self.identifier)
-        # FIXME: not working? or not present?
-        for res in self.objects(rdflib.OWL.sameAs):
-            if 'viaf.org' in res.identifier:
-                return res.identifier
-
     _name = rdfmap.Value(rdfns.SCHEMA_ORG.name)
 
     @property
@@ -216,35 +195,34 @@ class RdfPerson(RdfEntity):
     birthplace = rdfmap.Resource(rdfns.DBPEDIA_OWL.birthPlace, RdfLocation)
 
     occupation = rdfmap.ValueList(rdfns.SCHEMA_ORG.jobTitle)
-    same_as = rdfmap.ValueList(rdflib.OWL.sameAs)
+    same_as = rdfmap.ValueList(rdflib.OWL.sameAs, transitive=True)
+
+    @property
+    def dbpedia_uri(self):
+        for uri in self.same_as:
+            if 'dbpedia.org' in uri:
+                return uri
+
+    @property
+    def dbpedia(self):
+        if self.dbpedia_uri is not None:
+            return DBpediaEntity(self.graph, self.dbpedia_uri)
+
+    @property
+    def viaf_uri(self):
+        for uri in self.same_as:
+            if 'viaf.org' in uri:
+                return uri
+
     description = rdfmap.Value(rdfns.SCHEMA_ORG.description)
 
     work_locations = rdfmap.ResourceList(rdfns.SCHEMA_ORG.workLocation, RdfLocation)
     home_locations = rdfmap.ResourceList(rdfns.SCHEMA_ORG.homeLocation, RdfLocation)
 
+
     @property
     def locations(self):
         return self.work_locations + self.home_locations
-
-    @cached_property
-    def dbpedia_description(self):
-        if self.dbpedia_uri is not None:
-            for desc in self.graph.objects(subject=self.dbpedia_uri,
-                                           predicate=rdfns.DBPEDIA_OWL.abstract):
-                if desc.language == 'en':  # TODO: configurable (?)
-                    return desc
-
-    @cached_property
-    def wikipedia_url(self):
-        if self.dbpedia_uri is not None:
-            return self.graph.value(subject=self.dbpedia_uri,
-                                    predicate=rdfns.FOAF.isPrimaryTopicOf)
-
-    @cached_property
-    def dbpedia_thumbnail(self):
-        if self.dbpedia_uri is not None:
-            return self.graph.value(subject=self.dbpedia_uri,
-                                    predicate=rdfns.DBPEDIA_OWL.thumbnail)
 
     # TODO: need access to groupsheets by this person
 

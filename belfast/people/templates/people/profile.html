@@ -8,10 +8,10 @@
 
 {% block content %}
 <div class="container">
-{% if person.dbpedia_thumbnail %}
+{% if person.dbpedia.thumbnail %}
 <div class="pull-right">
-  <img src="{{ person.dbpedia_thumbnail }}"/>
-  <p><small><i>image via <a href="{{ person.wikipedia_url }}">Wikipedia</a></i></small></p>
+  <img src="{{ person.dbpedia.thumbnail }}"/>
+  <p><small><i>image via <a href="{{ person.dbpedia.wikipedia_url }}">Wikipedia</a></i></small></p>
 </div>
 {% endif %}
 
@@ -43,9 +43,9 @@
  </p>
 {% endif %}
 
-{% if person.dbpedia_description %}
- <p>{{ person.dbpedia_description }}
-    <small><i>({% if person.wikipedia_url %}<a href="{{ person.wikipedia_url }}">Wikipedia</a>{% else %}Wikipedia{% endif %})</i></small></p>
+{% if person.dbpedia.description %}
+ <p>{{ person.dbpedia.description }}
+    <small><i>({% if person.dbpedia.wikipedia_url %}<a href="{{ person.dbpedia.wikipedia_url }}">Wikipedia</a>{% else %}Wikipedia{% endif %})</i></small></p>
 {% endif %}
 
 <ul class="nav nav-tabs" id="vizTab">
