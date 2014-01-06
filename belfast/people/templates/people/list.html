@@ -8,13 +8,13 @@
 <h1 property="schema:name">People associated with the Belfast Group</h1>
 <ul>
 {% for person in people %}
-    <li><a href="{% url 'people:profile' person.slug %}">{{ person.last_name }}, {{ person.first_name }}</a>
-        {% comment %}  {# rels not in db yet #}
-      {% if rels %}
-        ({{ rels|join:', '}})
-      {% endif %}
-              {% endcomment %}
-     {# {{ person.fullname|slugify }} {{ person.short_id }} #}
+    <li><a href="{{ person }}"> {# RDF identifier = local URI #}
+      {# NOTE: all people with profiles should have first/last names in data #}
+        {% if person.lastname and person.firstname %}
+          {{ person.lastname }}, {{ person.firstname }}
+        {% else %} {{ person.name }}
+        {% endif %} </a>
+   {# TODO: display relationship to BG here? number of groupsheets? #}
    </li>
 {% endfor %}
 </ul>

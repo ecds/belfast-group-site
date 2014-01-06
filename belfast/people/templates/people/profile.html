@@ -1,50 +1,51 @@
 {% extends 'site_base.html' %}
 {% load static %}
 
-{% block page-subtitle %} | Members | {{ person.fullname }}{% endblock %}
+{% block page-subtitle %} | Members | {{ person.name }}{% endblock %}
 
 {% block head-extras %}
 {% endblock %}
 
 {% block content %}
-{% if person.rdfinfo.dbpedia_thumbnail %}
+<div class="container">
+{% if person.dbpedia.thumbnail %}
 <div class="pull-right">
-  <img src="{{ person.rdfinfo.dbpedia_thumbnail }}"/>
-  <p><small><i>image via <a href="{{ person.rdfinfo.wikipedia_url }}">Wikipedia</a></i></small></p>
+  <img src="{{ person.dbpedia.thumbnail }}"/>
+  <p><small><i>image via <a href="{{ person.dbpedia.wikipedia_url }}">Wikipedia</a></i></small></p>
 </div>
 {% endif %}
 
 <h1>{{ person.name }}</h1>
 
-{% if person.rdfinfo.occupation %}
-<p><b>Occupation:</b> {{ person.rdfinfo.occupation|join:', ' }}</p>
+{% if person.occupation %}
+<p><b>Occupation:</b> {{ person.occupation|join:', ' }}</p>
 {% endif %}
 
-{% if person.rdfinfo.locations %}
+{% if person.locations %}
 <p><b>Locations:</b>
     {# for now, link to outside URI location; eventually may want in-site links #}
-  {% for loc in person.rdfinfo.locations %}
+  {% for loc in person.locations %}
   <a href="{{ loc.identifier }}">{{ loc }}</a>{% if not forloop.last %}; {% else %}.{% endif %}
   {% endfor %}
   </p>
 {% endif %}
 
-{% if person.rdfinfo.birthdate %}
-<p>Born {{ person.rdfinfo.birthdate }}
-    {% if person.rdfinfo.birthplace %}
-    in <a href="{{ person.rdfinfo.birthplace.identifier }}">{{ person.rdfinfo.birthplace }}</a>{% endif %}.</p>
+{% if person.birthdate %}
+<p>Born {{ person.birthdate }}
+    {% if person.birthplace %}
+    in <a href="{{ person.birthplace.identifier }}">{{ person.birthplace }}</a>{% endif %}.</p>
 {% endif %}
 
-{% if person.rdfinfo.description %}
- <p class="description">{{ person.rdfinfo.description }}
+{% if person.description %}
+ <p class="description">{{ person.description }}
     <small><i>(MARBL)</i></small> {# should be safe to assume for now ... #}
     {# TODO: should really link to the findingaids where the description comes from #}
  </p>
 {% endif %}
 
-{% if person.rdfinfo.dbpedia_description %}
- <p>{{ person.rdfinfo.dbpedia_description }}
-    <small><i>({% if person.rdfinfo.wikipedia_url %}<a href="{{ person.rdfinfo.wikipedia_url }}">Wikipedia</a>{% else %}Wikipedia{% endif %})</i></small></p>
+{% if person.dbpedia.description %}
+ <p>{{ person.dbpedia.description }}
+    <small><i>({% if person.dbpedia.wikipedia_url %}<a href="{{ person.dbpedia.wikipedia_url }}">Wikipedia</a>{% else %}Wikipedia{% endif %})</i></small></p>
 {% endif %}
 
 <ul class="nav nav-tabs" id="vizTab">
@@ -58,10 +59,10 @@
 <div class="tab-content">
   <div class="tab-pane active" id="connections">
 
-  {% if person.rdfinfo.connected_people %}
+  {% if person.connected_people %}
     <h4>People</h4>
     <ul>
-    {% for conn, rel in person.rdfinfo.connected_people.iteritems %}
+    {% for conn, rel in person.connected_people.iteritems %}
         <li>{{ conn.fullname }}
             <small>&lt;{{ conn.identifier }}&gt;</small>
             {% if rel %} - {{ rel|join:', '}}{% endif %}
@@ -70,10 +71,10 @@
     </ul>
   {% endif %}
 
-  {% if person.rdfinfo.connected_organizations %}
+  {% if person.connected_organizations %}
     <h4>Organizations</h4>
     <ul>
-    {% for conn, rel in person.rdfinfo.connected_organizations.iteritems %}
+    {% for conn, rel in person.connected_organizations.iteritems %}
         <li>{{ conn.name }}
             <small>&lt;{{ conn.identifier }}&gt;</small>
             {% if rel %} - {{ rel|join:', '}}{% endif %}
@@ -98,7 +99,7 @@
   {% endif %}
 
 </div>
-
+</div>
 <script>
   $(function () {
     $('#vizTab a').click(function (e) {

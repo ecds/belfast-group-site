@@ -1,21 +1,29 @@
-import glob
 from datetime import datetime
 import rdflib
 import logging
 import os
-from os import path
 import re
-import time
-import networkx as nx
 from networkx.readwrite import gexf
 
 from django.conf import settings
-from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
 
+
+# TODO: consilidate with version somewhere in belfast.rdf
 def normalize_whitespace(str):
     return re.sub(r'\s+', ' ', str.strip())
+
+
+def rdf_data():
+    # method to get a copy of the conjunctive graph with rdf data for the site
+    data = rdflib.ConjunctiveGraph('Sleepycat')
+    data.open(settings.RDF_DATABASE)
+    return data
+
+# TODO: determine how to generate last-modified dates for refactored RDF
+# handling within the site
+# NOTE: the methods below are probably out of date
 
 def rdf_data_lastmodified():
     # get a last modification time for rdf data, based on the
@@ -25,67 +33,6 @@ def rdf_data_lastmodified():
     filelist = filter(lambda x: not os.path.isdir(x) and x.endswith('.xml'), filelist)
     newest = max([os.stat(os.path.join(settings.RDF_DATA_DIR, x)).st_mtime for x in filelist])
     return datetime.fromtimestamp(newest)
-
-
-def rdf_dburi_from_settings():
-    # generate db uri for rdflib-sqlalchemy based on django conf
-    # NOTE: getting database wrapper errors, so rdf data will
-    # need to be loaded into a separate db from site django content
-    dbconfig = settings.DATABASES['rdf']
-    if dbconfig['ENGINE'] == 'django.db.backends.sqlite3':
-        return rdflib.Literal('sqlite:///%s' % dbconfig['NAME'])
-
-    elif dbconfig['ENGINE'] == 'django.db.backends.mysql':
-        # FIXME: what if django port is set to empty string for default ?
-        # TODO: if port is not set, default is 3306
-        return rdflib.Literal('mysql+mysqldb://%(USER)s:%(PASSWORD)s@%(HOST)s:%(PORT)s/%(NAME)s?charset=utf8' % \
-                              dbconfig)
-
-_rdf_data = None
-
-
-def rdf_data():
-    global _rdf_data
-    if _rdf_data is not None:
-        return _rdf_data
-
-    start = time.time()
-    cache_key = 'BELFAST_RDF_GRAPH'
-    timeout = 60 * 60 * 24
-    graph = cache.get(cache_key)
-    if graph is None:
-
-        graph = rdflib.Graph()
-        filecount = 0
-        errcount = 0
-        # TODO: log time it takes to parse and load, totalnumber of files
-        for infile in glob.iglob(path.join(settings.RDF_DATA_DIR, '*.xml')):
-            try:
-                graph.parse(infile)
-                filecount += 1
-            except Exception as err:
-                logger.error('Failed to parse file %s: %s' % (infile, err))
-                errcount += 1
-
-        for infile in glob.iglob(path.join(settings.RDF_DATA_DIR, '*', '*.xml')):
-            try:
-                graph.parse(infile)
-                filecount += 1
-            except Exception as err:
-                logger.error('Failed to parse file %s: %s' % (infile, err))
-                errcount += 1
-
-        logger.debug('Loaded %d RDF documents in %.02f sec (%d errors)' % \
-                     (filecount, time.time() - start, errcount))
-
-        cache.set(cache_key, graph, timeout)
-    else:
-        logger.debug('Loaded RDF data from cache in %.02f sec' % \
-                     (time.time() - start))
-
-    _rdf_data = graph
-    return graph
-
 
 def network_data_lastmodified():
     # last modification time for nx network data, based on the gexf file

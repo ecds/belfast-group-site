@@ -130,7 +130,7 @@ INSTALLED_APPS = [
     'belfast.groupsheets',
     'belfast.people',
     'belfast.network',
-    'belfast.data',
+    'belfast.rdf',
 ]
 
 #TINYMCE_FILEBROWSER = True
@@ -168,9 +168,10 @@ if django_nose is not None:
     TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
     NOSE_PLUGINS = [
         'eulexistdb.testutil.ExistDBSetUp',
+        'belfast.rdf.testutil.RdfTestDatabase',
         # ...
     ]
-    NOSE_ARGS = ['--with-existdbsetup']
+    NOSE_ARGS = ['--with-existdbsetup', '--with-rdftestdatabase']
 
 
 #if DEBUG:

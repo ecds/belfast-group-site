@@ -10,7 +10,8 @@
 >
  <!-- simplified data based on longley findingaid for unit tests -->
 
-  <rdf:Description rdf:about="http://viaf.org/viaf/39398205/">
+  <rdf:Description rdf:about="http://example.com/people/michael-longley/">
+    <owl:sameAs rdf:resource="http://viaf.org/viaf/39398205/"/>
     <schema:name xml:lang="en">Michael Longley</schema:name>
     <schema:givenName xml:lang="en">Michael</schema:givenName>
     <schema:familyName xml:lang="en">Longley</schema:familyName>

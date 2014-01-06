@@ -11,7 +11,7 @@
   <div class="col-md-3 sidebar">
     <h4>Filter groupsheets</h4>
 
-    {% if filters %}
+    {% if filters %}{# display filters currently in effect, with link to remove #}
       <ul>
         {% for label, link in filters.iteritems %}
         <li>{{ label }} <a class="small" href="{{ link }}"><span class="glyphicon glyphicon-remove-sign"></span></a></li>
@@ -19,11 +19,7 @@
     </ul>
     {% endif %}
 
-    {# TODO: display filters and make them toggle-able #}
-
     <hr/>
-
-    {# FIXME: this link loses current filter when combining #}
     {% if facets.digital %}
     <p><a href="?edition=digital{{ url_suffix }}">digital editions</a> ({{ facets.digital }})</p>
     {% endif %}
@@ -31,8 +27,8 @@
     {% if facets.authors %}
     <p><b>Author</b></p>
     <ul>
-        {% for author, total in facets.authors %}
-        <li><a href="?author={{ author.slug }}{{ url_suffix }}">{{ author.name }}</a> ({{ total }})</li>
+        {% for f in facets.authors|dictsortreversed:"total" %}
+        <li><a href="?author={{ f.author.slug }}{{ url_suffix }}">{{ f.author.lastname }}, {{ f.author.firstname }}</a> ({{ f.total }})</li>
         {% endfor %}
     </ul>
     {% endif %}
@@ -40,8 +36,9 @@
     {% if facets.sources %}
     <p><b>Source</b></p>
     <ul>
-        {% for source in facets.sources %}  {# TODO: need to use short names here! #}
-        <li><a href="?source={{ source }}{{ url_suffix }}">{{ source }}</a> ({{ source.total_groupsheets }})</li>
+        {% for s in facets.sources|dictsortreversed:"total" %}  {# TODO: need to use short names here! #}
+        <li><a href="?source={{ s.source.identifier|urlencode }}{{ url_suffix }}">{{ s.source.name }}</a> ({{ s.total }})</li>
+        {# NOTE: urlencode required since collection URIs include #anchors which otherwise get lost #}
         {% endfor %}
     </ul>
     {% endif %}
@@ -52,7 +49,7 @@
 
     <h1 property="schema:name">Group Sheets</h1>
 
-    <p>Displaying {{ documents.count }} group sheets.</p>
+    <p>Displaying {{ documents|length }} group sheet{{ documents|pluralize }}.</p>
 
     <ul class="groupsheet-list">
         {% for doc in documents %}

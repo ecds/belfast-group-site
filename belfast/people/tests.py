@@ -18,13 +18,15 @@ class PeopleViewsTest(TestCase):
 
     def setUp(self):
         self.person = RdfPerson(self.graph,
-                                rdflib.URIRef('http://viaf.org/viaf/39398205/'))
+                                rdflib.URIRef('http://example.com/people/michael-longley/'))
 
     @patch('belfast.people.rdfmodels.network_data')
     @patch('belfast.people.rdfmodels.rdf_data')
-    def test_profile(self, mockrdf, mocknx):
+    @patch('belfast.people.views.rdf_data')
+    def test_profile(self, mockrdfv, mockrdfm, mocknx):
+        # needs to be mocked in view and rdfmodel
         # test against fixture rdf/gexf data
-        mockrdf.return_value = self.graph
+        mockrdfm.return_value = mockrdfv.return_value = self.graph
         mocknx.return_value = self.nx_graph
 
         # currently, id format is viaf:####
@@ -33,20 +35,10 @@ class PeopleViewsTest(TestCase):
                                            kwargs={'id': 'not-a-viaf-id'}))
         self.assertEqual(404, response.status_code,
                          'profile should return 404 for invalid person id')
-        # - domain not viaf
-        response = self.client.get(reverse('people:profile',
-                                           kwargs={'id': 'dbpedia:1234'}))
-        self.assertEqual(404, response.status_code,
-                         'profile should return 404 for unsupported person id')
-        # valid viaf id but not a person
-        response = self.client.get(reverse('people:profile',
-                                           kwargs={'id': 'viaf:127261399'}))
-        self.assertEqual(404, response.status_code,
-                         'profile should return 404 for non-person id')
 
         # test person from fixture data
         response = self.client.get(reverse('people:profile',
-                                           kwargs={'id': 'viaf:39398205'}))
+                                           kwargs={'id': 'michael-longley'}))
         self.assertEqual(200, response.status_code,
                          'profile should return 200 for valid person id')
         # spot-check profile info
@@ -57,7 +49,7 @@ class PeopleViewsTest(TestCase):
             response, 'Born %s' % self.person.birthdate,
             msg_prefix='birthdate should be included if present')
         self.assertContains(
-            response, self.person.dbpedia_description,
+            response, self.person.dbpedia.description,
             msg_prefix='dbpedia description should be included on profile')
         self.assertContains(
             response, '<p><b>Occupation:</b> %s</p>' % self.person.occupation[0],
@@ -96,7 +88,7 @@ class RdfPersonTest(TestCase):
 
     def setUp(self):
         self.person = RdfPerson(self.graph,
-                                rdflib.URIRef('http://viaf.org/viaf/39398205/'))
+                                rdflib.URIRef('http://example.com/people/michael-longley/'))
 
     def test_basic_properties(self):
         self.assertEqual('Michael Longley', unicode(self.person.name))
@@ -106,7 +98,11 @@ class RdfPersonTest(TestCase):
         # birth date is just a string for now...
         self.assertEqual('1939-07-27', unicode(self.person.birthdate))
         self.assertEqual('Poet', unicode(self.person.occupation[0]))
-        self.assertEqual('viaf:39398205', self.person.short_id)
+        self.assertEqual(rdflib.URIRef('http://viaf.org/viaf/39398205/'),
+                         self.person.viaf_uri)
+        self.assertEqual(rdflib.URIRef('http://dbpedia.org/resource/Michael_Longley'),
+                         self.person.dbpedia_uri)
+
 
     def test_locations(self):
         birthplace = self.person.birthplace
@@ -115,7 +111,8 @@ class RdfPersonTest(TestCase):
 
         # set of home and work locations
         locations = self.person.locations
-        self.assertEqual(4, len(locations))
+        print 'locations = ', locations
+        self.assertEqual(5, len(locations))
         self.assert_(isinstance(locations[0], RdfLocation))
         loc_names = [unicode(l.name) for l in locations]
         self.assert_('Belfast' in loc_names)
@@ -124,7 +121,7 @@ class RdfPersonTest(TestCase):
 
     def test_dbpedia_description(self):
         self.assertEqual('Michael Longley, CBE (born 27 July 1939) is a Northern Irish poet from Belfast.',
-                         unicode(self.person.dbpedia_description))
+                         unicode(self.person.dbpedia.description))
 
     @patch('belfast.people.rdfmodels.network_data')
     @patch('belfast.people.rdfmodels.rdf_data')
@@ -132,7 +129,10 @@ class RdfPersonTest(TestCase):
         # test against fixture rdf/gexf data
         mockrdf.return_value = self.graph
         mocknx.return_value = self.nx_graph
-        people = self.person.connected_people
+        # NOTE: current nx gexf based on viaf uri instead of local one
+        # TODO: regenerate text fixture (at least gexf) based on current process
+        person = RdfPerson(self.graph, rdflib.URIRef('http://viaf.org/viaf/39398205/'))
+        people = person.connected_people
         self.assert_(isinstance(people.keys()[0], RdfPerson))
         # convert into dict of string, list for easier testing
         names = dict((unicode(p.name), rels) for p, rels in people.iteritems())
@@ -152,7 +152,9 @@ class RdfPersonTest(TestCase):
         # test against fixture rdf/gexf data
         mockrdf.return_value = self.graph
         mocknx.return_value = self.nx_graph
-        orgs = self.person.connected_organizations
+        # same note as above for gexf / local uri
+        person = RdfPerson(self.graph, rdflib.URIRef('http://viaf.org/viaf/39398205/'))
+        orgs = person.connected_organizations
         self.assert_(isinstance(orgs.keys()[0], RdfOrganization))
         names = dict((unicode(o.name), rels) for o, rels in orgs.iteritems())
         self.assert_('Belfast Group' in names)

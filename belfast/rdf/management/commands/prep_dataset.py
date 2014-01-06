@@ -5,16 +5,16 @@
 from optparse import make_option
 import os
 import rdflib
+import shutil
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from belfast.data.harvest import HarvestRdf, Annotate # HarvestRelated
-from belfast.data.qub import QUB
-from belfast.data.clean import SmushGroupSheets, IdentifyGroupSheets, \
-    InferConnections
-from belfast.data.nx import Rdf2Gexf
-
+from belfast.rdf.harvest import HarvestRdf, Annotate # HarvestRelated
+from belfast.rdf.qub import QUB
+from belfast.rdf.clean import SmushGroupSheets, IdentifyGroupSheets, \
+    InferConnections, ProfileUris
+from belfast.rdf.nx import Rdf2Gexf
 
 class Command(BaseCommand):
     '''Harvest and prep Belfast Group RDF dataset'''
@@ -26,16 +26,18 @@ class Command(BaseCommand):
         make_option('-H', '--harvest', action='store_true', help='Harvest RDFa'),
         make_option('-q', '--queens', action='store_true',
             help='Convert Queens University Belfast collection to RDF'),
-        make_option('-r', '--related', action='store_true',
-            help='Harvest related RDF from VIAF, GeoNames, and DBpedia'),
         make_option('-i', '--identify', action='store_true',
             help='Identify group sheets'),
         make_option('-s', '--smush', action='store_true',
-            help='Smush groupsheet URIs'),
+            help='Smush groupsheet URIs and generate local profile URIs'),
+        make_option('-r', '--related', action='store_true',
+            help='Harvest related RDF from VIAF, GeoNames, and DBpedia'),
         make_option('-c', '--connect', action='store_true',
             help='Infer and make connections implicit in the data'),
         make_option('-g', '--gexf', action='store_true',
-            help='Generate GEXF network graph data')
+            help='Generate GEXF network graph data'),
+        make_option('-x', '--clear', action='store_true',
+            help='Clear all current RDF data and start fresh'),
     )
 
     # eadids for documents with tagged names
@@ -44,7 +46,6 @@ class Command(BaseCommand):
               'hobsbaum1013', 'mahon689', 'fallon817', 'grennan1150',
               'heaney-hammond1019', 'hughes644', 'mcbreen1088',
               'monteith789', 'deane1210']
-    # NOTE: once in production, related collections links should help
 
     # RDF from TEI group sheets
     tei_ids = ['longley1_10244', 'longley1_10353', 'heaney1_10407',
@@ -58,13 +59,13 @@ class Command(BaseCommand):
                'longley1_10316', 'simmons1_1035', 'simmons1_1069',
                'hobsbaum1_1047']
 
-    # for now, harvest from test FA site
-    harvest_urls = ['http://testfindingaids.library.emory.edu/documents/%s/' % e
+    # harvest from production EmoryFindingAids site
+    harvest_urls = ['http://findingaids.library.emory.edu/documents/%s/' % e
                     for e in eadids]
     # using local dev urls for now
     harvest_urls.extend(['http://localhost:8000/groupsheets/%s/' % i for i in tei_ids])
 
-    QUB_input = os.path.join(settings.BASE_DIR, 'data', 'fixtures', 'QUB_ms1204.html')
+    QUB_input = os.path.join(settings.BASE_DIR, 'rdf', 'fixtures', 'QUB_ms1204.html')
     # FIXME: can we find a better url for the Queen's Belfast Group collection ?
     QUB_URL = 'http://www.qub.ac.uk/directorates/InformationServices/TheLibrary/FileStore/Filetoupload,312673,en.pdf'
 
@@ -81,35 +82,43 @@ class Command(BaseCommand):
         # initialize graph persistence
         graph = rdflib.ConjunctiveGraph('Sleepycat')
         graph.open(settings.RDF_DATABASE, create=True)
+        # if clear is specified, remove the entire db
+        if options['clear']:
+            if self.verbosity >= self.v_normal:
+                print 'Removing %d contexts and %d triples from the current RDF graph' % \
+                      (len(list(graph.contexts())), len(graph))
+            # can't find a reliable way to remove all triples and contexts
+            # so close the graph, remove everything, and start over
+            graph.close()
+            shutil.rmtree(settings.RDF_DATABASE)
+            graph.open(settings.RDF_DATABASE, create=True)
 
         if all_steps or options['harvest']:
             self.stdout.write('-- Harvesting RDF from EmoryFindingAids related to the Belfast Group')
+            # inaccurate; also harvesting tei from local site
 
             HarvestRdf(self.harvest_urls,
-                       find_related=True, verbosity=0, #format=output_format,
+                       find_related=True, verbosity=0,
                        graph=graph)
 
         if all_steps or options['queens']:
             self.stdout.write('-- Converting Queens University Belfast Group collection description to RDF')
             QUB(self.QUB_input, verbosity=0, graph=graph, url=self.QUB_URL)
 
-        if all_steps or options['related']:
-            # FIXME: no longer quite accurate or what we need;
-            # to keep rdf dataset as small as possible, should *only* grab attributes
-            # we actually need to run the site
-            self.stdout.write('-- Annotating raph with related information from VIAF, GeoNames, and DBpedia')
-            Annotate(graph)
-            # HarvestRelated(graph)   # old harvest , which is pulling too much data
-
         if all_steps or options['identify']:
-            # smush any groupsheets in the data
+            # identify groupsheets in the data and add local groupsheet type if not present
             self.stdout.write('-- Identifying groupsheets')
             IdentifyGroupSheets(graph)
 
         if all_steps or options['smush']:
             # smush any groupsheets in the data
-            self.stdout.write('-- Smushing groupsheet URIs')
+            self.stdout.write('-- Smushing groupsheet URIs and generating local profile URIs')
             SmushGroupSheets(graph)
+            ProfileUris(graph)
+
+        if all_steps or options['related']:
+            self.stdout.write('-- Annotating graph with related information from VIAF, GeoNames, and DBpedia')
+            Annotate(graph)
 
         if all_steps or options['connect']:
             # infer connections
@@ -122,6 +131,5 @@ class Command(BaseCommand):
             self.stdout.write('-- Generating network graph and saving as GEXF')
             Rdf2Gexf(graph, settings.GEXF_DATA)
 
-        # TODO: create rdf profiles with local uris; get rid of person db model
-
         graph.close()
+

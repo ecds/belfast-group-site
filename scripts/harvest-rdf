@@ -3,7 +3,7 @@
 from urlparse import urlparse
 import argparse
 
-from belfast.data.harvest import HarvestRdf
+from belfast.rdf.harvest import HarvestRdf
 
 # todo: move into a utils file
 

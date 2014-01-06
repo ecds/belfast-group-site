@@ -1,7 +1,8 @@
 from django.contrib.sitemaps import Sitemap
 from django.core.urlresolvers import reverse
 
-from belfast.people.models import Person
+
+from belfast.people.rdfmodels import profile_people, RdfPerson
 
 
 class ProfileSitemap(Sitemap):
@@ -13,7 +14,7 @@ class ProfileSitemap(Sitemap):
     extra_pages = ['list']
 
     def items(self):
-        people = Person.objects.all()
+        people = profile_people()
         return self.extra_pages + [p for p in people]
 
     def location(self, item):

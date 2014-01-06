@@ -10,10 +10,10 @@ from belfast import rdfns
 class QUB(object):
 
     # regex to grab names from description
-    NAME_REGEX = re.compile('(?P<last>[A-Z][a-zA-Z]+), (?P<first>[A-Z][a-z. ]+)')
+    NAME_REGEX = re.compile('(?P<last>[A-Z][a-zA-Z]+), (?P<first>[A-Za-z. ]+)')  # include . for initials
     DATE_REGEX = re.compile('Dated (?P<day>\d{2})/(?P<month>\d{2})/(?P<year>\d{4})')
     YEAR_REGEX = re.compile('Dates [^\d]*(?P<year>\d{4})')
-    PAGES_REGEX = re.compile('Typescripts?, (?P<num>\d)(p|pp.)')
+    PAGES_REGEX = re.compile('Typescripts?,? (?P<num>\d)(p|pp.)')
     PAREN_REGEX = re.compile(' ?\([^())]+\)')
 
     NAME_URIS = {
@@ -21,7 +21,7 @@ class QUB(object):
         'Hobsbaum, Philip': 'http://viaf.org/viaf/91907300',
         'Heaney, Seamus': 'http://viaf.org/viaf/109557338',
         'Pakenham, John': 'http://viaf.org/viaf/40930958',
-        'Bredin, Hugh': 'http://viaf.org/viaf/94376522',   # seems likely (lecturer at Queen's Univ. Belfast)
+        'Bredin, Hugh T.': 'http://viaf.org/viaf/94376522',   # seems likely (lecturer at Queen's Univ. Belfast)
         'Buller, Norman': 'http://viaf.org/viaf/29058137',
         'McEldowney, Eugene': 'http://viaf.org/viaf/18143404',
         'Longley, Michael': 'http://viaf.org/viaf/39398205',
@@ -37,7 +37,7 @@ class QUB(object):
     QUB_BELFAST_COLLECTION = 'http://www.qub.ac.uk/directorates/InformationServices/TheLibrary/FileStore/Filetoupload,312673,en.pdf'
 
     # URIs not found for:
-    #   Croskery, Lynette
+    #   Croskery, Lynette M.
     #   Stronge, Marilyn
     #   Foster, Rodney  (possibly the Jazz musician born 1939 N. Ireland [still no uri])
     #   Ashton, Victor
@@ -62,16 +62,16 @@ class QUB(object):
 
         # if this context already exists in the conjunctive graph,
         # remove it to avoid duplicating data
-        cg = self.graph.get_context(url)
-        if cg and len(cg):
-            self.graph.remove_context(cg)
+        g = self.graph.get_context(url)
+        if g and len(g):
+            self.graph.remove_context(g)
 
         htmlfile = open(file)
         doc = BeautifulSoup(htmlfile)
         # g = rdflib.Graph()
         # create a subgraph context with a shared persistence layer and
         # the specified url as the graph identifier
-        g = rdflib.Graph(graph.store, url)
+        # g = rdflib.Graph(graph.store, url)
         # bind namespace prefixes for output
         g.bind('schema', rdfns.SCHEMA_ORG)
         g.bind('bibo', rdfns.BIBO)
@@ -82,9 +82,9 @@ class QUB(object):
         for t in [rdfns.ARCH.Collection, rdfns.SCHEMA_ORG.CreativeWork,
                   rdfns.DCMITYPE.Collection]:
             g.add((coll, rdflib.RDF.type, t))
-            g.add((coll, rdfns.SCHEMA_ORG.name, rdflib.Literal(doc.body.h1.text)))
-            g.add((coll, rdfns.SCHEMA_ORG.description, rdflib.Literal(doc.body.find(id='about').text)))
-            g.add((coll, rdfns.SCHEMA_ORG.about, rdflib.URIRef(self.NAME_URIS['Belfast Group'])))
+        g.add((coll, rdfns.SCHEMA_ORG.name, rdflib.Literal(doc.body.h1.text)))
+        g.add((coll, rdfns.SCHEMA_ORG.description, rdflib.Literal(doc.body.find(id='about').text)))
+        g.add((coll, rdfns.SCHEMA_ORG.about, rdflib.URIRef(self.NAME_URIS['Belfast Group'])))
 
         # TODO: add information about owning archive ?
         # queen's u belfast mentions some collections are in archives hub... doesn't seem to include this one
@@ -99,18 +99,17 @@ class QUB(object):
             msnode = rdflib.BNode()
             g.add((coll, rdfns.SCHEMA_ORG.mentions, msnode))
             g.add((msnode, rdflib.RDF.type, rdfns.BIBO.Manuscript))
+            g.add((msnode, rdflib.RDF.type, rdfns.BG.GroupSheet))
 
             content = list(div.stripped_strings)
             first_line = content[0]
             # first line should start with the author's name (if known)
-            # FIXME: a few have multiple authors
             name_match = self.NAME_REGEX.match(first_line)
             if name_match:
                 last_name = name_match.group('last').strip()
                 first_name = name_match.group('first').strip()
                 name_key = '%s, %s' % (last_name, first_name)
                 full_name = '%s %s' % (first_name, last_name)
-
                 # use known URI if possible
                 if name_key in self.NAME_URIS:
                     author = rdflib.URIRef(self.NAME_URIS[name_key])
@@ -118,7 +117,7 @@ class QUB(object):
                     author = rdflib.BNode()
 
                 # relate person to manuscript as author, include name information
-                g.add((msnode, rdfns.SCHEMA_ORG.author, author))
+                g.add((msnode, rdfns.DC.creator, author))
                 g.add((author, rdfns.rdflib.RDF.type, rdfns.SCHEMA_ORG.Person))
                 g.add((author, rdfns.SCHEMA_ORG.name, rdflib.Literal(full_name)))
                 g.add((author, rdfns.SCHEMA_ORG.familyName, rdflib.Literal(last_name)))
@@ -173,12 +172,14 @@ class QUB(object):
             if len(titles) == 1:
                 title = rdflib.Literal(titles[0])
                 g.add((msnode, rdfns.DC.title, title))
-            # multiple titles; use rdf sequence to preserve order
-            else:
+            # if multiple titles; use rdf sequence to preserve order
+            elif titles:
                 title_node = rdflib.BNode()
                 title_coll = RdfCollection(g, title_node,
                                            [rdflib.Literal(t) for t in titles])
                 g.add((msnode, rdfns.DC.title, title_node))
+            # if untitled, no dc:title should be added
+
 
         if self.graph is not None:
             pass

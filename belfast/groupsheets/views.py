@@ -1,15 +1,17 @@
+from django.core.urlresolvers import reverse
 from django.db.models import Count
 from django.shortcuts import render
 from django.http import Http404, HttpResponse
 from django.views.decorators.http import last_modified
+from django.contrib.sites.models import get_current_site
 from eulexistdb.exceptions import DoesNotExist, ExistDBException
 import logging
 import urllib
 
 from belfast import rdfns
 from belfast.groupsheets.forms import KeywordSearchForm
-from belfast.groupsheets.models import GroupSheet, ArchivalCollection
-from belfast.groupsheets.rdfmodels import TeiGroupSheet, TeiDocument
+from belfast.groupsheets.rdfmodels import TeiGroupSheet, TeiDocument, \
+    get_rdf_groupsheets, groupsheet_by_url
 from belfast.util import rdf_data_lastmodified, network_data_lastmodified
 
 logger = logging.getLogger(__name__)
@@ -37,7 +39,10 @@ def view_sheet(request, id):
     except DoesNotExist:
         raise Http404
 
-    sources = ArchivalCollection.objects.filter(groupsheet__tei_id=id)
+    # find the related rdf groupsheet object
+    # so we can display & link to sources
+    rdfgs = groupsheet_by_url(gs.ark)  # todo: associate with tei or rdf gs model
+    sources = rdfgs.sources if rdfgs else {}
 
     context.update({'document': gs,
                    'page_rdf_url': getattr(gs, 'ark', None),
@@ -63,70 +68,70 @@ def teixml(request, name):
 
 # TODO: based on db, how to calculate last modified?
 #@last_modified(rdf_lastmod)  # for now, list is based on rdf
-def list(request):
+def list_groupsheets(request):
     # without filters, find all group sheets
-    results = GroupSheet.objects.all()
-
+    # results = GroupSheet.objects.all()
     url_args = {}
+    filters = {}
     filter_digital = request.GET.get('edition', None)
     if filter_digital is not None:
-        results = results.filter(url__isnull=False)
+        filters['has_url'] = True
         url_args['edition'] = 'digital'
 
     filter_author = request.GET.get('author', None)
     if filter_author is not None:
-        results = results.filter(author__slug=filter_author)
+        # filter is in slug form; use that to build local uri
         url_args['author'] = filter_author
+        # TODO: utility method for this
+        current_site = get_current_site(request)
+        author_uri = 'http://%s%s' % (
+            current_site.domain,
+            reverse('people:profile', args=[filter_author])
+        )
+        filters['author'] = author_uri
 
     filter_source = request.GET.get('source', None)
     if filter_source is not None:
-        results = results.filter(sources__name=filter_source)
         url_args['source'] = filter_source
+        # TODO: preferred label / slugs / local identifier for these?
+        # currently arg is the uri
+        filters['source'] = filter_source
 
-    results = results.order_by('author__last_name').all()
+    results = get_rdf_groupsheets(**filters)
+    # TODO: support source filter; make more django-like
 
     # generate labels/totals for 'facet' filters
     digital_count = None
     # if not already filtered on digital, get a count
     if filter_digital is None:
-        # use the already filtered group sheet query from above
-        digital_count = results.filter(url__isnull=False).count()
+        digital_count = len([r for r in results if r.url])
 
     # filter to group sheets by author
-    authors = None
+    authors = {}
     if filter_author is None:
-        # find authors and calculate totals relative to filtered groupsheets we'll return
-        # NOTE: should use distinct here, but apparently it's not supported on mysql
-        gsauth = results.only('author').annotate(total_groupsheets=Count('author__groupsheet')) \
-                        .filter(total_groupsheets__gte=1) \
-                        .order_by('-total_groupsheets', 'author')
-        # generate a list of tuples: author, total
-        authors = []
-        last = None
-        for auth in gsauth:
-            # if the same as the previous, skip
-            if auth.author == last:
-                continue
-            last = auth.author
-            authors.append((auth.author, auth.total_groupsheets))
+        # find authors and calculate totals relative to filtered groupsheets to be returned
+        for r in results:
+            if r.author not in authors:
+                authors[r.author] = 1
+            else:
+                authors[r.author] += 1
 
     # filter to group sheets by source
-    sources = None
+    sources = {}
     if filter_source is None:
-        # can't find relative to filtered groupsheet b/c rel is many-to-many
-        sources = ArchivalCollection.objects.all()
-        # filter based on other facets that are set
-        if filter_digital:
-            sources = sources.filter(groupsheet__url__isnull=False)
-        if filter_author:
-            sources = sources.filter(groupsheet__author__slug=filter_author)
+        for r in results:
+            for s in r.sources:
+                if s not in sources:
+                    sources[s] = 1
+                else:
+                    sources[s] += 1
 
-        sources = sources.annotate(total_groupsheets=Count('groupsheet')) \
-                                 .filter(total_groupsheets__gte=1) \
-                                 .order_by('-total_groupsheets')
+    # generate lists of dicts for easy sorting in django template
+    authors = [{'author': k, 'total': v} for k, v in authors.iteritems()]
+    sources = [{'source': k, 'total': v} for k, v in sources.iteritems()]
 
-    # FIXME: make facets empty dict to indicate nothing to show?
     facets = {'digital': digital_count, 'authors': authors, 'sources': sources}
+    url_suffix = ''
     url_suffix = urllib.urlencode(url_args)
     # if not empty, prepend & for easy combination with other url args
     if url_suffix != '':
@@ -137,15 +142,32 @@ def list(request):
     if filter_digital is not None:
         args = url_args.copy()
         del args['edition']
-        filters['digital edition'] = '?' + urllib.urlencode(args)
+        filter_args = urllib.urlencode(args)
+        filters['digital edition'] = '?' + filter_args if filter_args else ''
     if filter_author is not None:
         args = url_args.copy()
         del args['author']
-        filters[results[0].author.name] = '?' + urllib.urlencode(args)
+        # pull author display name from results
+        # TODO: init rdfperson and use that label instead?
+        if results:
+            for a in results[0].author_list:
+                # groupsheets may have multiple authors, so make sure
+                # we get the correct label for the active filter
+                if str(a.identifier) == author_uri:
+                    filters[a.name] = '?' + urllib.urlencode(args)
+                    break
+
     if filter_source is not None:
         args = url_args.copy()
         del args['source']
-        filters[filter_source] = '?' + urllib.urlencode(args)
+        if results:
+            # pull source name from results (TODO: shorter labels)
+            for s in results[0].sources:
+                # groupsheets may have multiple sources, so make sure
+                # we get the correct label
+                if str(s.identifier) == filter_source:
+                    filters[s.name] = '?' + urllib.urlencode(args)
+                    break
 
     return render(request, 'groupsheets/list.html',
                   {'documents': results, 'facets': facets,

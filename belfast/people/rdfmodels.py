@@ -1,26 +1,25 @@
 import logging
 import networkx as nx
 import rdflib
-import re
 import time
 
+from django.conf import settings
+from django.contrib.sites.models import Site
+
 from belfast import rdfns
+from belfast.rdf import rdfmap
+from belfast.rdf.models import RdfResource
 from belfast.util import rdf_data, network_data, cached_property
 
 logger = logging.getLogger(__name__)
 
 
 
-class RdfEntity(rdflib.resource.Resource):
+class RdfEntity(RdfResource):
     # base class with common functionality for person, org
 
     _person_type = rdflib.resource.Resource
     _org_type = rdflib.resource.Resource
-
-    @property
-    def name(self):
-        # NOTE: would be better if we could use preferredLabel somehow
-        return self.value(rdfns.SCHEMA_ORG.name)
 
     @property
     def nx_node_id(self):
@@ -120,9 +119,9 @@ class RdfEntity(rdflib.resource.Resource):
 
 class RdfLocation(RdfEntity):
 
-    @property
-    def name(self):
-        return self.value(rdfns.SCHEMA_ORG.name)
+    name = rdfmap.Value(rdfns.SCHEMA_ORG.name)
+    latitude = rdfmap.Value(rdfns.GEO.lat, rdflib.XSD.double)
+    longitude = rdfmap.Value(rdfns.GEO.long, rdflib.XSD.double)
 
     def __unicode__(self):
         return self.value(rdfns.GN.name) \
@@ -130,84 +129,34 @@ class RdfLocation(RdfEntity):
             or self.value(rdfns.DBPPROP.name) \
             or self.name or self.identifier
 
-    @property
-    def latitude(self):
-        val = self.value(rdfns.GEO.lat)
-        if val is not None:
-            return float(unicode(val))
-
-    @property
-    def longitude(self):
-        val = self.value(rdfns.GEO.long)
-        if val is not None:
-            return float(unicode(val))
-
 
 
 class RdfOrganization(RdfEntity):
+    # specify expected rdf type?
     pass
+    # inherits standard name property
+
+
+class DBpediaEntity(RdfEntity):
+
+    description = rdfmap.Value(rdfns.DBPEDIA_OWL.abstract)     # FIXME: how to specify language?
+    wikipedia_url = rdfmap.Value(rdfns.FOAF.isPrimaryTopicOf)
+    thumbnail = rdfmap.Value(rdfns.DBPEDIA_OWL.thumbnail)
 
 
 class RdfPerson(RdfEntity):
     _org_type = RdfOrganization
 
-    @cached_property
-    def dbpedia_uri(self):
-        # same as
-        for res in self.objects(rdflib.OWL.sameAs):
-            if 'dbpedia.org' in res.identifier:
-                return res.identifier
-
-    @cached_property
-    def viaf_uri(self):
-        if 'viaf.org' in self.identifier:
-            return unicode(self.identifier)
-
     @property
-    def name(self):
-        # NOTE: would be better if we could use preferredLabel somehow
-        return self.value(rdfns.SCHEMA_ORG.name)
+    def slug(self):
+        # all persons with profiles should have local, slug-based uris
+        return self.identifier.strip('/').split('/')[-1]
 
-    name_re = re.compile('^((?P<last>[^ ]{2,}), (?P<first>[^.,( ]{2,}))[.,]?')
-    _firstname = None
-    _lastname = None
+    # NOTE: group sheet authors and other people with profiles on this site
+    # should have first/last names added to the rdf data by the dataprep process
 
-    def _calculate_first_last_name(self):
-        for name in self.objects(rdfns.FOAF.name):
-            match = self.name_re.match(unicode(name))
-            if match:
-                name_info = match.groupdict()
-                self._firstname = name_info['first']
-                self._lastname = name_info['last']
-                # stop after we get the first name we can use (?)
-                # note that for ciaran carson only one variant has the accent...
-                break
-
-    @property
-    def lastname(self):
-        if self._lastname is not None:
-            return self._lastname
-        val = self.value(rdfns.SCHEMA_ORG.familyName)
-        if val is not None:
-            return val
-        self._calculate_first_last_name()
-        return self._lastname
-
-
-    @property
-    def firstname(self):
-        if self._firstname is not None:
-            return self._firstname
-        fname = self.value(rdfns.SCHEMA_ORG.givenName)
-        if fname is not None:
-            return fname
-        self._calculate_first_last_name()
-        return self._firstname
-
-# (u'Carson, Ciaran Irish poet and novelist, born 1948'), rdflib.term.Literal(u'Ciaran Carson'), rdflib.term.Literal(u'Carson, Ciaran, 1948-'), rdflib.term.Literal(u'Carson, Ciaran.'), rdflib.term.Literal(u'Carson, Ciaran'), rdflib.term.Literal(u'Carson, Ciar\xe1n (1948- ).')]
-# error: no first/last name for http://viaf.org/viaf/85621766 - na
-
-        return fname
+    lastname = rdfmap.Value(rdfns.SCHEMA_ORG.familyName)
+    firstname = rdfmap.Value(rdfns.SCHEMA_ORG.givenName)
 
     @property
     def fullname(self):
@@ -218,67 +167,38 @@ class RdfPerson(RdfEntity):
         else:
             return self.name
 
-    @property
-    def birthdate(self):
-        # TODO: convert to date type
-        return self.value(rdfns.SCHEMA_ORG.birthDate)
+    same_as = rdfmap.ValueList(rdflib.OWL.sameAs, transitive=True)
 
     @property
-    def birthplace(self):
-        place = self.value(rdfns.DBPEDIA_OWL.birthPlace)
-        if place:
-            return RdfLocation(self.graph, place.identifier)
+    def dbpedia_uri(self):
+        for uri in self.same_as:
+            if 'dbpedia.org' in uri:
+                return uri
 
     @property
-    def occupation(self):
-        'list of occupations via http://schema.org/jobTitle property'
-        return list(self.objects(rdfns.SCHEMA_ORG.jobTitle))
+    def dbpedia(self):
+        if self.dbpedia_uri is not None:
+            return DBpediaEntity(self.graph, self.dbpedia_uri)
 
     @property
-    def same_as(self):
-        return list(self.objects(rdflib.OWL.sameAs))
+    def viaf_uri(self):
+        for uri in self.same_as:
+            if 'viaf.org' in uri:
+                return uri
+
+    birthdate = rdfmap.Value(rdfns.SCHEMA_ORG.birthDate)
+    birthplace = rdfmap.Resource(rdfns.DBPEDIA_OWL.birthPlace, RdfLocation)
+
+    occupation = rdfmap.ValueList(rdfns.SCHEMA_ORG.jobTitle)
+    description = rdfmap.Value(rdfns.SCHEMA_ORG.description)
+
+    work_locations = rdfmap.ResourceList(rdfns.SCHEMA_ORG.workLocation, RdfLocation)
+    home_locations = rdfmap.ResourceList(rdfns.SCHEMA_ORG.homeLocation, RdfLocation)
+
 
     @property
-    def description(self):
-        'http://schema.org/description, if available'
-        return self.value(rdfns.SCHEMA_ORG.description).strip()
-
-    @cached_property
     def locations(self):
-        place_uris = list(self.objects(rdfns.SCHEMA_ORG.workLocation))
-        place_uris.extend(list(self.objects(rdfns.SCHEMA_ORG.homeLocation)))
-        place_uris = set(p.identifier for p in place_uris)
-        return [RdfLocation(self.graph, p) for p in place_uris]
-
-    @cached_property
-    def short_id(self):
-        uri = unicode(self)
-        baseid = uri.rstrip('/').split('/')[-1]
-        if 'viaf.org' in uri:
-            idtype = 'viaf'
-        elif 'dbpedia.org' in uri:
-            idtype = 'dbpedia'
-        return '%s:%s' % (idtype, baseid)
-
-    @cached_property
-    def dbpedia_description(self):
-        if self.dbpedia_uri is not None:
-            for desc in self.graph.objects(subject=self.dbpedia_uri,
-                                           predicate=rdfns.DBPEDIA_OWL.abstract):
-                if desc.language == 'en':  # TODO: configurable (?)
-                    return desc
-
-    @cached_property
-    def wikipedia_url(self):
-        if self.dbpedia_uri is not None:
-            return self.graph.value(subject=self.dbpedia_uri,
-                                    predicate=rdfns.FOAF.isPrimaryTopicOf)
-
-    @cached_property
-    def dbpedia_thumbnail(self):
-        if self.dbpedia_uri is not None:
-            return self.graph.value(subject=self.dbpedia_uri,
-                                    predicate=rdfns.DBPEDIA_OWL.thumbnail)
+        return self.work_locations + self.home_locations
 
     # TODO: need access to groupsheets by this person
 
@@ -296,43 +216,29 @@ def BelfastGroup():
   return RdfOrganization(rdf_data(), rdfns.BELFAST_GROUP_URIREF)
 
 
-# deprecated; this is slow, use BelfastGroup.connected_people instead
-def get_belfast_people():
+def profile_people():
     g = rdf_data()
-    # FIXME: possibly more efficient to use nx / ego graph?
-    # i.e., equivalent of connected_people for RdfOrganization instance
-
     start = time.time()
-    # query for persons one relation removed from the belfast group
+    current_site = Site.objects.get(id=settings.SITE_ID)
     res = g.query('''
-        PREFIX schema: <%(xsd)s>
+        PREFIX schema: <%(schema)s>
         PREFIX rdf: <%(rdf)s>
-        SELECT DISTINCT ?person
+        SELECT ?person
         WHERE {
-            {
-              ?person ?rel1 <%(bg)s> .
-              ?person rdf:type schema:Person
-            }
-            UNION
-            {
-              <%(bg)s> ?rel2 ?person .
-              ?person rdf:type schema:Person
-            }
-            ?author schema:name ?name
+          ?person rdf:type schema:Person .
+          ?person schema:familyName ?name .
+          FILTER regex(str(?person), "^http://%(site)s")
         } ORDER BY ?name
-        ''' % {'xsd': rdflib.XSD, 'rdf': rdflib.RDF,
-               'bg': rdfns.BELFAST_GROUP_URI}
-    )
+        ''' % {'schema': rdfns.SCHEMA_ORG, 'rdf': rdflib.RDF,
+               'site': current_site.domain}
+        )
+
     logger.debug('Found %d people in %.02f sec' % (len(res),
                  time.time() - start))
-
-#            FILTER EXISTS {?person ?p <%(bg)s>}
-# { ?book dc10:title  ?title } UNION { ?book dc11:title  ?title }
-    #    ?person schema:affiliation <%s> .
-    #    ?person schema:memberOf <%s> .
-
+    # people = [RdfPerson(g.get_context(r['person']), r['person']) for r in res]
     people = [RdfPerson(g, r['person']) for r in res]
     return people
+
 
 def find_places():
     g = rdf_data()
