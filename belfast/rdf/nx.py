@@ -57,42 +57,42 @@ class Rdf2Gexf(object):
 
         # iterate through rdf triples and add to the network graph
         # NOTE: could also iterate through the graph by contexts...
-        for triple in self.graph:
-            subj, pred, obj = triple
+        for cx in self.graph.contexts():
+            for triple in cx.triples((None, None, None)):
+                subj, pred, obj = triple
 
-            if pred == rdflib.RDF.first or pred == rdflib.RDF.rest:
-                continue
-            # FIXME: iterating through all triples results in
-            # rdf sequences (first/rest) being handled weirdly...
+                if pred == rdflib.RDF.first or pred == rdflib.RDF.rest:
+                    continue
+                # FIXME: iterating through all triples results in
+                # rdf sequences (first/rest) being handled weirdly...
 
-            # make sure subject and object are added to the graph as nodes,
-            # if appropriate
-            self._add_nodes(triple)
+                # make sure subject and object are added to the graph as nodes,
+                # if appropriate
+                self._add_nodes(triple)
 
-            # get the short-hand name for property or edge label
-            name = self._edge_label(pred)
+                # get the short-hand name for property or edge label
+                name = self._edge_label(pred)
 
-            # if the object is a literal, add it to the node as a property of the subject
-            if subj in self.network and isinstance(obj, rdflib.Literal) \
-               or pred == rdflib.RDF.type:
-                if pred == rdflib.RDF.type:
-                    ns, val = rdflib.namespace.split_uri(obj)
-                    # special case (for now)
-                    if val == 'Manuscript':
-                        if isinstance(self.graph.value(subj, DC.title), rdflib.BNode):
+                # if the object is a literal, add it to the node as a property of the subject
+                if subj in self.network and isinstance(obj, rdflib.Literal) \
+                  or pred == rdflib.RDF.type:
+                    if pred == rdflib.RDF.type:
+                        ns, val = rdflib.namespace.split_uri(obj)
+                        # special case (for now)
+                        if val == 'Manuscript' and isinstance(cx.value(subj, DC.title), rdflib.BNode):
                             val = 'BelfastGroupSheet'
+                        else:
+                            val = unicode(obj)
+                            self.network.node[self._uri_to_node_id(subj)][name] = normalize_whitespace(val)
 
-                else:
-                    val = unicode(obj)
-                self.network.node[self._uri_to_node_id(subj)][name] = normalize_whitespace(val)
+                    # otherwise, add an edge between the two resource nodes
+                    else:
+                        edge_labels.add(name)
+                        self.network.add_edge(self._uri_to_node_id(subj),
+                            self._uri_to_node_id(obj),
+                            label=name,
+                            weight=connection_weights.get(name, 1))
 
-            # otherwise, add an edge between the two resource nodes
-            else:
-                edge_labels.add(name)
-                self.network.add_edge(self._uri_to_node_id(subj),
-                                      self._uri_to_node_id(obj),
-                                      label=name,
-                                      weight=connection_weights.get(name, 1))
 
         print '%d nodes, %d edges' % (self.network.number_of_nodes(),
                                       self.network.number_of_edges())
