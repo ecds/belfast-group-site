@@ -106,6 +106,12 @@ class TeiGroupSheet(XmlModel):
             if a.id == self.id:
                 return a.value
 
+    @property
+    def multi_author(self):
+        '''boolean indicating if this groupsheet includes content by
+        multiple authors'''
+        return len(set([p.byline for p in self.poems])) != 1
+
     # TODO: it would be nice if this were a little easier to access
     # or generate; xmlmap dictfield might get part way there..
     # Possible to generate xpaths based on current object properties?

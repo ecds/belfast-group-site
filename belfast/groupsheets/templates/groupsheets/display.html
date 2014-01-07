@@ -31,11 +31,15 @@
     {# NOTE: there is a table of contents item list, but it does not include ids #}
     {# generating toc from the actual poems instead #}
     <ul class="nav nav-list sidenav affix">
-        <li><h4>{{ document.toc.title }}</h4></li> {# must be in list to stay fixed #}
+        <li><h4>{{ document.toc.title }}</h4></li> {# heading must be in list to stay fixed #}
         {% for poem in document.poems %}
+        {# display authors by section if groupsheet has multiple authors #}
+        {% if document.multi_author %}
+          {% ifchanged %}<li>{{ poem.byline }}</li>{% endifchanged %}
+        {% endif %}
           <li><a href="#{{ poem.id }}">{{ poem.title|default:'[untitled]' }}</a></li>
         {% endfor %}
-        {# FIXME: section headings for groupsheet with multiple authors ? #}
+
     </ul>
   </div> {# end sidenav #}
 
