@@ -113,8 +113,9 @@ class Command(BaseCommand):
         if all_steps or options['smush']:
             # smush any groupsheets in the data
             self.stdout.write('-- Smushing groupsheet URIs and generating local profile URIs')
-            SmushGroupSheets(graph)
             ProfileUris(graph)
+            # smush after cleaning up so we have reliable access to author names
+            SmushGroupSheets(graph)
 
         if all_steps or options['related']:
             self.stdout.write('-- Annotating graph with related information from VIAF, GeoNames, and DBpedia')
