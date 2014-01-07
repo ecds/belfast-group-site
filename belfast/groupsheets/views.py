@@ -1,3 +1,4 @@
+from collections import defaultdict
 from django.core.urlresolvers import reverse
 from django.db.models import Count
 from django.shortcuts import render
@@ -106,41 +107,23 @@ def list_groupsheets(request):
     # TODO: support source filter; make more django-like
 
     # generate labels/totals for 'facet' filters
-    digital_count = None
-    # if not already filtered on digital, get a count
-    if filter_digital is None:
-        digital_count = len([r for r in results if r.url])
-
-    # filter to group sheets by author
-    authors = {}
-    if filter_author is None:
-        # find authors and calculate totals relative to filtered groupsheets to be returned
-        for r in results:
-            if r.author not in authors:
-                authors[r.author] = 1
-            else:
-                authors[r.author] += 1
-
-    # filter to group sheets by source
-    sources = {}
-    if filter_source is None:
-        for r in results:
+    digital_count = 0
+    authors = defaultdict(int)
+    sources = defaultdict(int)
+    time_periods = defaultdict(int)
+    for r in results:
+       # if not already filtered on digital, get a count
+        if filter_digital is None and r.url:
+            digital_count += 1
+        if filter_author is None:
+            # use author list to ensure *all* authors are listed properly
+            for author in r.author_list:
+                authors[author] += 1
+        if filter_source is None:
             for s in r.sources:
-                if s not in sources:
-                    sources[s] = 1
-                else:
-                    sources[s] += 1
-
-    # filter to group sheets by date
-    time_periods = {}
-    if filter_time is None:
-        # find authors and calculate totals relative to filtered groupsheets to be returned
-        for r in results:
-            if r.coverage not in time_periods:
-                time_periods[r.coverage] = 1
-            else:
-                time_periods[r.coverage] += 1
-    print time_periods
+                sources[s] +=1
+        if filter_time is None:
+            time_periods[r.coverage] += 1
 
     # generate lists of dicts for easy sorting in django template
     authors = [{'author': k, 'total': v} for k, v in authors.iteritems()]
