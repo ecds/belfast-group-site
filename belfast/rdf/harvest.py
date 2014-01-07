@@ -80,7 +80,7 @@ class HarvestRdf(object):
 
         g = self.graph.get_context(url)
         if g and len(g):
-            last_modified = g.value(g.identifier, SCHEMA_ORG.dateModified)
+            last_modified = g.value(g.identifier, rdfns.SCHEMA_ORG.dateModified)
             # TODO: use g.set(triple) to replace; may need to adjust date formats
             try:
                 response = requests.get(url, headers={'if-modified-since': last_modified},
@@ -107,7 +107,7 @@ class HarvestRdf(object):
                 self.errors += 1
                 return
 
-                # last_modified = g.value(g.identifier, SCHEMA_ORG.dateModified)
+                # last_modified = g.value(g.identifier, rdfns.SCHEMA_ORG.dateModified)
                 # TODO: use g.set(triple) to replace
 
         else:
@@ -160,7 +160,7 @@ class HarvestRdf(object):
         # replace schema.org/dateModified with full date-time from http response
         # so we can use it for conditional get when re-harvesting
         if 'last-modified' in response.headers:
-            g.set((g.identifier, SCHEMA_ORG.dateModified, rdflib.Literal(response.headers['last-modified'])))
+            g.set((g.identifier, rdfns.SCHEMA_ORG.dateModified, rdflib.Literal(response.headers['last-modified'])))
 
         # TODO: add graph with context?
         if self.graph is not None:
