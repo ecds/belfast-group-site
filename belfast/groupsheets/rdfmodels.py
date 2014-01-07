@@ -128,6 +128,8 @@ class RdfGroupSheet(RdfResource):
     # simple single-value properties
     date = rdfmap.Value(rdfns.DC.date)
     'date of groupsheet if known; dc:date'
+    coverage = rdfmap.Value(rdfns.DC.coverage)
+    'date range for groupsheet (i.e., first or second period of Belfast Group)'
     num_pages = rdfmap.Value(rdfns.BIBO.numPages)
     'number of pages in this groupsheet, if known; bibo:numPages'
     genre = rdfmap.Value(rdfns.SCHEMA_ORG.genre)
