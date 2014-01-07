@@ -42,7 +42,7 @@
   <div class="col-md-5">
     <h1 property="schema:name">{{ document.title }}</h1>
     <div>
-      <p><strong>Time period</strong>: {{ document.date }}</p>
+      <p><strong>Time period</strong>: <span property="dc:coverage">{{ document.date }}</span></p>
       {# NOTE: using byline from the first poem rather than document.author in order to generate RDF person info #}
       <p><strong>Poet</strong>: {{ document.poems.0.back|format_tei }}</p>
 
