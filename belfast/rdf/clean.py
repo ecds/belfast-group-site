@@ -1,3 +1,4 @@
+import datetime
 import hashlib
 import logging
 import rdflib
@@ -12,7 +13,7 @@ from django.utils.text import slugify
 
 from belfast import rdfns
 from belfast.rdf import rdfmap
-from belfast.util import rdf_data
+from belfast.rdf.qub import QUB
 
 logger = logging.getLogger(__name__)
 
@@ -149,8 +150,16 @@ class SmushGroupSheets(object):
         # - slugify titles so we can ignore discrepancies in case and punctuation
         titles = sorted([slugify(t) for t in titles])
 
-        author = graph.value(uri, rdfns.SCHEMA_ORG.author)
+        author = graph.value(uri, rdfns.DC.creator)
+        # NOTE: for some reason, author is not being found in local graph;
+        # check in the full graph to ensure we get one
+        if author is None:
+            author = self.full_graph.value(uri, rdfns.DC.creator)
+
+        print 'author %s titles %s' % (author, titles)
+
         # blank node for the author is unreliable...
+        # NOTE: possible goes away if running *after* generating local profile uris
         if isinstance(author, rdflib.BNode):
             # This should mostly only occur in Queen's University Belfast,
             # where we don't have URIs but *do* have first & last names.
@@ -293,11 +302,20 @@ class ProfileUris(object):
         # TODO: consider keeping track of total number of replacements to assist with testing
         # (might be inflated due to blank nodes across contexts...)
 
+    # in some cases, there are multiple versions of a name; convert name slug
+    # here to ensure we get a single uri for each person
+    name_conversions = {
+        'hugh-t-bredin': 'hugh-bredin',
+    }
+
     def local_person_uri(self, name):
         # calculate a local uri for a person based on their name
+        slug = slugify(name)
+        if slug in self.name_conversions:
+            slug = self.name_conversions[slug]
         uri = 'http://%s%s' % (
             self.current_site.domain,
-            reverse('people:profile', args=[slugify(name)])
+            reverse('people:profile', args=[slug])
         )
         return uri
 
@@ -428,6 +446,46 @@ class ProfileUris(object):
 
 
 class InferConnections(object):
+    first_period = {  # using cumulative dates for comparison
+        'start': datetime.date(1963, 10, 1),
+        'end': datetime.date(1966, 3, 30),
+        'coverage': '1963-1966'
+
+    }
+    second_period = {
+        'start': datetime.date(1966, 4, 1),
+        'end': datetime.date(1972, 12, 31),
+        'coverage': '1966-1972'
+    }
+    # October 1963-March 1966
+    # Second Period, 1966-1970 & 1971-1972?
+
+    # cases where we can infer date based on the collection it belongs to
+    known_collection_dates = {
+        # Hobsbaum collection at Queen's is labeled 1963-6, first period materials only
+        QUB.QUB_BELFAST_COLLECTION: first_period['coverage'],
+        # Carson collection starts at 1970; we know Carson only involved in second period
+        'http://findingaids.library.emory.edu/documents/carson746/series5/': second_period['coverage'],
+        # Muldoon only involved in second period
+        'http://findingaids.library.emory.edu/documents/muldoon784/series2/subseries2.7/': second_period['coverage'],
+        # Irish Literary Miscellany includes letter about re-forming the group;
+        # all groupsheets in this collection listed in second period on previous version of the site
+        'http://findingaids.library.emory.edu/documents/irishmisc794/': second_period['coverage'],
+        # ormsby groupsheets are all second period
+        'http://findingaids.library.emory.edu/documents/ormsby805/series2/subseries2.2/': second_period['coverage']
+    }
+
+    # possible other ways to infer:
+    # tom mcgurk seems to be all second period
+    # hugh bredin all first
+    # maurice gallagher not in hobsbaum collection -> second period
+
+
+
+    # need to recognize dates in the following formats: YYYY, YYYY-MM-DD, or YYYY/YYYY
+    # year_re = re.compile('^\d{4}$')
+    # yearmonthday_re = re.compile('^(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})$')
+    date_re = re.compile('^(?P<year>\d{4})(-(?P<month>\d{2})-(?P<day>\d{2}))?(/(?P<year2>\d{4}))?$')
 
     def __init__(self, graph):
 
@@ -440,6 +498,41 @@ class InferConnections(object):
         if len(ms) == 0:
             return
 
+        # calculate or infer if ms belongs to first or second period of the group
+        for m in ms:
+            # if coverage is already present (e.g., from TEI groupsheet or previous calculation),
+            # nothing needs to be done
+            coverage = graph.value(m, rdfns.DC.coverage)
+            if coverage is not None:
+                continue
+
+            date = graph.value(m, rdfns.DC.date)
+            # if date is known, check which period it falls into and assign dc:coverage accordingly
+
+            if date:
+                print 'ms %s date %s coverage %s' % (m, date, coverage)
+                match = self.date_re.match(date)
+                if match:
+                    info = match.groupdict()
+                    d = datetime.date(int(info['year']),
+                        int(info['month'] or 1),
+                        int(info['day'] or 1))
+
+                    if self.first_period['start'] < d < self.first_period['end']:
+                        graph.set((m, rdfns.DC.coverage, rdflib.Literal(self.first_period['coverage'])))
+                    elif self.second_period['start'] < d < self.second_period['end']:
+                        graph.set((m, rdfns.DC.coverage, rdflib.Literal(self.second_period['coverage'])))
+
+            # If date is not known but part of Hobsbaum collection, infer first period
+            elif str(graph.identifier) in self.known_collection_dates:
+                graph.set((m, rdfns.DC.coverage,
+                          rdflib.Literal(self.known_collection_dates[str(graph.identifier)])))
+            else:
+                print 'no date for %s context %s' % (m, graph.identifier)
+
+            # TODO: figure out how to handle remaining ms
+
+        # find authors of groupsheets and associate them with the Belfast Group
         res = graph.query('''
                 PREFIX schema: <%(schema)s>
                 PREFIX rdf: <%(rdf)s>
@@ -458,5 +551,8 @@ class InferConnections(object):
             bg_assoc = (r['author'], rdfns.SCHEMA_ORG.affiliation, rdflib.URIRef(rdfns.BELFAST_GROUP_URI))
             if bg_assoc not in graph:
                 graph.add(bg_assoc)
+
+
+
 
 
