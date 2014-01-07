@@ -46,9 +46,10 @@ class Resource(object):
         if self.is_object:
             rel = obj.value(self.predicate)
         else:
-            rel = obj.subjects(self.predicate)
+            # could be multiple; for now just grab the first one
+            rel = list(obj.subjects(self.predicate))[0]
         if rel:
-            return self.resource_type(obj.graph, rel.identifier)
+            return self.resource_type(obj.graph, rel)
 
 
 class ResourceList(object):

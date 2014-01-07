@@ -10,7 +10,7 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 
-# TODO: consilidate with version somewhere in belfast.rdf
+# TODO: consolidate with version somewhere in belfast.rdf
 def normalize_whitespace(str):
     return re.sub(r'\s+', ' ', str.strip())
 

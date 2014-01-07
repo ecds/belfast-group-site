@@ -119,12 +119,31 @@ class TeiGroupSheet(XmlModel):
 
 # TBD: how do groupsheet and people apps share rdf models?
 
+class RdfDocument(RdfResource):
+    part_of = rdfmap.Resource(rdfns.DC.isPartOf, RdfResource)
+
+
 class RdfArchivalCollection(RdfResource):
     '''RDF :class:`~rdflib.resource.Resource` for an archival collection. '''
     rdf_type = rdfns.ARCH.Collection
     'expected rdf:type for this class'
 
     # inherits standard name property
+
+    # access to the webpage/findingaid that describes this collection
+    # (NOTE: in at least one case, collection id does NOT resolve to findingaid)
+    documents = rdfmap.ResourceList(rdfns.SCHEMA_ORG.about, RdfDocument,
+                                    is_object=False)
+    @property
+    def access_url(self):
+        # subseries are part of primary findingaid docuent, so if there
+        # is a partOf rel use that uri, otherwise use document uri
+        for d in self.documents:
+            return d.part_of or d
+
+        # fallback access (should only apply to QUB collection)
+        return self.identifier
+
 
 
 class RdfGroupSheet(RdfResource):
@@ -172,8 +191,7 @@ def groupsheet_by_url(url):
     logger.debug('Found %d group sheet for url %s in %.02f sec' % (
                  len(uris), url, time.time() - start))
     # type should be rdfns.BG.GroupSheet, but probably don't need to confirm...
-    if uris:
-        return RdfGroupSheet(g, uris[0])
+    return [RdfGroupSheet(g, u) for u in uris]
 
 
 def get_rdf_groupsheets(author=None, has_url=None, source=None, coverage=None):

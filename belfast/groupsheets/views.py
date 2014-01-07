@@ -40,10 +40,10 @@ def view_sheet(request, id):
     except DoesNotExist:
         raise Http404
 
-    # find the related rdf groupsheet object
+    # find the related rdf groupsheet object(s)
     # so we can display & link to sources
     rdfgs = groupsheet_by_url(gs.ark)  # todo: associate with tei or rdf gs model
-    sources = rdfgs.sources if rdfgs else {}
+    sources = [s for r in rdfgs for s in r.sources]
 
     context.update({'document': gs,
                    'page_rdf_url': getattr(gs, 'ark', None),
