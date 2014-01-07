@@ -97,6 +97,11 @@ def list_groupsheets(request):
         # currently arg is the uri
         filters['source'] = filter_source
 
+    filter_time = request.GET.get('dates', None)
+    if filter_time is not None:
+        url_args['dates'] = filter_time
+        filters['coverage'] = filter_time
+
     results = get_rdf_groupsheets(**filters)
     # TODO: support source filter; make more django-like
 
@@ -126,11 +131,25 @@ def list_groupsheets(request):
                 else:
                     sources[s] += 1
 
+    # filter to group sheets by date
+    time_periods = {}
+    if filter_time is None:
+        # find authors and calculate totals relative to filtered groupsheets to be returned
+        for r in results:
+            if r.coverage not in time_periods:
+                time_periods[r.coverage] = 1
+            else:
+                time_periods[r.coverage] += 1
+    print time_periods
+
     # generate lists of dicts for easy sorting in django template
     authors = [{'author': k, 'total': v} for k, v in authors.iteritems()]
     sources = [{'source': k, 'total': v} for k, v in sources.iteritems()]
+    time_periods = [{'time_period': k, 'total': v} for k, v in time_periods.iteritems()]
 
-    facets = {'digital': digital_count, 'authors': authors, 'sources': sources}
+    facets = {'digital': digital_count, 'authors': authors, 'sources': sources,
+              'time_periods': time_periods}
+
     url_suffix = ''
     url_suffix = urllib.urlencode(url_args)
     # if not empty, prepend & for easy combination with other url args
@@ -168,6 +187,12 @@ def list_groupsheets(request):
                 if str(s.identifier) == filter_source:
                     filters[s.name] = '?' + urllib.urlencode(args)
                     break
+
+    if filter_time is not None:
+        args = url_args.copy()
+        del args['dates']
+        filters[filter_time] = '?' + urllib.urlencode(args)
+
 
     return render(request, 'groupsheets/list.html',
                   {'documents': results, 'facets': facets,

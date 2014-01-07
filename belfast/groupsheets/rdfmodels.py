@@ -170,7 +170,7 @@ def groupsheet_by_url(url):
         return RdfGroupSheet(g, uris[0])
 
 
-def get_rdf_groupsheets(author=None, has_url=None, source=None):
+def get_rdf_groupsheets(author=None, has_url=None, source=None, coverage=None):
     # query rdf data to get a list of belfast group sheets
     # optionally filter by author (takes a URI)
     start = time.time()
@@ -184,6 +184,13 @@ def get_rdf_groupsheets(author=None, has_url=None, source=None):
 
     if source is not None:
         fltr += '. <%s> schema:mentions ?ms' % source
+
+    if coverage is not None:
+        if coverage == 'undetermined':
+            # TEMPORARY: hopefully we don't actually need to support this...
+            fltr += ' FILTER NOT EXISTS { ?ms dc:coverage ?date } '
+        else:
+            fltr += '. ?ms dc:coverage "%s"' % coverage
 
     query = '''
         PREFIX schema: <%(schema)s>

@@ -24,6 +24,15 @@
     <p><a href="?edition=digital{{ url_suffix }}">digital editions</a> ({{ facets.digital }})</p>
     {% endif %}
 
+    {% if facets.time_periods %}
+    <p><b>Time Period</b></p>
+    <ul>
+        {% for f in facets.time_periods|dictsort:"time_period" %}
+        <li><a href="?dates={{ f.time_period|default:"undetermined" }}{{ url_suffix }}">{{ f.time_period|default:"Undetermined" }}</a> ({{ f.total }})</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
     {% if facets.authors %}
     <p><b>Author</b></p>
     <ul>
