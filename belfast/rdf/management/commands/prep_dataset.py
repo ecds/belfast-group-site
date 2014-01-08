@@ -126,7 +126,7 @@ class Command(BaseCommand):
 
         if all_steps or options['connect']:
             # infer connections
-            self.stdout.write('-- Inferring connections: groupsheet authors affiliated with group')
+            self.stdout.write('-- Inferring connections: groupsheet time period, owner, authors affiliated with group')
             InferConnections(graph)
             # TODO: groupsheet owner based on source collection
 

@@ -468,6 +468,7 @@ class InferConnections(object):
     date_re = re.compile('^(?P<year>\d{4})(-(?P<month>\d{2})-(?P<day>\d{2}))?(/(?P<year2>\d{4}))?$')
 
     def __init__(self, graph):
+        self.full_graph = graph
 
         for ctx in graph.contexts():
             self.process_graph(ctx)
@@ -478,49 +479,19 @@ class InferConnections(object):
         if len(ms) == 0:
             return
 
-        # calculate or infer if ms belongs to first or second period of the group
+        # *** group sheet specific information: time period, owner
         for m in ms:
-            # if coverage is already present (e.g., from TEI groupsheet or previous calculation),
-            # nothing needs to be done
-            coverage = graph.value(m, rdfns.DC.coverage)
-            if coverage is not None:
-                continue
+            # calculate time period for group sheet
+            self.time_period(m, graph)
+            # infer ownership of groupsheet copies based on archival collection
+            self.ownership(m, graph)
 
-            date = graph.value(m, rdfns.DC.date)
-            # if date is known, check which period it falls into and assign dc:coverage accordingly
-
-            if date:
-                match = self.date_re.match(date)
-                if match:
-                    info = match.groupdict()
-                    d = datetime.date(int(info['year']),
-                        int(info['month'] or 1),
-                        int(info['day'] or 1))
-
-                    if self.first_period['start'] < d < self.first_period['end']:
-                        graph.set((m, rdfns.DC.coverage, rdflib.Literal(self.first_period['coverage'])))
-                    elif self.second_period['start'] < d < self.second_period['end']:
-                        graph.set((m, rdfns.DC.coverage, rdflib.Literal(self.second_period['coverage'])))
-
-            # If date is not known but part of Hobsbaum collection, infer first period
-            # (Hobsbaum collection at Queen's is labeled 1963-6; first period materials only)
-            elif str(graph.identifier) == QUB.QUB_BELFAST_COLLECTION:
-                graph.set((m, rdfns.DC.coverage,
-                          rdflib.Literal(self.first_period['coverage'])))
-
-            # Hobsbaum collection is *very* complete for first period
-            # so if not known and not Hobsbaum, infer second period
-            else:
-                graph.set((m, rdfns.DC.coverage,
-                          rdflib.Literal(self.second_period['coverage'])))
-
-
-        # find authors of groupsheets and associate them with the Belfast Group
+        # *** find authors of groupsheets and explicitly associate them with the Belfast Group
         res = graph.query('''
                 PREFIX schema: <%(schema)s>
                 PREFIX rdf: <%(rdf)s>
                 PREFIX bg: <%(bg)s>
-                SELECT ?author
+                SELECT DISTINCT ?author
                 WHERE {
                     ?ms schema:author ?author .
                     ?ms rdf:type bg:GroupSheet
@@ -535,6 +506,72 @@ class InferConnections(object):
             if bg_assoc not in graph:
                 graph.add(bg_assoc)
 
+    def time_period(self, ms, graph):
+        # determine whether a groupsheet is first or second period
+        # and store the corresponding dates for that period in the rdf
+
+        # if coverage is already present (e.g., from TEI groupsheet or previous calculation),
+        # nothing needs to be done
+        coverage = graph.value(ms, rdfns.DC.coverage)
+        if coverage is not None:
+            return
+
+        date = graph.value(ms, rdfns.DC.date)
+        # if date is known, check which period it falls into and assign dc:coverage accordingly
+        if date:
+            match = self.date_re.match(date)
+            if match:
+                info = match.groupdict()
+                d = datetime.date(int(info['year']),
+                    int(info['month'] or 1),
+                    int(info['day'] or 1))
+
+                if self.first_period['start'] < d < self.first_period['end']:
+                    graph.set((ms, rdfns.DC.coverage, rdflib.Literal(self.first_period['coverage'])))
+                elif self.second_period['start'] < d < self.second_period['end']:
+                    graph.set((ms, rdfns.DC.coverage, rdflib.Literal(self.second_period['coverage'])))
+
+        # If date is not known but part of Hobsbaum collection, infer first period
+        # (Hobsbaum collection at Queen's is labeled 1963-6; first period materials only)
+        elif str(graph.identifier) == QUB.QUB_BELFAST_COLLECTION:
+            graph.set((ms, rdfns.DC.coverage,
+                      rdflib.Literal(self.first_period['coverage'])))
+
+        # Hobsbaum collection is *very* complete for first period
+        # so if not known and not Hobsbaum, infer second period
+        else:
+            graph.set((ms, rdfns.DC.coverage,
+                      rdflib.Literal(self.second_period['coverage'])))
+
+    def ownership(self, ms, graph):
+        # if possible, infer ownership of a manuscript based on the archival
+        # collection it came from
+        collection = list(self.full_graph.subjects(rdfns.SCHEMA_ORG.mentions, ms))
+        for c in collection:
+            types = list(self.full_graph.objects(c, rdflib.RDF.type))
+            if rdfns.ARCH.Collection not in types:
+                continue
+
+            # the *creator* of the archival collection is the person
+            # who collected and owned the materials before they were donated
+            # to the archive
+            # therefore, inferring that collection creator owned the
+            # groupsheets that are included in that collection
+
+            creator = graph.value(c, rdfns.SCHEMA_ORG.creator)
+            # may not be in the current context, so check full graph in case
+            if not creator:
+                creator = self.full_graph.value(c, rdfns.SCHEMA_ORG.creator)
+
+            # not all collections have a creator
+            if creator:
+                # NOTE: this identifier is most likely a VIAF URI;
+                # we probably want to use the local profile uri instead;
+                # consider usingsame-as rel to find?
+
+                # using schema.org owns rel here - intended for product ownership,
+                # but seems to be close enough for our purposes
+                graph.set((creator, rdfns.SCHEMA_ORG.owns, ms))
 
 
 

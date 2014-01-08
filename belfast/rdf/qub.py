@@ -93,6 +93,8 @@ class QUB(object):
         g.add((coll, rdfns.SCHEMA_ORG.name, rdflib.Literal(doc.body.h1.text)))
         g.add((coll, rdfns.SCHEMA_ORG.description, rdflib.Literal(doc.body.find(id='about').text)))
         g.add((coll, rdfns.SCHEMA_ORG.about, rdflib.URIRef(self.NAME_URIS['Belfast Group'])))
+        # set Hobsbaum as collection creator since these were his materials
+        g.add((coll, rdfns.SCHEMA_ORG.creator, rdflib.URIRef(self.NAME_URIS['Hobsbaum, Philip'])))
 
         # TODO: add information about owning archive ?
         # queen's u belfast mentions some collections are in archives hub... doesn't seem to include this one

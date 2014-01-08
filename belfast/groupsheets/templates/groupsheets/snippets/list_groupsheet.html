@@ -25,3 +25,9 @@
         {% endfor %}</small>
   </p>
 {% endif %}
+{% comment %}  TESTING: display inferred owner based on collection
+{% if doc.owners %}
+<p><b>owners:</b>
+{% for o in doc.owners %}{{ o.name }}{% if not forloop.last %}; {% endif %}{% endfor %}
+</p>{% endif %}
+{% endcomment %}

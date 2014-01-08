@@ -185,6 +185,8 @@ class RdfGroupSheet(RdfResource):
     sources = rdfmap.ResourceList(rdfns.SCHEMA_ORG.mentions, RdfArchivalCollection,
                                   is_object=False)
 
+    owners= rdfmap.ResourceList(rdfns.SCHEMA_ORG.owns, RdfPerson,
+                                  is_object=False)
 
 def groupsheet_by_url(url):
     start = time.time()
