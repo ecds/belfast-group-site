@@ -67,7 +67,8 @@ class Command(BaseCommand):
 
     QUB_input = os.path.join(settings.BASE_DIR, 'rdf', 'fixtures', 'QUB_ms1204.html')
     # FIXME: can we find a better url for the Queen's Belfast Group collection ?
-    QUB_URL = 'http://www.qub.ac.uk/directorates/InformationServices/TheLibrary/FileStore/Filetoupload,312673,en.pdf'
+    # QUB_URL = 'http://www.qub.ac.uk/directorates/InformationServices/TheLibrary/FileStore/Filetoupload,312673,en.pdf'
+    # NOTE: using version defined on the QUB class (currently same url)
 
     def handle(self, *args, **options):
         self.verbosity = options['verbosity']
@@ -103,7 +104,8 @@ class Command(BaseCommand):
 
         if all_steps or options['queens']:
             self.stdout.write('-- Converting Queens University Belfast Group collection description to RDF')
-            QUB(self.QUB_input, verbosity=0, graph=graph, url=self.QUB_URL)
+            QUB(self.QUB_input, verbosity=self.verbosity, graph=graph,
+                url=QUB.QUB_BELFAST_COLLECTION)
 
         if all_steps or options['identify']:
             # identify groupsheets in the data and add local groupsheet type if not present
@@ -113,9 +115,10 @@ class Command(BaseCommand):
         if all_steps or options['smush']:
             # smush any groupsheets in the data
             self.stdout.write('-- Smushing groupsheet URIs and generating local profile URIs')
-            ProfileUris(graph)
-            # smush after cleaning up so we have reliable access to author names
+            # NOTE: might be nice to smush *after* cleaning up author names, but for some reason
+            # that results in a number of authors/groupsheets getting dropped
             SmushGroupSheets(graph)
+            ProfileUris(graph)
 
         if all_steps or options['related']:
             self.stdout.write('-- Annotating graph with related information from VIAF, GeoNames, and DBpedia')
