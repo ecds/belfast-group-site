@@ -50,6 +50,7 @@
       {# NOTE: using byline from the first poem rather than document.author in order to generate RDF person info #}
       <p><strong>Poet{{ document.authors|pluralize }}</strong>:
           {% for author in document.authors %}{{ author|format_tei}}{% if not forloop.last %}; {% endif %}{% endfor %}
+        </p>
       {% if document.ark %}
       <p><strong>Permanent URL</strong>:
           <a href="{{ document.ark }}" rel="bookmark schema:URL">{{ document.ark }}</a></p>
