@@ -38,7 +38,7 @@
 
 {% if person.description %}
  <p class="description">{{ person.description }}
-    <small><i>(MARBL)</i></small> {# should be safe to assume for now ... #}
+    <small><i>(<a href="{{ person.description_context }}">{{ person.desc_context_name }}</a>)</i></small> {# should be safe to assume for now ... #}
     {# TODO: should really link to the findingaids where the description comes from #}
  </p>
 {% endif %}

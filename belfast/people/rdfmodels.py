@@ -192,9 +192,42 @@ class RdfPerson(RdfEntity):
     occupation = rdfmap.ValueList(rdfns.SCHEMA_ORG.jobTitle)
     description = rdfmap.Value(rdfns.SCHEMA_ORG.description)
 
+    @property
+    def description_context(self):
+        # find the identifier for the document where the description of this
+        # person comes from
+        # NOTE: Using triples here because description text doesn't match (loses lang?)
+        triples = list(self.graph.triples((self.identifier, rdfns.SCHEMA_ORG.description, None)))
+        # there should only be one triple
+        if triples:
+            # and there should only be one context
+            contexts = list(self.graph.contexts(triple=triples[0]))
+            if contexts:
+                ctx = contexts[0]
+
+                # FIXME: for some reason the rdf types don't seem to be in the correct context;
+                # should be able to query by type if they were
+                # list(ctx[0].subjects(rdflib.RDF.type, rdfns.SCHEMA_ORG.WebPage))
+                # list(ctx[0].subjects(rdflib.RDF.type, rdfns.ARCH.Collection))
+
+                # as a work-around, find things that are *about* this person and
+                # then filter to make sure we return the correct url
+                about = list(ctx.subjects(rdfns.SCHEMA_ORG.about, self.identifier))
+                for a in about:
+                    # might be niceto use archival collection object from groupsheet models
+                    # (currently that would be a circular import)
+                    if (a, rdflib.RDF.type, rdfns.SCHEMA_ORG.WebPage) in self.graph:
+                        return self.graph.value(a, rdfns.DC.isPartOf) or a
+
+    @property
+    def desc_context_name(self):
+        # for some reason, context uri is coming through as a literal instead;
+        # perhaps because it is being found via isPartOf rel?
+        desc_context = rdflib.URIRef(self.description_context)
+        return self.graph.value(desc_context, rdfns.SCHEMA_ORG.name)
+
     work_locations = rdfmap.ResourceList(rdfns.SCHEMA_ORG.workLocation, RdfLocation)
     home_locations = rdfmap.ResourceList(rdfns.SCHEMA_ORG.homeLocation, RdfLocation)
-
 
     @property
     def locations(self):
