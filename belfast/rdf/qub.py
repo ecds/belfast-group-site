@@ -1,5 +1,5 @@
+from collections import defaultdict
 import re
-import os.path
 import rdflib
 from rdflib.collection import Collection as RdfCollection
 from bs4 import BeautifulSoup
@@ -60,6 +60,14 @@ class QUB(object):
             graph = rdflib.ConjunctiveGraph()
         self.graph = graph
 
+        # keep track of total number of manuscripts and unique authors,
+        # for reporting on what was done
+        ms_total = 0
+        authors = defaultdict(int)
+
+        # make sure verbosity is an int rather than a string for comparisons
+        verbosity = int(verbosity)
+
         # if this context already exists in the conjunctive graph,
         # remove it to avoid duplicating data
         g = self.graph.get_context(url)
@@ -92,36 +100,50 @@ class QUB(object):
 
         for div in doc.find_all('div'):
             # only include typescript content (should be all but one)
-            if 'Typescript' not in div.text:
-                continue
+            # if 'Typescript' not in div.text:
+            #     continue
 
             # create a blank node for the manuscript object
             msnode = rdflib.BNode()
             g.add((coll, rdfns.SCHEMA_ORG.mentions, msnode))
             g.add((msnode, rdflib.RDF.type, rdfns.BIBO.Manuscript))
             g.add((msnode, rdflib.RDF.type, rdfns.BG.GroupSheet))
+            ms_total += 1
 
             content = list(div.stripped_strings)
             first_line = content[0]
             # first line should start with the author's name (if known)
-            name_match = self.NAME_REGEX.match(first_line)
-            if name_match:
-                last_name = name_match.group('last').strip()
-                first_name = name_match.group('first').strip()
-                name_key = '%s, %s' % (last_name, first_name)
-                full_name = '%s %s' % (first_name, last_name)
-                # use known URI if possible
-                if name_key in self.NAME_URIS:
-                    author = rdflib.URIRef(self.NAME_URIS[name_key])
-                else:
-                    author = rdflib.BNode()
+            # second line *may* include a secondary author, but
+            # because we don't know exactly where the second line starts, check all content
+            for line in content:
+                name_match = self.NAME_REGEX.match(line)
+                if name_match:
+                    last_name = name_match.group('last').strip()
+                    # in some cases the 'Typescript, #pp' looks like a name; exclude
+                    if last_name.lower() == 'typescript':
+                        continue
 
-                # relate person to manuscript as author, include name information
-                g.add((msnode, rdfns.DC.creator, author))
-                g.add((author, rdfns.rdflib.RDF.type, rdfns.SCHEMA_ORG.Person))
-                g.add((author, rdfns.SCHEMA_ORG.name, rdflib.Literal(full_name)))
-                g.add((author, rdfns.SCHEMA_ORG.familyName, rdflib.Literal(last_name)))
-                g.add((author, rdfns.SCHEMA_ORG.givenName, rdflib.Literal(first_name)))
+                    first_name = name_match.group('first').strip()
+                    name_key = '%s, %s' % (last_name, first_name)
+                    full_name = '%s %s' % (first_name, last_name)
+                    # use known URI if possible
+                    if name_key in self.NAME_URIS:
+                        author = rdflib.URIRef(self.NAME_URIS[name_key])
+                    else:
+                        author = rdflib.BNode()
+
+                    # relate person to manuscript as author, include name information
+                    g.add((msnode, rdfns.DC.creator, author))
+                    g.add((author, rdfns.rdflib.RDF.type, rdfns.SCHEMA_ORG.Person))
+                    g.add((author, rdfns.SCHEMA_ORG.name, rdflib.Literal(full_name)))
+                    g.add((author, rdfns.SCHEMA_ORG.familyName, rdflib.Literal(last_name)))
+                    g.add((author, rdfns.SCHEMA_ORG.givenName, rdflib.Literal(first_name)))
+
+                    if verbosity > 1:
+                        print 'Author: %s' % full_name
+
+                    authors[full_name] += 1
+
 
             # A *few* items include a date; add it to the RDF when present
             last_line = content[-1]
@@ -168,6 +190,9 @@ class QUB(object):
 
                     titles.append(title)
 
+            if titles and verbosity > 1:
+                print 'Titles: %s' % ', '.join(titles)
+
             # if only one title, no parts
             if len(titles) == 1:
                 title = rdflib.Literal(titles[0])
@@ -180,20 +205,9 @@ class QUB(object):
                 g.add((msnode, rdfns.DC.title, title_node))
             # if untitled, no dc:title should be added
 
+        # report on what was done
+        if verbosity >= 1:
+            print 'Identified %d manuscripts by %d authors' % (ms_total,
+                len(authors.keys()))
 
-        if self.graph is not None:
-            pass
-            # self.graph.addN([(s, p, o, url) for s, p, o in g])
 
-        else:
-            # use input filename as base, but generate as .fmt in current directory
-            basename, ext = os.path.splitext(os.path.basename(file))
-            filename = '%s.%s' % (basename, output_format)
-            if output_dir is not None:
-                filename = os.path.join(output_dir, filename)
-
-            if verbosity >= 1:
-                print 'Saving as %s' % filename
-
-            with open(filename, 'w') as datafile:
-                g.serialize(datafile, format=output_format)
