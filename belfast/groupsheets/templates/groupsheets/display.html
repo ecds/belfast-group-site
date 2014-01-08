@@ -48,7 +48,7 @@
     <div>
       <p><strong>Time period</strong>: <span property="dc:coverage">{{ document.date }}</span></p>
       {# NOTE: using byline from the first poem rather than document.author in order to generate RDF person info #}
-      <p><strong>Poet</strong>:
+      <p><strong>Poet{{ document.authors|pluralize }}</strong>:
           {% for author in document.authors %}{{ author|format_tei}}{% if not forloop.last %}; {% endif %}{% endfor %}
       {% if document.ark %}
       <p><strong>Permanent URL</strong>:
