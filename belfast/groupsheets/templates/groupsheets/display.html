@@ -43,13 +43,13 @@
     </ul>
   </div> {# end sidenav #}
 
-  <div class="col-md-5">
+  <div class="col-md-7">
     <h1 property="schema:name">{{ document.title }}</h1>
     <div>
       <p><strong>Time period</strong>: <span property="dc:coverage">{{ document.date }}</span></p>
       {# NOTE: using byline from the first poem rather than document.author in order to generate RDF person info #}
-      <p><strong>Poet</strong>: {{ document.poems.0.back|format_tei }}</p>
-
+      <p><strong>Poet</strong>:
+          {% for author in document.authors %}{{ author|format_tei}}{% if not forloop.last %}; {% endif %}{% endfor %}
       {% if document.ark %}
       <p><strong>Permanent URL</strong>:
           <a href="{{ document.ark }}" rel="bookmark schema:URL">{{ document.ark }}</a></p>

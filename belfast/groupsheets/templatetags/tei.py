@@ -53,8 +53,9 @@ def format_name(node):
     uri = node.get('ref')
     # for now, use mentions as a catch-all relation between text and name
     rel = 'schema:mentions'
-    # if name is inside a byline, rel is author
-    if node.getparent().tag == '{%s}byline' % TEI_NAMESPACE:
+    # if name is inside a byline or docAuthor, rel is author
+    author_tags = ['{%s}%s' % (TEI_NAMESPACE, tag) for tag in ['byline', 'docAuthor']]
+    if node.getparent().tag in author_tags:
         rel = 'schema:author'
 
     # TODO: or if no ref?

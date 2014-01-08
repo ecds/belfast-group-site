@@ -78,9 +78,11 @@ class TeiGroupSheet(XmlModel):
     id = xmlmap.StringField('@xml:id')
     title = xmlmap.StringField('tei:head')
     author = xmlmap.StringField('tei:docAuthor')
+    # map as node to allow exposing name info as RDFa
+    authors = xmlmap.NodeListField('tei:docAuthor', xmlmap.XmlObject)
     date = xmlmap.StringField('tei:docDate')
     toc = xmlmap.NodeField('tei:argument', Contents)
-    # in one case, list of Contents sectiosn (multiple authors in a single sheet)
+    # in one case, list of Contents sections (multiple authors in a single sheet)
     toc_list = xmlmap.NodeListField('tei:argument', Contents)
 
     poems = xmlmap.NodeListField('tei:text', Poem)
@@ -230,6 +232,7 @@ def get_rdf_groupsheets(author=None, has_url=None, source=None, coverage=None):
         ''' % {'schema': rdfns.SCHEMA_ORG, 'dc': rdfns.DC,
                'rdf': rdflib.RDF, 'bg': rdfns.BG.GroupSheet,
                'filter': fltr}
+    # TODO: use OPTIONAL {...} for author/name to include anonymous groupsheet?
 
     logger.debug(query)
     res = g.query(query)
