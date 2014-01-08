@@ -153,10 +153,8 @@ class SmushGroupSheets(object):
         author = graph.value(uri, rdfns.DC.creator)
         # NOTE: for some reason, author is not being found in local graph;
         # check in the full graph to ensure we get one
-        if author is None:
-            author = self.full_graph.value(uri, rdfns.DC.creator)
-
-        print 'author %s titles %s' % (author, titles)
+        # if author is None:
+        #     author = self.full_graph.value(uri, rdfns.DC.creator)
 
         # blank node for the author is unreliable...
         # NOTE: possible goes away if running *after* generating local profile uris
@@ -176,6 +174,7 @@ class SmushGroupSheets(object):
         # if not at least one title or title and author, skip this ms
         if not titles and not author:
             return
+        logger.debug('author %s titles %s' % (author, titles))
 
         m = hashlib.md5()
         if author is None:
@@ -369,6 +368,9 @@ class ProfileUris(object):
         # generate local URIs for people in the group, and make sure we have
         # first and last names for everyone (where possible)
 
+        # TODO: add more verbose output so it is easier to tell what is happening
+        # and where things are going wrong when people get lost
+
         ctx_uris = {}
         fullgraph_uris = {}
         people = self.belfast_group_people(graph)
@@ -460,28 +462,6 @@ class InferConnections(object):
     # October 1963-March 1966
     # Second Period, 1966-1970 & 1971-1972?
 
-    # cases where we can infer date based on the collection it belongs to
-    known_collection_dates = {
-        # Hobsbaum collection at Queen's is labeled 1963-6, first period materials only
-        QUB.QUB_BELFAST_COLLECTION: first_period['coverage'],
-        # Carson collection starts at 1970; we know Carson only involved in second period
-        'http://findingaids.library.emory.edu/documents/carson746/series5/': second_period['coverage'],
-        # Muldoon only involved in second period
-        'http://findingaids.library.emory.edu/documents/muldoon784/series2/subseries2.7/': second_period['coverage'],
-        # Irish Literary Miscellany includes letter about re-forming the group;
-        # all groupsheets in this collection listed in second period on previous version of the site
-        'http://findingaids.library.emory.edu/documents/irishmisc794/': second_period['coverage'],
-        # ormsby groupsheets are all second period
-        'http://findingaids.library.emory.edu/documents/ormsby805/series2/subseries2.2/': second_period['coverage']
-    }
-
-    # possible other ways to infer:
-    # tom mcgurk seems to be all second period
-    # hugh bredin all first
-    # maurice gallagher not in hobsbaum collection -> second period
-
-
-
     # need to recognize dates in the following formats: YYYY, YYYY-MM-DD, or YYYY/YYYY
     # year_re = re.compile('^\d{4}$')
     # yearmonthday_re = re.compile('^(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})$')
@@ -510,7 +490,6 @@ class InferConnections(object):
             # if date is known, check which period it falls into and assign dc:coverage accordingly
 
             if date:
-                print 'ms %s date %s coverage %s' % (m, date, coverage)
                 match = self.date_re.match(date)
                 if match:
                     info = match.groupdict()
@@ -524,13 +503,17 @@ class InferConnections(object):
                         graph.set((m, rdfns.DC.coverage, rdflib.Literal(self.second_period['coverage'])))
 
             # If date is not known but part of Hobsbaum collection, infer first period
-            elif str(graph.identifier) in self.known_collection_dates:
+            # (Hobsbaum collection at Queen's is labeled 1963-6; first period materials only)
+            elif str(graph.identifier) == QUB.QUB_BELFAST_COLLECTION:
                 graph.set((m, rdfns.DC.coverage,
-                          rdflib.Literal(self.known_collection_dates[str(graph.identifier)])))
-            else:
-                print 'no date for %s context %s' % (m, graph.identifier)
+                          rdflib.Literal(self.first_period['coverage'])))
 
-            # TODO: figure out how to handle remaining ms
+            # Hobsbaum collection is *very* complete for first period
+            # so if not known and not Hobsbaum, infer second period
+            else:
+                graph.set((m, rdfns.DC.coverage,
+                          rdflib.Literal(self.second_period['coverage'])))
+
 
         # find authors of groupsheets and associate them with the Belfast Group
         res = graph.query('''
