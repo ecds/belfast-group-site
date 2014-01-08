@@ -14,12 +14,17 @@ logger = logging.getLogger(__name__)
 def normalize_whitespace(str):
     return re.sub(r'\s+', ' ', str.strip())
 
+_rdf_data = None
 
 def rdf_data():
-    # method to get a copy of the conjunctive graph with rdf data for the site
-    data = rdflib.ConjunctiveGraph('Sleepycat')
-    data.open(settings.RDF_DATABASE)
-    return data
+    global _rdf_data
+    # TODO: check if there is a way to open this read-only?
+    # only requires read access for normal site operation
+    if _rdf_data is None:
+        # method to get a copy of the conjunctive graph with rdf data for the site
+        _rdf_data = rdflib.ConjunctiveGraph('Sleepycat')
+        _rdf_data.open(settings.RDF_DATABASE)
+    return _rdf_data
 
 # TODO: determine how to generate last-modified dates for refactored RDF
 # handling within the site
@@ -64,3 +69,4 @@ class cached_property(object):
             return self
         obj.__dict__[self.__name__] = result = self.fget(obj)
         return result
+
