@@ -3,6 +3,7 @@
 from datetime import datetime
 import os
 import rdflib
+import re
 import requests
 import SPARQLWrapper
 import sys
@@ -241,9 +242,17 @@ class Annotate(object):
         self.viaf_people()
         self.dbpedia_people()
 
+    # regex to pull geonames id from a geonames uri
+    # geonames uris should look roughly like:
+    #   http://www.geonames.org/2638360/
+    # - some have sws instead of www; may not have trailing slash or could have /name.html
+    geonames_id = re.compile('^http://[a-z]+.geonames.org/(?P<id>\d+)/?')
+
     def places(self):
         # not sure what graph context makes the most sense, so grouping by source
         context = self.graph.get_context('http://geonames.org/')
+        # FIXME: for geonames use ###/about.rdf instead?
+        # and probably should pull default title/name
 
         start = datetime.now()
         res = self.graph.query('''
@@ -253,11 +262,12 @@ class Annotate(object):
             SELECT DISTINCT ?uri
             WHERE {
                 ?uri rdf:type schema:Place .
-                FILTER NOT EXISTS {?uri geo:lat ?lat}
+
             }
             ''' % {'schema': rdfns.SCHEMA_ORG, 'rdf': rdflib.RDF,
                    'geo': rdfns.GEO}
         )
+                        # FILTER NOT EXISTS {?uri geo:lat ?lat}
         logger.info('Found %d places without lat/long in %s' % \
                     (len(res), datetime.now() - start))
 
@@ -276,19 +286,29 @@ class Annotate(object):
                 # skip (should be able to check for bnode type instead?)
                 continue
 
+            match = self.geonames_id.match(uri)
+            geonames_id = match.groupdict()['id'] if match else None
+
             if not self.graph.value(uri, rdfns.GEO.lat):
                 try:
                     g = rdflib.Graph()
-                    data = requests.get(uri, headers={'accept': 'application/rdf+xml'})
+                    # ought to be able to use content-negotation for any of
+                    # these uris (geonames or dbpedia), but that errors on a
+                    # handful of geonames documents
+                    if geonames_id is not None:
+                        rdf_url = 'http://www.geonames.org/%s/about.rdf' % geonames_id
+                    else:
+                        rdf_url = uri
+                    data = requests.get(rdf_url, headers={'accept': 'application/rdf+xml'})
                     if data.status_code == requests.codes.ok:
                         g.parse(data=data.content)
 
                         lat = g.value(uri, rdfns.GEO.lat)
                         lon = g.value(uri, rdfns.GEO.long)
-                        if lat:
-                            context.add((uri, rdfns.GEO.lat, lat))
-                        if lon:
-                            context.add((uri, rdfns.GEO.long, lon))
+                        if lat is not None:
+                            context.set((uri, rdfns.GEO.lat, lat))
+                        if lon is not None:
+                            context.set((uri, rdfns.GEO.long, lon))
 
                 except Exception as err:
                     print 'Error loading %s : %s' % (uri, err)
