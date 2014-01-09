@@ -152,7 +152,11 @@ def map_js(request):
     # places = Place.objects.all()
     markers = []
     for pl in places:
-        # lat/long required in db, so shouldn't need to skip
+        # lat/long should have been added in rdf data prep, but
+        # check just in case, because missing lat/long breaks the map
+        if not all([pl.latitude, pl.longitude]):
+            continue
+
         info = {
             'latitude': pl.latitude,
             'longitude': pl.longitude,
