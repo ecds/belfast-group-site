@@ -81,15 +81,16 @@ class Rdf2Gexf(object):
                         # special case (for now)
                         if val == 'Manuscript' and isinstance(cx.value(subj, DC.title), rdflib.BNode):
                             val = 'BelfastGroupSheet'
-                        else:
-                            val = unicode(obj)
-                            self.network.node[self._uri_to_node_id(subj)][name] = normalize_whitespace(val)
-
-                    # otherwise, add an edge between the two resource nodes
                     else:
-                        edge_labels.add(name)
-                        self.network.add_edge(self._uri_to_node_id(subj),
-                            self._uri_to_node_id(obj),
+                        val = unicode(obj)
+
+                    self.network.node[self._uri_to_node_id(subj)][name] = normalize_whitespace(val)
+
+                # otherwise, add an edge between the two resource nodes
+                else:
+                    edge_labels.add(name)
+                    self.network.add_edge(self._uri_to_node_id(subj),
+                        self._uri_to_node_id(obj),
                             label=name,
                             weight=connection_weights.get(name, 1))
 
