@@ -1,5 +1,7 @@
-from django.contrib import admin
+from django.conf import settings
 from django.conf.urls import patterns, include, url
+from django.conf.urls.static import static
+from django.contrib import admin
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 from django.contrib.sitemaps import FlatPageSitemap
@@ -57,3 +59,7 @@ urlpatterns += patterns('django.contrib.sitemaps.views',
     (r'^sitemap\.xml$', 'index', {'sitemaps': sitemaps}),
     (r'^sitemap-(?P<section>.+)\.xml$', 'sitemap', {'sitemaps': sitemaps}),
 )
+
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

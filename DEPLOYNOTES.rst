@@ -6,6 +6,7 @@ DEPLOYNOTES
 Initial setup
 -------------
 
+
 * Install python dependencies (virtualenv is recommended)::
 
   pip install -r pip-install-req.txt
@@ -20,6 +21,9 @@ Initial setup
 * Load fixtures for initial required flat pages::
 
   python manage.py loaddata belfast/pages/fixtures/initial_flatpages.json
+
+.. TODO: update this, it is out of date
+.. NOTE: need to include instructions for setting up MEDIA_ROOT/MEDIA_URL
 
 * Check out a copy of the Belfast Group RDF data from
   https://github.com/emory-libraries-disc/belfast-group-data
