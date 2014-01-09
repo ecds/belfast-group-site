@@ -25,6 +25,9 @@ class Value(object):
 
     def __get__(self, obj, objtype=None):
         val = obj.value(self.predicate)
+        # if we got a 'none' return as is (don't convert to "None")
+        if val is None:
+            return val
         if self.datatype is not None:
             val = rdflib.Literal(val, datatype=self.datatype).toPython()
         elif isinstance(val, rdflib.Literal):
