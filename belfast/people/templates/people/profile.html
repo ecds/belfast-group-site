@@ -8,6 +8,27 @@
 
 {% block content %}
 <div class="container">
+  {% if pic %}
+  <div class="thumbnail pull-right">
+    <img src="{{ MEDIA_ROOT}}{{ pic.img.url }}" width="250"/> {# cheating here on size #}
+    <div class="caption">
+      <h3>{{ pic.title }}</h3>
+      <p><small>
+      {% if pic.creator %}{{ pic.creator }}{% endif %}
+      {% if pic.creator and pic.publisher %} // {% endif %}
+      {% if pic.publisher %}
+        {% if pic.publisher_url %}<a href="{{ pic.publisher_url }}">{{ pic.publisher }}</a>
+        {% else %}{{ pic.publisher }}{% endif %}
+      {% endif %}
+      </small></p>
+      {% if pic.collection %}
+        <p><small><a href="{{ pic.rdfcollection }}">{{ pic.collection }}</a></small></p>
+      {% endif %}
+      <p><small>{{ pic.permisions }}</small></p>
+    </div>
+  </div>
+  {% endif %}
+
 {% if person.dbpedia.thumbnail %}
 <div class="pull-right">
   <img src="{{ person.dbpedia.thumbnail }}"/>

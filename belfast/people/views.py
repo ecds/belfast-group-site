@@ -11,6 +11,7 @@ from belfast import rdfns
 from belfast.util import rdf_data, rdf_data_lastmodified, \
     network_data_lastmodified
 from belfast.groupsheets.rdfmodels import get_rdf_groupsheets
+from belfast.people.models import ProfilePicture
 from belfast.people.rdfmodels import BelfastGroup, profile_people, RdfPerson
 from belfast.network.util import annotate_graph
 
@@ -49,8 +50,13 @@ def profile(request, id):
     person = RdfPerson(g, uriref)
     groupsheets = get_rdf_groupsheets(author=uri) # TODO: move to rdfperson class
 
+    # find profile picture if there is one (not present for all)
+    pics = ProfilePicture.objects.filter(person_uri=uri)
+    pic = pics[0] if pics.count() else None
+
     return render(request, 'people/profile.html',
-                  {'person': person, 'groupsheets': groupsheets})
+                  {'person': person, 'groupsheets': groupsheets,
+                  'pic': pic})
 
 
 # @last_modified(rdf_nx_lastmod)  # uses both rdf and gexf
