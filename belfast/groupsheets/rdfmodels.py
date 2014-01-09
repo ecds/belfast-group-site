@@ -124,6 +124,10 @@ class TeiGroupSheet(XmlModel):
 class RdfDocument(RdfResource):
     part_of = rdfmap.Resource(rdfns.DC.isPartOf, RdfResource)
 
+def archival_collections():
+    graph = rdf_data()
+    subj = graph.subjects(rdflib.RDF.type, rdfns.ARCH.Collection)
+    return [RdfArchivalCollection(graph, s) for s in subj]
 
 class RdfArchivalCollection(RdfResource):
     '''RDF :class:`~rdflib.resource.Resource` for an archival collection. '''
@@ -185,7 +189,7 @@ class RdfGroupSheet(RdfResource):
     sources = rdfmap.ResourceList(rdfns.SCHEMA_ORG.mentions, RdfArchivalCollection,
                                   is_object=False)
 
-    owners= rdfmap.ResourceList(rdfns.SCHEMA_ORG.owns, RdfPerson,
+    owners = rdfmap.ResourceList(rdfns.SCHEMA_ORG.owns, RdfPerson,
                                   is_object=False)
 
 def groupsheet_by_url(url):

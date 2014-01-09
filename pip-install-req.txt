@@ -8,7 +8,7 @@ networkx
 eulcommon
 html5lib
 progressbar
-git+https://github.com/RDFLib/rdflib-sqlalchemy#egg=rdflib-sqlalchemy
+PIL
 
 # additional rdf script reqs
 requests>=1.1
