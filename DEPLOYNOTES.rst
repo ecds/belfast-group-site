@@ -6,7 +6,6 @@ DEPLOYNOTES
 Initial setup
 -------------
 
-
 * Install python dependencies (virtualenv is recommended)::
 
   pip install -r pip-install-req.txt
@@ -22,32 +21,26 @@ Initial setup
 
   python manage.py loaddata belfast/pages/fixtures/initial_flatpages.json
 
-.. TODO: update this, it is out of date
-.. NOTE: need to include instructions for setting up MEDIA_ROOT/MEDIA_URL
+* Manually create an eXist collection and load the TEI Belfast Group Sheet
+  content. Load the index configuration and index the content::
 
-* Check out a copy of the Belfast Group RDF data from
-  https://github.com/emory-libraries-disc/belfast-group-data
-  and configure the location of the ``data`` directory
-  in ``localsettings.py`` as **RDF_DATA_DIR**.
+  python manage.py existdb load-index
+  python manage.py existdb reindex
 
-  * Run ``smush-rdf.py`` to de-dupe group sheets in the data::
+* Configure the site to run under Apache with mod WSGI (see ``apache/belfast.conf``
+  for an apache site configuration starting point).
 
-      ./scripts/smush-rdf.py data/*.xml
+* Configure **MEDIA_ROOT** and **MEDIA_URL** in ``localsettings.py``;
+  when running under apache, you must configure **STATIC** and **MEDIA**
+  directories to be served out at the appropriate url.
 
-  * Run ``harvest-related.py`` to download related RDF (VIAf, DBpedia, etc)::
+* Log in to the Django admin site and configure the default **Site**
+  to match the domain where the application is deployed.
 
-      ./scripts/harvest-related.py data/*.xml -o data
+* Configure **RDF_DATABASE** and **GEXF_DATA** in ``localsettings.py``;
+  run manage command to harvest and prepare the RDF data for the site::
 
-  * Run ``rdf2gexf.py`` script on Belfast Group RDF data to
-    generate and save a Network Graph fle, e.g.::
+  python manage.py prep_dataset
 
-      ./scripts/rdf2gexf.py data/*.xml -o belfast-group-data.gexf
-
-    Configure the resulting file in the ``localsettings.py``
-    as **GEXF_DATA**.
-
-* Ensure that a cache is configured in ``localsettings.py``
-
-# TODO: notes about secondary database for rdf
 
 
