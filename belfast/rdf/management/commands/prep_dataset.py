@@ -75,7 +75,7 @@ class Command(BaseCommand):
 
         # harvest from the current configured site
         current_site = Site.objects.get(id=settings.SITE_ID)
-        self.harvest_urls.extend(['http://%s/groupsheets/%s/' % (current_site.domain, i)
+        self.harvest_urls.extend(['http://%s/groupsheets/%s/' % (current_site.domain.rstrip('/'), i)
                                   for i in self.tei_ids])
 
         # if specific steps are specified, run only those

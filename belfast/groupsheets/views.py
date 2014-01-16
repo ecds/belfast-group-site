@@ -13,7 +13,8 @@ from belfast import rdfns
 from belfast.groupsheets.forms import KeywordSearchForm
 from belfast.groupsheets.rdfmodels import TeiGroupSheet, TeiDocument, \
     get_rdf_groupsheets, groupsheet_by_url
-from belfast.util import rdf_data_lastmodified, network_data_lastmodified
+from belfast.util import rdf_data_lastmodified, network_data_lastmodified, \
+    local_uri
 
 logger = logging.getLogger(__name__)
 
@@ -83,12 +84,8 @@ def list_groupsheets(request):
     if filter_author is not None:
         # filter is in slug form; use that to build local uri
         url_args['author'] = filter_author
-        # TODO: utility method for this
-        current_site = get_current_site(request)
-        author_uri = 'http://%s%s' % (
-            current_site.domain,
-            reverse('people:profile', args=[filter_author])
-        )
+        author_uri = local_uri(reverse('people:profile', args=[filter_author]),
+                               request)
         filters['author'] = author_uri
 
     filter_source = request.GET.get('source', None)

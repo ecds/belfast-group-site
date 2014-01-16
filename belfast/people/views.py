@@ -9,7 +9,7 @@ import rdflib
 
 from belfast import rdfns
 from belfast.util import rdf_data, rdf_data_lastmodified, \
-    network_data_lastmodified
+    network_data_lastmodified, local_uri
 from belfast.groupsheets.rdfmodels import get_rdf_groupsheets
 from belfast.people.models import ProfilePicture
 from belfast.people.rdfmodels import BelfastGroup, profile_people, RdfPerson
@@ -36,11 +36,8 @@ def list(request):
 
 # @last_modified(rdf_nx_lastmod)  # uses both rdf and gexf
 def profile(request, id):
-    current_site = get_current_site(request)
-    uri = 'http://%s%s' % (
-        current_site.domain,
-        reverse('people:profile', args=[id])
-    )
+    uri = local_uri(reverse('people:profile', args=[id]), request)
+    print 'local uri = ', uri
     g = rdf_data()
     uriref = rdflib.URIRef(uri)
     # check that the generated URI is actually a person in our rdf dataset;
@@ -61,11 +58,7 @@ def profile(request, id):
 
 # @last_modified(rdf_nx_lastmod)  # uses both rdf and gexf
 def egograph_js(request, id):
-    current_site = get_current_site(request)
-    uri = 'http://%s%s' % (
-        current_site.domain,
-        reverse('people:profile', args=[id])
-    )
+    uri = local_uri(reverse('people:profile', args=[id]), request)
     g = rdf_data()
     person = RdfPerson(g, rdflib.URIRef(uri))
     # TODO: possibly make ego-graph radius a parameter in future

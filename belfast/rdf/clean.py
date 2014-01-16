@@ -12,6 +12,7 @@ from django.core.urlresolvers import reverse
 from django.utils.text import slugify
 
 from belfast import rdfns
+from belfast.util import local_uri
 from belfast.rdf import rdfmap
 from belfast.rdf.qub import QUB
 
@@ -312,10 +313,8 @@ class ProfileUris(object):
         slug = slugify(name)
         if slug in self.name_conversions:
             slug = self.name_conversions[slug]
-        uri = 'http://%s%s' % (
-            self.current_site.domain,
-            reverse('people:profile', args=[slug])
-        )
+
+        uri = local_uri(reverse('people:profile', args=[slug]))
         return uri
 
     def belfast_group_people(self, graph):

@@ -6,6 +6,7 @@ import re
 from networkx.readwrite import gexf
 
 from django.conf import settings
+from django.contrib.sites.models import Site, get_current_site
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +26,19 @@ def rdf_data():
         _rdf_data = rdflib.ConjunctiveGraph('Sleepycat')
         _rdf_data.open(settings.RDF_DATABASE)
     return _rdf_data
+
+
+def local_uri(path, request=None):
+    '''Utility method to generate an absolute path for a local URI based
+    on the current Site.'''
+    # NOTE: should possibly be in belfast.rdf.util or similar
+
+    if request is not None:
+        current_site = get_current_site(request)
+    else:
+        current_site = Site.objects.get(id=settings.SITE_ID)
+    return 'http://%s/%s' % (current_site.domain.rstrip('/'), path.lstrip('/'))
+
 
 # TODO: determine how to generate last-modified dates for refactored RDF
 # handling within the site
