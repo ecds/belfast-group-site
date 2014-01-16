@@ -3,6 +3,8 @@ import rdflib
 import logging
 import os
 import re
+from urlparse import urlparse
+
 from networkx.readwrite import gexf
 
 from django.conf import settings
@@ -37,6 +39,15 @@ def local_uri(path, request=None):
         current_site = get_current_site(request)
     else:
         current_site = Site.objects.get(id=settings.SITE_ID)
+
+    # If django is configured to run under a non-root url, reverse
+    # will include that path when generating urls.  Make sure we don't
+    # duplicate that portion of the path
+    base_url = 'http://%s' % (current_site.domain)
+    parsed_url = urlparse(base_url)
+    if parsed_url.path and path.startswith(parsed_url.path):
+        path = path[len(parsed_url.path):]
+
     return 'http://%s/%s' % (current_site.domain.rstrip('/'), path.lstrip('/'))
 
 

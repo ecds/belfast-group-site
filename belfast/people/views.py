@@ -37,7 +37,6 @@ def list(request):
 # @last_modified(rdf_nx_lastmod)  # uses both rdf and gexf
 def profile(request, id):
     uri = local_uri(reverse('people:profile', args=[id]), request)
-    print 'local uri = ', uri
     g = rdf_data()
     uriref = rdflib.URIRef(uri)
     # check that the generated URI is actually a person in our rdf dataset;
