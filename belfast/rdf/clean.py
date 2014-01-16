@@ -20,7 +20,9 @@ logger = logging.getLogger(__name__)
 
 
 def normalize_whitespace(s):
-    return unicode(re.sub(r'\s+', u' ', s.strip(), flags=re.UNICODE))
+    # FIXME: if we want to use flags in python 2.6 needs to be compiled first
+    return unicode(re.sub(r'\s+', u' ', s.strip()))
+    # return unicode(re.sub(r'\s+', u' ', s.strip(), flags=re.UNICODE))
 
 
 class IdentifyGroupSheets(object):
