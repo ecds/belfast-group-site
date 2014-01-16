@@ -1,14 +1,15 @@
 Django
 django-tinymce
 eulexistdb
-rdflib
+rdflib<=4.1.0
+PIL
 # for sleepycat/berkeleydb persistence
 bsddb3
 networkx
 eulcommon
 html5lib
 progressbar
-PIL
+
 
 # additional rdf script reqs
 requests>=1.1
