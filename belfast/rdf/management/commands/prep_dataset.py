@@ -9,6 +9,7 @@ import shutil
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.contrib.sites.models import Site
 
 from belfast.rdf.harvest import HarvestRdf, Annotate # HarvestRelated
 from belfast.rdf.qub import QUB
@@ -62,8 +63,7 @@ class Command(BaseCommand):
     # harvest from production EmoryFindingAids site
     harvest_urls = ['http://findingaids.library.emory.edu/documents/%s/' % e
                     for e in eadids]
-    # using local dev urls for now
-    harvest_urls.extend(['http://localhost:8000/groupsheets/%s/' % i for i in tei_ids])
+
 
     QUB_input = os.path.join(settings.BASE_DIR, 'rdf', 'fixtures', 'QUB_ms1204.html')
     # FIXME: can we find a better url for the Queen's Belfast Group collection ?
@@ -72,6 +72,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.verbosity = options['verbosity']
+
+        # harvest from the current configured site
+        current_site = Site.objects.get(id=settings.SITE_ID)
+        self.harvest_urls.extend(['http://%s/groupsheets/%s/' % (current_site.domain, i)
+                                  for i in self.tei_ids])
 
         # if specific steps are specified, run only those
         # otherwise, run all steps
