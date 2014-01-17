@@ -13,6 +13,8 @@ class ProfilePicture(models.Model):
     img = models.ImageField(upload_to='profile/', verbose_name='Image')
     title = models.CharField(max_length=255,
         help_text='Title or caption to be shown with the image')
+    date = models.CharField(max_length=255,
+        help_text='Date of the photo, if known', blank=True)
     collection_uri = models.URLField(blank=True, null=True,
         help_text='Archival collection where the original picture was found',
         verbose_name='Archival Collection')
