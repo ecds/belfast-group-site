@@ -12,7 +12,7 @@ class KeywordSearchForm(forms.Form):
         widget=forms.TextInput(attrs={
             'autocomplete': 'off',
             'class': 'searchform',
-            'placeholder': 'Search...',
+            'placeholder': 'Search digital editions...',
             'autocomplete': 'off',
             'data-toggle': 'tooltip',
             'data-placement': 'bottom',
