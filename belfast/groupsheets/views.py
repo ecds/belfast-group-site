@@ -31,7 +31,7 @@ def rdf_nx_lastmod(request, *args, **kwargs):
 
 def view_sheet(request, id):
     context = {
-        'extra_ns': {'bg': rdfns.BG},
+        'extra_ns': {'bg': rdfns.BG, 'freebase': rdfns.FREEBASE},
         'page_rdf_type': 'bg:GroupSheet'
     }
     try:

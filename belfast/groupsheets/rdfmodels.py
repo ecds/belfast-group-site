@@ -24,6 +24,9 @@ class Contents(teimap._TeiBase):
 class Poem(teimap._TeiBase):
     id = xmlmap.StringField('@xml:id')    # is this the correct id to use?
     title = xmlmap.StringField('tei:front/tei:titlePage/tei:docTitle/tei:titlePart[@type="main"]')
+    title_node = xmlmap.NodeField('tei:front/tei:titlePage/tei:docTitle/tei:titlePart[@type="main"]', xmlmap.XmlObject)
+    # little bit hacky; access to title as node instead of string, to allow formatting
+    # embedded content (i.e. tagged places or other names)
     body = xmlmap.NodeField('tei:body', xmlmap.XmlObject)
     back = xmlmap.NodeField('tei:back', xmlmap.XmlObject)
     byline = xmlmap.StringField('tei:back/tei:byline')

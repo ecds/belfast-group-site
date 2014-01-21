@@ -65,11 +65,11 @@
 
     {% for poem in document.poems %}
     {# NOTE: using ARK URL plus the poem id for poem URI #}
-      <div class="poem" typeof="schema:CreativeWork" about="{{ document.ark}}#{{poem.id }}" id="{{ poem.id }}">
+      <div class="poem" typeof="schema:CreativeWork freebase:book/poem" about="{{ document.ark}}#{{poem.id }}" id="{{ poem.id }}">
         <hr/>
         <a name="{{ poem.id }}">
           {% if poem.title %}
-            <h3 property="schema:name">{{ poem.title }}</h3>
+            <h3 property="schema:name">{{ poem.title_node|format_tei }}</h3>
           {% endif %}
         </a>
         {{ poem.body|format_tei }}

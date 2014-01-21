@@ -13,6 +13,7 @@ GN = rdflib.Namespace('http://www.geonames.org/ontology#')
 DBPPROP = rdflib.Namespace('http://dbpedia.org/property/')
 FOAF = rdflib.Namespace('http://xmlns.com/foaf/0.1/')
 GEO = rdflib.Namespace('http://www.w3.org/2003/01/geo/wgs84_pos#')
+FREEBASE = rdflib.Namespace('http://www.freebase.com/')
 
 # local belfast group ontology
 BG = rdflib.Namespace('http://belfastgroup.library.emory.edu/ontologies/2013/6/belfastgroup/#')
