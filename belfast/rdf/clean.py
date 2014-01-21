@@ -310,11 +310,12 @@ class ProfileUris(object):
         'hugh-t-bredin': 'hugh-bredin',
     }
 
-    def local_person_uri(self, name):
+    @staticmethod
+    def local_person_uri(name):
         # calculate a local uri for a person based on their name
         slug = slugify(name)
-        if slug in self.name_conversions:
-            slug = self.name_conversions[slug]
+        if slug in ProfileUris.name_conversions:
+            slug = ProfileUris.name_conversions[slug]
 
         uri = local_uri(reverse('people:profile', args=[slug]))
         return uri
@@ -365,6 +366,41 @@ class ProfileUris(object):
 
         return people
 
+    @staticmethod
+    def convert_to_localprofile(graph, subject, full_graph, verbosity=1):
+        # takes context graph, person uri, full graph
+        firstname, lastname = person_names(graph, subject)
+        if firstname is None and lastname is None:
+            # if names were not found in current context, check full graph
+            firstname, lastname = person_names(full_graph, subject)
+            if firstname is None and lastname is None:
+                if verbosity >= 1:
+                    print 'Names could not be determined for %s' % subject
+                # for now, skip if names couldn't be found
+                return
+
+        full_name = '%s %s' % (firstname, lastname)
+        uri = ProfileUris.local_person_uri(full_name)
+        uriref = rdflib.URIRef(uri)
+        # set type to person (FIXME: redundant once smushed?)
+        # ctx.add((uriref, rdflib.namespace.RDF.type, rdfns.SCHEMA_ORG.Person))
+        # add full name as preferred label for local use
+        name_triples = [
+            (uriref, rdflib.namespace.SKOS.preferredLabel, rdflib.Literal(full_name)),
+            (uriref, rdfns.SCHEMA_ORG.givenName, rdflib.Literal(firstname)),
+            (uriref, rdfns.SCHEMA_ORG.familyName, rdflib.Literal(lastname))
+        ]
+        # if names are not yet present in the graph, add to current context
+        for name in name_triples:
+            if name not in full_graph:
+                graph.add(name)
+
+        # if original subject uri was not a blank node, add a sameAs rel
+        if not isinstance(uri, rdflib.BNode):
+            graph.add((uriref, rdflib.OWL.sameAs, subject))
+
+        return uri
+
     def process_graph(self, graph):
         # generate local URIs for people in the group, and make sure we have
         # first and last names for everyone (where possible)
@@ -399,46 +435,25 @@ class ProfileUris(object):
 
             # if existing sameAs local uri was not found, generate local uri + add names
             if uriref is None:
-                firstname, lastname = person_names(graph, subject)
-                if firstname is None and lastname is None:
-                    if self.verbosity >= 1:
-                        print 'Names could not be determined for %s' % subject
-
-                    # for now, skip if names couldn't be found
+                uri = ProfileUris.convert_to_localprofile(graph, subject,
+                    self.full_graph, verbosity=self.verbosity)
+                # skip if local-uri generation failed (e.g. first/last name not determined)
+                if uri is None:
                     continue
-
-                full_name = '%s %s' % (firstname, lastname)
-                uri = self.local_person_uri(full_name)
+                uriref = rdflib.URIRef(uri)
 
                 # skip if already converted ??
                 if uri == str(subject):
                     continue
-
-                uriref = rdflib.URIRef(uri)
-
-                # set type to person (FIXME: redundant once smushed?)
-                # ctx.add((uriref, rdflib.namespace.RDF.type, rdfns.SCHEMA_ORG.Person))
-                # add full name as preferred label for local use
-                name_triples = [
-                    (uriref, rdflib.namespace.SKOS.preferredLabel, rdflib.Literal(full_name)),
-                    (uriref, rdfns.SCHEMA_ORG.givenName, rdflib.Literal(firstname)),
-                    (uriref, rdfns.SCHEMA_ORG.familyName, rdflib.Literal(lastname))
-                ]
-                # if names are not yet present in theg raph, add to current context
-                for name in name_triples:
-                    if name not in self.full_graph:
-                        graph.add(name)
 
             # "smush" - convert all author identifiers to local uris
             # convert bnodes to local URIs so we can group authors
             # bnodes should only be converted in current context
             ctx_uris[subject] = uriref
 
-            # if original subject uri was not a blank node, add a sameAs rel
+            # proper URIs (e.g. VIAF ids) should be converted anywhere
+            # they occur, throughout the graph
             if not isinstance(subject, rdflib.BNode):
-                graph.add((uriref, rdflib.OWL.sameAs, subject))
-                # proper URIs (e.g. VIAF ids) should be converted anywhere
-                # they occur, throughout the graph
                 fullgraph_uris[subject] = uriref
 
             # NOTE: dbpedia rel will be harvested via VIAF
@@ -468,8 +483,10 @@ class InferConnections(object):
     # yearmonthday_re = re.compile('^(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})$')
     date_re = re.compile('^(?P<year>\d{4})(-(?P<month>\d{2})-(?P<day>\d{2}))?(/(?P<year2>\d{4}))?$')
 
+
     def __init__(self, graph):
         self.full_graph = graph
+        self.current_site = Site.objects.get(id=settings.SITE_ID)
 
         for ctx in graph.contexts():
             self.process_graph(ctx)
@@ -487,25 +504,37 @@ class InferConnections(object):
             # infer ownership of groupsheet copies based on archival collection
             self.ownership(m, graph)
 
-        # *** find authors of groupsheets and explicitly associate them with the Belfast Group
+        # *** find authors and owners of groupsheets and explicitly associate
+        # them with the Belfast Group
         res = graph.query('''
                 PREFIX schema: <%(schema)s>
+                PREFIX dc: <%(dc)s>
                 PREFIX rdf: <%(rdf)s>
                 PREFIX bg: <%(bg)s>
-                SELECT DISTINCT ?author
+                SELECT DISTINCT ?person
                 WHERE {
-                    ?ms schema:author ?author .
-                    ?ms rdf:type bg:GroupSheet
+                    ?ms rdf:type bg:GroupSheet .
+                    {?ms dc:creator ?person }
+                      UNION
+                    {?person schema:owns ?ms }
                 }
-                ''' % {'schema': rdfns.SCHEMA_ORG,
-                       'rdf': rdflib.RDF,
-                       'bg': rdfns.BG}
+                ''' % {'schema': rdfns.SCHEMA_ORG, 'dc': rdfns.DC,
+                       'rdf': rdflib.RDF, 'bg': rdfns.BG}
         )
         for r in res:
             # triple to indicate the author is affiliated with BG
-            bg_assoc = (r['author'], rdfns.SCHEMA_ORG.affiliation, rdflib.URIRef(rdfns.BELFAST_GROUP_URI))
+            bg_assoc = (r['person'], rdfns.SCHEMA_ORG.affiliation, rdflib.URIRef(rdfns.BELFAST_GROUP_URI))
             if bg_assoc not in graph:
                 graph.add(bg_assoc)
+
+            # if person does not have a local uri (i.e., owner and not author),
+            # generate one now (can't detect sooner)
+            if not str(r['person']).startswith('http://%s' % self.current_site.domain):
+                uri = ProfileUris.convert_to_localprofile(graph, r['person'],
+                    self.full_graph)
+                if uri is not None:
+                    # if local uri was generated, convert everywhere in the graph
+                    smush(self.full_graph, {r['person']: rdflib.URIRef(uri)})
 
     def time_period(self, ms, graph):
         # determine whether a groupsheet is first or second period
