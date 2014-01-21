@@ -129,7 +129,26 @@ class RdfLocation(RdfEntity):
             or self.value(rdfns.DBPPROP.name) \
             or self.name or self.identifier
 
+    # text/poem
+    mentioned_in = rdfmap.ResourceList(rdfns.SCHEMA_ORG.mentions, RdfEntity, is_object=False)
 
+    @property
+    def texts(self):
+        # list of poems that mention this location
+        return [res for res in self.mentioned_in if rdfns.FREEBASE['book/poem'] in res.rdf_types]
+
+    # current types of locations we support
+    born_here = rdfmap.ResourceList(rdfns.DBPEDIA_OWL.birthPlace, RdfEntity, is_object=False)
+    worked_here = rdfmap.ResourceList(rdfns.SCHEMA_ORG.workLocation, RdfEntity, is_object=False)
+    home_here = rdfmap.ResourceList(rdfns.SCHEMA_ORG.homeLocation, RdfEntity, is_object=False)
+
+    @property
+    def people(self):
+        # list of people connected to this location
+        # NOTE: this seems clunky, but seems to be significantly faster than
+        # getting the same data via sparql query
+        return [RdfPerson(self.graph, r.identifier)
+                for r in set(self.born_here + self.worked_here + self.home_here)]
 
 class RdfOrganization(RdfEntity):
     # specify expected rdf type?
@@ -151,6 +170,12 @@ class RdfPerson(RdfEntity):
     def slug(self):
         # all persons with profiles should have local, slug-based uris
         return self.identifier.strip('/').split('/')[-1]
+
+    @property
+    def local_uri(self):
+        current_site = Site.objects.get(id=settings.SITE_ID)
+        return str(self.identifier).startswith('http://%s' % current_site.domain)
+
 
     # NOTE: group sheet authors and other people with profiles on this site
     # should have first/last names added to the rdf data by the dataprep process

@@ -6,7 +6,7 @@
 {% block head-extras %}
 <script type="text/javascript" src="//maps.google.com/maps/api/js?sensor=true"></script>
 {# <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script> #}
-<script type="text/javascript" src="{% static 'js/jquery.ui.map.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/jquery.ui.map.full.min.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -30,7 +30,9 @@
     $.each( data.markers, function(i, marker) {
       $('#map_canvas').gmap('addMarker', {
         'position': new google.maps.LatLng(marker.latitude, marker.longitude),
-        'bounds': true
+        'bounds': true,
+        'tags': marker.tags,
+        'icon': "{% static 'img/' %}map_marker_" + marker.icon_color  + ".png"
       }).click(function() {
         $('#map_canvas').gmap('openInfoWindow', { 'content': marker.content }, this);
       });

@@ -9,7 +9,7 @@ import rdflib
 from StringIO import StringIO
 
 from belfast.util import network_data, rdf_data,  \
-    rdf_data_lastmodified, network_data_lastmodified
+    rdf_data_lastmodified, network_data_lastmodified, normalize_whitespace
 from belfast.rdfns import BELFAST_GROUP_URI
 from belfast.groupsheets.rdfmodels import RdfGroupSheet
 from belfast.people.rdfmodels import RdfOrganization, find_places
@@ -157,11 +157,41 @@ def map_js(request):
         if not all([pl.latitude, pl.longitude]):
             continue
 
+        tags = []
+        # if this place is mentioned in poems, add title/link to description
+        texts = ''
+        if pl.texts:
+            texts = '<p>Mentioned in %s.</p>' % (
+                '; '.join('<a href="%s">%s</a>' % (t.identifier, normalize_whitespace(t.name))
+                          for t in pl.texts)
+            )
+            tags.append('text')
+        people = ''
+        if pl.people:
+            people = '<p>Connected people: %s.</p>' % (
+                '; '.join('<a href="%s">%s</a>' % (p.identifier, p.name) if p.local_uri
+                          else p.name
+                          for p in pl.people)
+            )
+            # possibly put specific slugs here for filtering
+            tags.append('people')
+
+        # if this place is not identifiably connected to a person or place
+        # in our data, skip it (for now at least)
+        if not people and not texts:
+            continue
+
+
         info = {
             'latitude': pl.latitude,
             'longitude': pl.longitude,
             'title': pl.name,
-            'content': pl.name,   # text content when you click on a marker
+            # text (html) content to be shown when clicking on a marker
+            'content': '''<b>%s</b> %s %s''' % (pl.name, people, texts),
+            # properties to affect display
+            'tags': tags,
+            # icon color so we can use different icons on the map by type (?)
+            'icon_color': 'blue' if texts else 'red'
         }
         markers.append(info)
     map_data = {'markers': markers}
