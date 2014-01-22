@@ -46,13 +46,18 @@ class Resource(object):
         self.is_object = is_object
 
     def __get__(self, obj, objtype):
+        # need to use subjects/objects instead of value to get a resource
+        # and for consistency with ResourceList
         if self.is_object:
-            rel = obj.value(self.predicate)
+            meth = obj.objects
         else:
-            # could be multiple; for now just grab the first one
-            rel = list(obj.subjects(self.predicate))[0]
-        if rel:
-            return self.resource_type(obj.graph, rel)
+            meth = obj.subjects
+
+        # these methods return multiple; for now just grab the first one
+        rels = list(meth(self.predicate))
+        # NOTE: could probably use as generator without forcing to list instead?
+        if rels:
+            return self.resource_type(obj.graph, rels[0].identifier)
 
 
 class ResourceList(object):
