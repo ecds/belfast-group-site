@@ -143,7 +143,19 @@ def group_people_js(request):
 
 
 def map(request):
-    return render(request, 'network/map.html')
+    people = {}
+    # semi-redundant with json view functionality, but easier to build filter
+    for pl in find_places():
+        # lat/long should have been added in rdf data prep, but
+        # check just in case, because missing lat/long breaks the map
+        if not all([pl.latitude, pl.longitude]):
+            continue
+
+        for p in pl.people:
+            if p.local_uri:
+                people[str(p.identifier)] = p.fullname
+
+    return render(request, 'network/map.html', {'people': people})
 
 
 # @last_modified(rdf_lastmod)
@@ -166,21 +178,25 @@ def map_js(request):
                           for t in pl.texts)
             )
             tags.append('text')
+            for t in pl.texts:
+                if t.author is not None:
+                    tags.append(unicode(t.author.identifier))
+
         people = ''
         if pl.people:
             people = '<p>Connected people: %s.</p>' % (
-                '; '.join('<a href="%s">%s</a>' % (p.identifier, p.name) if p.local_uri
-                          else p.name
+                '; '.join('<a href="%s">%s</a>' % (p.identifier, p.fullname) if p.local_uri
+                          else p.fullname
                           for p in pl.people)
             )
             # possibly put specific slugs here for filtering
             tags.append('people')
+            tags.extend([unicode(p.identifier) for p in pl.people if p.local_uri])
 
         # if this place is not identifiably connected to a person or place
         # in our data, skip it (for now at least)
         if not people and not texts:
             continue
-
 
         info = {
             'latitude': pl.latitude,
@@ -194,6 +210,7 @@ def map_js(request):
             'icon_color': 'blue' if texts else 'red'
         }
         markers.append(info)
+
     map_data = {'markers': markers}
     return HttpResponse(json.dumps(map_data), content_type='application/json')
 

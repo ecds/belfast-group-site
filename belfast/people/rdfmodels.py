@@ -135,7 +135,9 @@ class RdfLocation(RdfEntity):
     @property
     def texts(self):
         # list of poems that mention this location
-        return [res for res in self.mentioned_in if rdfns.FREEBASE['book/poem'] in res.rdf_types]
+        return [RdfPoem(res.graph, res.identifier)
+                for res in self.mentioned_in
+                if rdfns.FREEBASE['book/poem'] in res.rdf_types]
 
     # current types of locations we support
     born_here = rdfmap.ResourceList(rdfns.DBPEDIA_OWL.birthPlace, RdfEntity, is_object=False)
@@ -259,6 +261,9 @@ class RdfPerson(RdfEntity):
         return self.work_locations + self.home_locations
 
     # TODO: need access to groupsheets by this person
+
+class RdfPoem(RdfEntity):
+    author = rdfmap.Resource(rdfns.SCHEMA_ORG.author, RdfPerson)
 
 
 # FIXME! this is a hack; find a better way to do this...

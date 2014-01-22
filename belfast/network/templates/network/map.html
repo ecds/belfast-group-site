@@ -12,13 +12,32 @@
 {% block content %}
 <div class="container">
 
-<p>A map of all places referenced in our data specific to
-  the Belfast Group and the people associated with it.</p>
+<p></p>
 
+<div class="panel panel-default">
+  <div class="panel-heading">A map of all places referenced in our data specific to
+  the Belfast Group and the people associated with it.
 
-<div id="map_canvas" style="border:1px solid black;width:75%;height:80%;position:absolute">
+  <!-- Single button -->
+  <div class="btn-group" style="margin-left:50px">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+      Filter by person <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu map-filter" role="menu">
+      {% for id, name in people.iteritems %}
+        <li><a id="{{ id }}">{{ name }}</a></li>
+      {% endfor %}
+        <li class="divider"></li>
+        <li class="active"><a id="view_all">View All</a></li>
+    </ul>
+  </div>
+</div>
 
+{# FIXME: height % seems to be ignored entirely... #}
+  <div id="map_canvas" class="panel-body" style="height:90%;min-height:550px;">
+{# <div id="map_canvas" style="border:1px solid black;width:75%;height:80%;position:absolute"> #}
 <br/>
+</div>
 </div>
 
 <script type="text/javascript">
@@ -38,6 +57,23 @@
       });
     });
   });
+});
+$('.map-filter a').click(function() {
+  var id = $(this).attr('id');
+  // show or hide map markers based on the selected filter
+  if (id == 'view_all') {
+    $.each($('#map_canvas').gmap('get', 'markers'), function(i, m) {
+      m.setVisible(true);
+    });
+  } else {
+    $('#map_canvas').gmap('find', 'markers', { 'property': 'tags', 'value': id }, function(marker, found) {
+      marker.setVisible(found);
+
+    });
+  }
+  $('.map-filter li').removeClass('active');
+  $(this).parent().addClass('active');
+
 });
 </script>
 </div>
