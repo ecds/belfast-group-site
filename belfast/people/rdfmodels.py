@@ -120,13 +120,17 @@ class RdfEntity(RdfResource):
 class RdfLocation(RdfEntity):
 
     name = rdfmap.Value(rdfns.SCHEMA_ORG.name)
+    geonames_name = rdfmap.Value(rdfns.GN.name)
+    dbpedia_name = rdfmap.Value(rdfns.DBPPROP.name)
     latitude = rdfmap.Value(rdfns.GEO.lat, rdflib.XSD.double)
     longitude = rdfmap.Value(rdfns.GEO.long, rdflib.XSD.double)
 
+
+
     def __unicode__(self):
-        return self.value(rdfns.GN.name) \
+        return self.geonames_name \
             or self.graph.preferredLabel(self) \
-            or self.value(rdfns.DBPPROP.name) \
+            or self.dbpedia_name \
             or self.name or self.identifier
 
     # text/poem

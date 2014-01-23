@@ -47,6 +47,7 @@ def profile(request, id):
     groupsheets = get_rdf_groupsheets(author=uri) # TODO: move to rdfperson class
 
     # find profile picture if there is one (not present for all)
+    # TODO: make this a class method on rdfperson
     pics = ProfilePicture.objects.filter(person_uri=uri)
     pic = pics[0] if pics.count() else None
 
