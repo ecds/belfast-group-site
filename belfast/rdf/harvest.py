@@ -34,12 +34,13 @@ class HarvestRdf(object):
     _serialize_opts = {}
 
     def __init__(self, urls, output_dir=None, find_related=False, verbosity=1,
-                 format=None, graph=None):
+                 format=None, graph=None, no_cache=False):
         self.URL_QUEUE.update(set(urls))
         self.find_related = find_related
         self.base_dir = output_dir
-        self.verbosity = verbosity
+        self.verbosity = int(verbosity)
         self.graph = graph
+        self.no_cache = no_cache
 
         self.format = format
         if format is not None:
@@ -84,7 +85,12 @@ class HarvestRdf(object):
             last_modified = g.value(g.identifier, rdfns.SCHEMA_ORG.dateModified)
             # TODO: use g.set(triple) to replace; may need to adjust date formats
             try:
-                response = requests.get(url, headers={'if-modified-since': last_modified},
+                if self.no_cache:
+                    headers={'cache-control': 'no-cache'}
+                else:
+                    headers={'if-modified-since': last_modified}
+
+                response = requests.get(url, headers=headers,
                                         allow_redirects=False)
                 # if this is a redirect, don't follow but add the real
                 # url to the queue; this avoids an issue where related
@@ -135,8 +141,6 @@ class HarvestRdf(object):
         g = rdflib.Graph(self.graph.store, url)
 
         try:
-            # TODO: optional flag to update everything - don't use date-modified OR cache
-            # response = requests.get(url, headers={'cache-control': 'no-cache'})
             data = g.parse(data=response.content, location=url, format='rdfa')
             # NOTE: this was working previously, and should be fine,
             # but now generates an RDFa parsing error / ascii codec error

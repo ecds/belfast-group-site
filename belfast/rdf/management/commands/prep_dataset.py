@@ -25,6 +25,9 @@ class Command(BaseCommand):
 
     option_list = BaseCommand.option_list + (
         make_option('-H', '--harvest', action='store_true', help='Harvest RDFa'),
+        make_option('--no-cache', action='store_true',
+                    help='Request no cache when harvesting RDFa data',
+                    default=False),
         make_option('-q', '--queens', action='store_true',
             help='Convert Queens University Belfast collection to RDF'),
         make_option('-i', '--identify', action='store_true',
@@ -63,6 +66,9 @@ class Command(BaseCommand):
     # harvest from production EmoryFindingAids site
     harvest_urls = ['http://findingaids.library.emory.edu/documents/%s/' % e
                     for e in eadids]
+
+    # TEMP: harvest from QA for RDFa bugs found during development
+    harvest_urls.append('http://testfindingaids.library.emory.edu/documents/hobsbaum1013/')
 
 
     QUB_input = os.path.join(settings.BASE_DIR, 'rdf', 'fixtures', 'QUB_ms1204.html')
@@ -104,8 +110,8 @@ class Command(BaseCommand):
             # inaccurate; also harvesting tei from local site
 
             HarvestRdf(self.harvest_urls,
-                       find_related=True, verbosity=0,
-                       graph=graph)
+                       find_related=True, verbosity=self.verbosity,
+                       graph=graph, no_cache=options['no_cache'])
 
         if all_steps or options['queens']:
             self.stdout.write('-- Converting Queens University Belfast Group collection description to RDF')
