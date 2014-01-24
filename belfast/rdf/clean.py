@@ -285,6 +285,9 @@ def person_names(graph, uri):
                     name_info = match.groupdict()
                     firstname = name_info['first']
                     lastname = name_info['last']
+                    # in some places names are all caps; don't use those
+                    if firstname.isupper() and lastname.isupper():
+                        continue
                     break
 
     return (firstname, lastname)
