@@ -270,6 +270,9 @@ def person_names(graph, uri):
                 name_info = match.groupdict()
                 firstname = name_info['first']
                 lastname = name_info['last']
+                # in some places names are all caps; don't use those
+                if firstname.isupper() and lastname.isupper():
+                    continue
                 # stop after we get the first name we can use
                 # note that for ciaran carson only one variant has the accent...
                 break
@@ -478,6 +481,14 @@ class InferConnections(object):
     # October 1963-March 1966
     # Second Period, 1966-1970 & 1971-1972?
 
+    # a couple of TEI groupsheets have dates that don't quite match what
+    # we expect; make them consistent with our dates
+    coverage_convert = {
+        '1963-1968': '1963-1966',
+        '1963-1972': '1963-1966',
+        '1966-1976': '1966-1972'
+    }
+
     # need to recognize dates in the following formats: YYYY, YYYY-MM-DD, or YYYY/YYYY
     # year_re = re.compile('^\d{4}$')
     # yearmonthday_re = re.compile('^(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})$')
@@ -544,6 +555,10 @@ class InferConnections(object):
         # nothing needs to be done
         coverage = graph.value(ms, rdfns.DC.coverage)
         if coverage is not None:
+            # a couple of TEI groupsheet dates need to be cleaned up
+            if str(coverage) in self.coverage_convert:
+                graph.set((ms, rdfns.DC.coverage,
+                           rdflib.Literal(self.coverage_convert[str(coverage)])))
             return
 
         date = graph.value(ms, rdfns.DC.date)
