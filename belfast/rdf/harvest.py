@@ -384,10 +384,12 @@ class Annotate(object):
                     # NOTE: may need to restrict to names we know we need...
                 for n in names:
                     context.add((uri, rdfns.FOAF.name, n['name']))
+                    logger.debug('Adding name %s for %s' % (n['name'], uri))
 
                 for obj in tmpgraph.objects(uri, rdflib.OWL.sameAs):
                     if 'dbpedia.org' in unicode(obj):
                         context.add((uri, rdflib.OWL.sameAs, obj))
+                        logger.debug('Adding %s sameAs %s' % (uri, obj))
 
             if progress:
                 processed += 1
@@ -442,7 +444,9 @@ class Annotate(object):
                 continue
 
             try:
-                dbpedia_sparql.setQuery(u'DESCRIBE <%s>' % uri)
+                uriref = rdflib.URIRef(uri)
+                dbpedia_sparql.setQuery(u'DESCRIBE <%s>' % uriref)
+                logger.debug('describing %s' % uri)
                 # NOTE: DESCRIBE <uri> is the simplest query that's
                 # close to what we want and returns a response that
                 # can be easily converted to an rdflib graph, but it generates
@@ -455,7 +459,7 @@ class Annotate(object):
 
                 for predicate in [rdfns.DBPEDIA_OWL.abstract, rdfns.FOAF.isPrimaryTopicOf]: #,
                                   # rdfns.DBPEDIA_OWL.thumbnail]:
-                    objects = list(tmp_graph.objects(uri, predicate))
+                    objects = list(tmp_graph.objects(uriref, predicate))
                     if objects:
                         # if something returns multiple values (i.e. abstract)
                         # find the one in english
@@ -467,7 +471,8 @@ class Annotate(object):
                         else:
                             obj = objects[0]
 
-                        context.add((uri, predicate, obj))
+                        context.add((uriref, predicate, obj))
+                        logger.debug('Adding %s %s %s' % (uriref, predicate, obj))
 
 
             except Exception as err:
