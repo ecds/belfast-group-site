@@ -366,3 +366,12 @@ footer {
 	.section-image.pull-right {margin-left: 0; margin-bottom: 10px;}
 
 }
+
+
+
+/** local/dev additions */
+
+.local-sidenav li > a {
+	padding: 5px 8px;
+	background-color: white;
+}
