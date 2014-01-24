@@ -115,7 +115,8 @@ class TeiGroupSheet(XmlModel):
     def multi_author(self):
         '''boolean indicating if this groupsheet includes content by
         multiple authors'''
-        return len(set([p.byline for p in self.poems])) != 1
+        return len(set([p.byline for p in self.poems
+                       if p.byline is not None])) != 1
 
     # TODO: it would be nice if this were a little easier to access
     # or generate; xmlmap dictfield might get part way there..
