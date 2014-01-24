@@ -290,7 +290,7 @@ def profile_people():
     res = g.query('''
         PREFIX schema: <%(schema)s>
         PREFIX rdf: <%(rdf)s>
-        SELECT ?person
+        SELECT DISTINCT ?person
         WHERE {
           ?person rdf:type schema:Person .
           ?person schema:familyName ?name .
@@ -299,6 +299,9 @@ def profile_people():
         ''' % {'schema': rdfns.SCHEMA_ORG, 'rdf': rdflib.RDF,
                'site': current_site.domain}
         )
+    # FIXME:  should be possible to filter at this level
+    # on precense of a dbpedia description or a local schema description
+    # but can't get the query to work...
 
     logger.debug('Found %d people in %.02f sec' % (len(res),
                  time.time() - start))

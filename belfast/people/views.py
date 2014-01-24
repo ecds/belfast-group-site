@@ -28,6 +28,7 @@ def rdf_nx_lastmod(request, *args, **kwargs):
 def list(request):
     # display a list of people one remove from belfast group
     people = profile_people()
+    people = [p for p in people if p.description or p.dbpedia and p.dbpedia.description]
     # people = BelfastGroup().connected_people
     # people = Person.objects.order_by('last_name').all()
     return render(request, 'people/list.html',
