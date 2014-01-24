@@ -56,7 +56,7 @@ def format_name(node):
     # if name is inside a byline or docAuthor, rel is author
     author_tags = ['{%s}%s' % (TEI_NAMESPACE, tag) for tag in ['byline', 'docAuthor']]
     if node.getparent().tag in author_tags:
-        rel = 'schema:author'
+        rel = 'schema:author dc:creator'
 
     # TODO: or if no ref?
     # if not a supported type, don't tag at all
