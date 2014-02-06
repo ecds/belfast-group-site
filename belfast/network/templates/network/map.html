@@ -53,7 +53,10 @@
         'tags': marker.tags,
         'icon': "{% static 'img/' %}map_marker_" + marker.icon_color  + ".png"
       }).click(function() {
-        $('#map_canvas').gmap('openInfoWindow', { 'content': marker.content }, this);
+        $('#map_canvas').gmap('openInfoWindow', {
+           'content': marker.content,
+           'maxWidth': 250,
+         }, this);
       });
     });
   });
