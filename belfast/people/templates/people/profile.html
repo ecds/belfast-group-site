@@ -12,7 +12,7 @@
 <h1>{{ person.name }}</h1>
 {% if pic %}
   <div class="thumbnail pull-right">
-    <img src="{{ MEDIA_ROOT}}{{ pic.img.url }}" width="250"/> {# cheating here on size #}
+    <img src="{{ MEDIA_ROOT}}{{ pic.img.url }}" width="{{ pic.img.width }}" height="{{ pic.img.height }}"/>
     <div class="caption">
       <h4>{{ pic.title }}</h3>
       <ul class="list-inline small">
