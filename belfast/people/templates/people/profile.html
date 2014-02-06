@@ -64,9 +64,7 @@
     <small><i>(<a href="{{ person.description_context }}">{{ person.desc_context_name }}</a>)</i></small> {# should be safe to assume for now ... #}
     {# TODO: should really link to the findingaids where the description comes from #}
  </p>
-{% endif %}
-
-{% if person.dbpedia.description %}
+{% elif person.dbpedia.description %}
  <p>{{ person.dbpedia.description }}
     <small><i>({% if person.dbpedia.wikipedia_url %}<a href="{{ person.dbpedia.wikipedia_url }}">Wikipedia</a>{% else %}Wikipedia{% endif %})</i></small></p>
 {% endif %}
