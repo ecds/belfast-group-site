@@ -28,11 +28,17 @@ def rdf_nx_lastmod(request, *args, **kwargs):
 def list(request):
     # display a list of people one remove from belfast group
     people = profile_people()
+    # filter to only people with a description
     people = [p for p in people if p.description or p.dbpedia and p.dbpedia.description]
+    # find profile pictures
+    pictures = ProfilePicture.objects.filter(person_uri__in=[p.identifier for p in people])
+    pics = dict([(p.person_uri, p) for p in pictures])
+    # make a list of tuples: rdf person, corresponding profile pic if any
+    people_pics = [(p, pics.get(str(p.identifier), None)) for p in people]
     # people = BelfastGroup().connected_people
     # people = Person.objects.order_by('last_name').all()
     return render(request, 'people/list.html',
-                  {'people': people})
+                  {'people_pics': people_pics})
 
 
 # @last_modified(rdf_nx_lastmod)  # uses both rdf and gexf

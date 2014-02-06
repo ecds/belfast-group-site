@@ -7,7 +7,7 @@ $("document").ready(function(){
       "columnWidth": 1
     });
   });
-  
+
   $poets.on('mouseover','figure',function(){
     $(this).siblings("figure").children('img').stop().animate({"opacity":0.5});
   })
@@ -18,5 +18,14 @@ $("document").ready(function(){
     $url = $(this).find('a').attr('href');
     window.location.assign($url);
   });
+
+
+  $(window).load(function(){
+   $("#bios").masonry({
+      "itemSelector": '.panel',
+      "columnWidth": 1,
+    });
+  });
+
 
 });

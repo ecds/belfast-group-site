@@ -1,23 +1,50 @@
 {% extends 'site_base.html' %}
+{% load static %}
 
 {% block page-subtitle %} | Members{% endblock %}
+{% block head-extras %}
+  <script src="{% static 'js/masonry.min.js' %}"></script>
+{% endblock %}
+
 
 {% block content %}
 <div class="container">
 
 <h1 property="schema:name">People associated with the Belfast Group</h1>
-<ul>
-{% for person in people %}
-    <li><a href="{{ person }}"> {# RDF identifier = local URI #}
-      {# NOTE: all people with profiles should have first/last names in data #}
-        {% if person.lastname and person.firstname %}
-          {{ person.lastname }}, {{ person.firstname }}
-        {% else %} {{ person.name }}
-        {% endif %} </a>
-   {# TODO: display relationship to BG here? number of groupsheets? #}
-   </li>
-{% endfor %}
-</ul>
 
+<div id="bios">
+  {% for person, pic in people_pics %}
+  <div class="panel">
+    <div class="thumbnail text-center">
+          {% if pic %}
+          <a href="{{ person }}">
+            <img src="{{ pic.thumbnail.url }}" alt="{{ pic.title }}">
+          </a>
+          {% endif %}
+          <div class="caption">
+            <a href="{{ person }}">
+            {% if person.lastname and person.firstname %}
+              {{ person.lastname }}, {{ person.firstname }}
+            {% else %} {{ person.name }}
+            {% endif %}
+            </a>
+            {# NOTE: would be nice to include count of connections/groupsheet; currently very SLOW #}
+            {% comment %}
+            {% if person.connected_people %}
+              <p>{{ person.connected_people|length }} connected people</p>
+            {% endif %}
+            {% if person.connected_organizations %}
+              <p>{{ person.connected_organizations|length }} connected organizations</p>
+            {% endif %}
+            {% endcomment %}
+        </div> {# end caption #}
+    </div> {# end thumbnail #}
+  </div> {# end panel #}
+  {% endfor %}
 </div>
+
+{% endblock %}
+
+{% block endbody %}
+  <script src="{% static 'js/belfast.js' %}"></script>
 {% endblock %}
