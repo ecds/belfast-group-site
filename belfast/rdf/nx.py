@@ -88,6 +88,10 @@ class Rdf2Gexf(object):
 
                 # otherwise, add an edge between the two resource nodes
                 else:
+                    # NOTE: gephi doesn't support multiple edges, and
+                    # the d3/json output probably elides them also.
+                    # Consider instead: if an edge already exists,
+                    # add to the strength of the exesting edge
                     edge_labels.add(name)
                     self.network.add_edge(self._uri_to_node_id(subj),
                         self._uri_to_node_id(obj),
