@@ -125,7 +125,7 @@ function ForceGraphControls(config) {
   // (force node size to be recalculated using existing function)
   for (key in sizeopts) {
     // bind change method for all resize-attribute inputs
-    sizeopts[key].input.change(function() { force.resume(); });
+    sizeopts[key].input.change(force.resume());
   }
   $("#nodesize-range").slider().on('slidechange', function(event, ui) {
     force.resume();
@@ -228,6 +228,15 @@ function init_graph(json) {
     node.append("svg:circle")
         .attr("r", options.nodesize)
         .style("fill", function(d) { return options.fill(d.type); });
+
+    // plain text labels reading left-to-right after the node
+    /*
+    node.append('svg:text')
+        .attr('class', 'node-label')
+        .attr('x', 10)  // offset so text doesn't overlap node
+        .attr('dy', '.31em')
+        .text(function(d) { return ' ' + d.label ;});
+    */
 
   // when not using force-directed graph labels, add node label
   // for display as hover text
