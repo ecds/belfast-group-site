@@ -33,13 +33,17 @@
   </div>
 {% endif %}
 
+{% comment %}  {# Using local profile images instead of dbpedia thumbnails #}
 {% if person.dbpedia.thumbnail %}
 <div class="pull-right">
   <img src="{{ person.dbpedia.thumbnail }}"/>
   <p><small><i>image via <a href="{{ person.dbpedia.wikipedia_url }}">Wikipedia</a></i></small></p>
 </div>
 {% endif %}
+{% endcomment %}
 
+{# suppressing rdf occupation, locations, birth date & place - redundant with description #}
+{% comment %}
 {% if person.occupation %}
 <p><b>Occupation:</b> {{ person.occupation|join:', ' }}</p>
 {% endif %}
@@ -58,6 +62,7 @@
     {% if person.birthplace %}
     in <a href="{{ person.birthplace.identifier }}">{{ person.birthplace }}</a>{% endif %}.</p>
 {% endif %}
+{% endcomment %}
 
 {% if person.description %}
  <p class="description">{{ person.description }}
