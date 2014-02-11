@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.http import last_modified
@@ -121,25 +122,37 @@ def chord_diagram(request):
 
 
 # @last_modified(rdf_nx_lastmod)
-def group_people(request):
+def group_people(request, mode='egograph'):
     # graph of just people directly connected to the belfast group
+    if mode == 'egograph':
+        js_view = 'network:bg-js'
+    elif mode == 'groupsheet-model':
+        js_view = 'network:bg-gs-js'
     return render(request, 'network/bg.html',
-                  {'bg_uri': BELFAST_GROUP_URI})
+                  {'bg_uri': BELFAST_GROUP_URI,
+                  'js_view': js_view, 'mode': mode})
 
 
 # @last_modified(rdf_nx_lastmod)
-def group_people_js(request):
-    belfast_group = RdfOrganization(network_data().copy(), BELFAST_GROUP_URI)
-    ego_graph = belfast_group.ego_graph(radius=1, types=['Person', 'Organization'])
-    # annotate nodes in graph with degree
-    # FIXME: not a directional graph; in/out degree not available
-    ego_graph = annotate_graph(ego_graph,
-        fields=['degree', 'in_degree', 'out_degree',
-                'betweenness_centrality',
-                'eigenvector_centrality'])
-    data = json_graph.node_link_data(ego_graph)
-    return HttpResponse(json.dumps(data), content_type='application/json')
+def group_people_js(request, mode='egograph'):
+    if mode == 'egograph':
+        belfast_group = RdfOrganization(network_data().copy(), BELFAST_GROUP_URI)
+        graph = belfast_group.ego_graph(radius=1, types=['Person', 'Organization'])
+        # annotate nodes in graph with degree
+        # FIXME: not a directional graph; in/out degree not available
+        graph = annotate_graph(graph,
+            fields=['degree', 'in_degree', 'out_degree',
+                    'betweenness_centrality',
+                    'eigenvector_centrality'])
 
+    elif mode == 'groupsheet-model':
+        graph = gexf.read_gexf(settings.GEXF_DATA['bg1'])
+        graph = annotate_graph(graph,
+            fields=['degree', #'in_degree', 'out_degree',
+                   'betweenness_centrality'])
+
+    data = json_graph.node_link_data(graph)
+    return HttpResponse(json.dumps(data), content_type='application/json')
 
 
 def map(request):
