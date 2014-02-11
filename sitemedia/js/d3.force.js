@@ -22,6 +22,10 @@ function ForceGraphControls(config) {
   var p = $("<p>").append(label_toggle).append(" display labels <br/>");
   p.append($("<small>(not recommended for large graphs)</small>"));
   controls.append(p);
+  // if labels is specified as true in user-config, start with it checked
+  if (options.graph_options.labels) {
+    label_toggle.attr('checked', 'checked');
+  }
   options.graph_options.labels = $("#graph-labels").is(":checked");
 
   var size_attributes = {
@@ -149,7 +153,7 @@ function ForceGraph(config) {
     'target': '#chart', // selector for element where svg should be added
     'width': 400,
     'height': 400,
-    'fill': d3.scale.category20(),
+    'fill': d3.scale.category20c(),
     'highlight': [],
     'labels': false,
     'nodesize': 5,
