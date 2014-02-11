@@ -1,4 +1,4 @@
-{% extends 'site_base.html' %}
+{% extends 'page_base.html' %}
 {% load tei %} {% load static %}
 
 {% block page-subtitle %} | {{ document.title }}{% endblock %}
@@ -16,9 +16,7 @@
 
 {% block body-attrs %}data-spy="scroll" data-target=".local-sidenav" data-offset-top="200"{% endblock %}
 
-{% block content %}
-<div class="container">
-
+{% block page-content %}
   <div class="row">
   <div class="contents col-md-4 local-sidenav">
     {# use toc item titles for RDF title list #}
@@ -83,5 +81,4 @@
   </div> {# end right column #}
 
  </div> {# end row #}
-</div> {# end container #}
 {% endblock %}

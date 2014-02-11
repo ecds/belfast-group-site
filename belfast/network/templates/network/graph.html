@@ -1,4 +1,4 @@
-{% extends 'site_base.html' %}
+{% extends 'page_base.html' %}
 {% load static %}
 
 {% block page-subtitle %} | Network Graph{% endblock %}
@@ -9,7 +9,7 @@
   <script type="text/javascript" src="{% static 'js/jquery-ui/js/jquery-ui-1.10.3.custom.min.js' %}"></script>
 {% endblock %}
 
-{% block content %}
+{% block page-content %}
 <div>See also:
   <ul>
     <li><a href="{% url 'network:bg' %}">a network graph of people connected to

@@ -1,9 +1,9 @@
-{% extends 'site_base.html' %}
+{% extends 'page_base.html' %}
 {% load static %}
 
 {% block page-subtitle %} | Network Chord Diagram{% endblock %}
 
-{% block content %}
+{% block page-content %}
 {% with min_degree=3 %}
 <p>Chord diagram of people, places, and organizations in the network,
   filtering out nodes with degree less than {{ min_degree}}.

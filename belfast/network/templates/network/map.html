@@ -1,4 +1,4 @@
-{% extends 'site_base.html' %}
+{% extends 'page_base.html' %}
 {% load static %}
 
 {% block page-subtitle %} | Places in the Network{% endblock %}
@@ -9,11 +9,7 @@
 <script type="text/javascript" src="{% static 'js/jquery.ui.map.full.min.js' %}"></script>
 {% endblock %}
 
-{% block content %}
-<div class="container">
-
-<p></p>
-
+{% block page-content %}
 <div class="panel panel-default">
   <div class="panel-heading">A map of all places referenced in our data specific to
   the Belfast Group and the people associated with it.
@@ -79,5 +75,4 @@ $('.map-filter a').click(function() {
 
 });
 </script>
-</div>
 {% endblock %}

@@ -1,4 +1,4 @@
-{% extends 'site_base.html' %}
+{% extends 'page_base.html' %}
 {% load static %}
 
 {% block page-subtitle %} | Members | {{ person.name }}{% endblock %}
@@ -6,9 +6,7 @@
 {% block head-extras %}
 {% endblock %}
 
-{% block content %}
-<div class="container">
-
+{% block page-content %}
 <h1>{{ person.name }}</h1>
 {% if pic %}
   <div class="thumbnail pull-right">
@@ -129,7 +127,6 @@
     </div>
   {% endif %}
 
-</div>
 </div>
 <script>
   $(function () {
