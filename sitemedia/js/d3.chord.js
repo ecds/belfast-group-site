@@ -12,7 +12,7 @@ function ChordDiagram(config) {
   var options = {
     'width': 720,
     'height': 720,
-    'fill': d3.scale.category20(),
+    'fill': d3.scale.category20c(),  // was using category20 before...
     // NOTE: assigning separate color by id for now,
     // but if dataset is large enough should probably be by category
     'highlight': [],
@@ -30,7 +30,7 @@ var arc = d3.svg.arc()
     .outerRadius(outerRadius);
 
 var layout = d3.layout.chord()
-    .padding(.04)
+    .padding(0.04)
     .sortSubgroups(d3.descending)
     .sortChords(d3.ascending);
 
