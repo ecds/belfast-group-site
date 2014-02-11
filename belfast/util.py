@@ -74,7 +74,7 @@ _NX_GRAPH = None
 def network_data():
     global _NX_GRAPH
     if _NX_GRAPH is None:
-        _NX_GRAPH = gexf.read_gexf(settings.GEXF_DATA)
+        _NX_GRAPH = gexf.read_gexf(settings.GEXF_DATA['full'])
     return _NX_GRAPH
 
 

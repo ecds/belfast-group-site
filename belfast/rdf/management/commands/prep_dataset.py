@@ -15,7 +15,7 @@ from belfast.rdf.harvest import HarvestRdf, Annotate # HarvestRelated
 from belfast.rdf.qub import QUB
 from belfast.rdf.clean import SmushGroupSheets, IdentifyGroupSheets, \
     InferConnections, ProfileUris
-from belfast.rdf.nx import Rdf2Gexf
+from belfast.rdf import nx
 
 class Command(BaseCommand):
     '''Harvest and prep Belfast Group RDF dataset'''
@@ -144,7 +144,8 @@ class Command(BaseCommand):
         if all_steps or options['gexf']:
             # generate gexf
             self.stdout.write('-- Generating network graph and saving as GEXF')
-            Rdf2Gexf(graph, settings.GEXF_DATA)
+            nx.Rdf2Gexf(graph, settings.GEXF_DATA['full'])
+            nx.BelfastGroupGexf(graph, settings.GEXF_DATA['bg1'])
 
         graph.close()
 

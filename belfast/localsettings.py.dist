@@ -41,9 +41,12 @@ EXISTDB_ROOT_COLLECTION = "/sample_collection"
 
 # path for the RDF berkeley db
 RDF_DATABASE = os.path.join(BASE_DIR, 'belfastrdf.bdb')
-# path to network file generated from rdf data via networkx
-GEXF_DATA = os.path.join(BASE_DIR, 'belfastgroup.gexf')
-
+# path to directory for network files generated from rdf data via networkx
+GEXF_DATA_DIR = os.path.join(BASE_DIR, '..', 'gexf')
+GEXF_DATA = {
+    'full': os.path.join(GEXF_DATA_DIR, 'belfastgroup.gexf'),
+    'bg1': os.path.join(GEXF_DATA_DIR, 'bg1.gexf')
+}
 
 # ** MEDIA_ROOT and MEDIA_URL used for profile pictures managed via django admin
 

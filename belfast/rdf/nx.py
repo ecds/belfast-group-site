@@ -1,11 +1,10 @@
-
-import glob
+from collections import defaultdict
 import networkx as nx
 from networkx.readwrite import gexf
 import rdflib
 from rdflib.collection import Collection as RdfCollection
 
-from belfast.rdfns import SCHEMA_ORG, DC
+from belfast import rdfns
 from belfast.rdf.clean import normalize_whitespace
 
 # first-pass attempt to generate weighted network based on
@@ -79,7 +78,7 @@ class Rdf2Gexf(object):
                     if pred == rdflib.RDF.type:
                         ns, val = rdflib.namespace.split_uri(obj)
                         # special case (for now)
-                        if val == 'Manuscript' and isinstance(cx.value(subj, DC.title), rdflib.BNode):
+                        if val == 'Manuscript' and isinstance(cx.value(subj, rdfns.DC.title), rdflib.BNode):
                             val = 'BelfastGroupSheet'
                     else:
                         val = unicode(obj)
@@ -99,8 +98,8 @@ class Rdf2Gexf(object):
                             weight=connection_weights.get(name, 1))
 
 
-        print '%d nodes, %d edges' % (self.network.number_of_nodes(),
-                                      self.network.number_of_edges())
+        print '%d nodes, %d edges in full network' % \
+            (self.network.number_of_nodes(), self.network.number_of_edges())
 
         # TODO: useful for verbose output? (also report on relations with no weight?)
         #print 'edge labels: %s' % ', '.join(edge_labels)
@@ -112,11 +111,11 @@ class Rdf2Gexf(object):
         # for important nodes in our data
 
         # use name first, if we have one
-        name = self.graph.value(res, SCHEMA_ORG.name)
+        name = self.graph.value(res, rdfns.SCHEMA_ORG.name)
         if name:
             return normalize_whitespace(name)
 
-        title = self.graph.value(res, DC.title)
+        title = self.graph.value(res, rdfns.DC.title)
         if title:
             # if title is a bnode, convert from list/collection
             if isinstance(title, rdflib.BNode):
@@ -148,7 +147,7 @@ class Rdf2Gexf(object):
             self._add_node(subj)
 
         # special case: don't treat title list as a node in the network
-        if pred == DC.title and isinstance(obj, rdflib.BNode):
+        if pred == rdfns.DC.title and isinstance(obj, rdflib.BNode):
             return
 
         if pred != rdflib.RDF.type and self._include_as_node(obj) \
@@ -174,4 +173,84 @@ class Rdf2Gexf(object):
         if label is not None:
             attrs['label'] = label
         self.network.add_node(self._uri_to_node_id(res), **attrs)
+
+
+class BelfastGroupGexf(object):
+    bg_label = 'Belfast Group'
+    bg_periods = ['1963-1966', '1966-1972']
+    bg_nodes = [
+        '%s, %s' % (bg_label, bg_periods[0]),
+        '%s, %s' % (bg_label, bg_periods[1])
+    ]
+
+    edge_weights = defaultdict(int)
+
+    def __init__(self, graph, outfile):
+        self.outfile = outfile
+        self.graph = graph
+
+        self.network = nx.Graph()
+        for bg in self.bg_nodes:
+            self.network.add_node(bg, label=bg, type='Organization')
+        # assert the two phases are connected to each other:
+        # self.edge_weights[(self.bg_nodes[0], self.bg_nodes[1])] += 1
+
+        ms = set(list(graph.subjects(predicate=rdflib.RDF.type, object=rdfns.BG.GroupSheet)))
+
+        for m in ms:
+            coverage = graph.value(subject=m, predicate=rdfns.DC.coverage)
+            bg_period = '%s, %s' % (self.bg_label, coverage)
+            if bg_period not in self.bg_nodes:
+                print 'Error: coverage %s doesn\'t map to a recognized Belfast Group period' % coverage
+                continue
+
+            authors = list(graph.objects(subject=m, predicate=rdfns.DC.creator))
+            for i, a in enumerate(authors):
+                author_id = str(a)  # stringify author uri
+                # if not in the network, add it
+                if author_id not in self.network:
+                    # TODO: use preferred label instead?
+                    self.network.add_node(author_id,
+                        label=graph.value(a, rdfns.SCHEMA_ORG.name),
+                        type='Person')
+                # increase connection weight by one for each groupsheet
+                self.edge_weights[(author_id, bg_period)] += 1
+
+                # make connection between co-authors
+                if len(authors) > (i + 1):
+                    for co_author in authors[i+1:]:
+                        self.edge_weights[(author_id, str(co_author))] += 1
+
+            # groupsheet owners are also associated with the group of the same period
+            # and the groupsheet authors
+            owners = list(graph.subjects(predicate=rdfns.SCHEMA_ORG.owns, object=m))
+            for i, o in enumerate(owners):
+                # same basic logic as for owners
+                owner_id = str(o)
+                if owner_id not in self.network:
+                    # TODO: use preferred label instead?
+                    self.network.add_node(owner_id,
+                        label=graph.value(o, rdfns.SCHEMA_ORG.name),
+                        type='Person')
+                # increase connection weight by one for each groupsheet
+                self.edge_weights[(owner_id, bg_period)] += 1
+
+                # connected to groupsheet authors
+                for auth in authors:
+                    self.edge_weights[(owner_id, str(auth))] += 1
+                # connected to other groupsheet owners
+                if len(owners) > (i + 1):
+                    for co_owner in owners[i+1:]:
+                        self.edge_weights[(owner_id, str(co_owner))] += 1
+
+
+
+        # convert dict into list of tuple that can be easily added to the network graph
+        edge_bunch = [(s, t, w) for (s, t), w in self.edge_weights.iteritems()]
+        self.network.add_weighted_edges_from(edge_bunch)
+
+        print '%d nodes, %d edges in Belfast Group network based on groupsheets' \
+            % (self.network.number_of_nodes(), self.network.number_of_edges())
+
+        gexf.write_gexf(self.network, self.outfile)
 
