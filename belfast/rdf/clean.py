@@ -506,6 +506,10 @@ class InferConnections(object):
             self.process_graph(ctx)
 
     def process_graph(self, graph):
+        # add direct relationships for authors of poems that mention other
+        # people, places, etc
+        self.writes_about(graph)
+
         ms = list(graph.subjects(predicate=rdflib.RDF.type, object=rdfns.BG.GroupSheet))
         # if no manuscripts are found, skip
         if len(ms) == 0:
@@ -621,6 +625,24 @@ class InferConnections(object):
                 # but seems to be close enough for our purposes
                 graph.set((creator, rdfns.SCHEMA_ORG.owns, ms))
 
+    def writes_about(self, graph):
+        poems = list(graph.subjects(predicate=rdflib.RDF.type,
+                     object=rdflib.URIRef('http://www.freebase.com/book/poem')))
+
+        for p in poems:
+            # NOTE: this *should* be in the local graph context, but
+            # apparently context is getting lost when triples including local URIs are converted
+            authors = list(self.full_graph.objects(subject=p, predicate=rdfns.DC.creator))
+            if not authors:  # should be present, but check just in case...
+                continue
+            author = authors[0]
+            mentioned = list(graph.objects(subject=p, predicate=rdfns.SCHEMA_ORG.mentions))
+            for m in mentioned:
+                # triple to add direct connection between author and subject
+                # using schema:mentions as shorthand for "writes about"
+                writes_about = (author, rdfns.SCHEMA_ORG.mentions, m)
+                if writes_about not in graph:
+                    graph.add(writes_about)
 
 
 
