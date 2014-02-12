@@ -11,9 +11,9 @@ circle.node {
     stroke-opacity: .6;
 }
 
-
 .node-label {
-    fill: #adadad;
+    /*fill: #adadad;*/
+    fill: #818181;  /* bit darker for more readablity (?) */
     font-family: "Arial";
     font-size: 10pt;
 }
