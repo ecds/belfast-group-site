@@ -79,7 +79,7 @@ function ForceGraphControls(config) {
     // adjust node size
     var p2 = $("<p/>").append("Size nodes by: <br/>");
     // TODO: have an option to switch back to all the same size?
-    var none = $("<input/>").attr('type', 'radio').attr('name', 'node-size').attr('value', 'none');
+    // var none = $("<input/>").attr('type', 'radio').attr('name', 'node-size').attr('value', 'none');
 
     for (key in sizeopts) {
       p2.append(sizeopts[key].input).append(' ' + size_attributes[key].label + ' ');
@@ -105,7 +105,6 @@ function ForceGraphControls(config) {
     options.graph_options.nodesize = function nodesize(x) {
       var sizetype = $("input[name=node-size]:checked").val();
       var values = $("#nodesize-range" ).slider("option", "values");
-
       if (sizeopts[sizetype]) {
         // adjust the scale for this attribute to current slider values
         sizeopts[sizetype].scale.range(values);
@@ -115,6 +114,7 @@ function ForceGraphControls(config) {
 
       return 5;  // default size
     };
+
 
   // declare variable to hold the forcedirected graph once it's launched
   var force;
@@ -160,16 +160,22 @@ function ForceGraph(config) {
   */
 
   var options = {
-    'target': '#chart', // selector for element where svg should be added
-    'width': 400,
-    'height': 400,
-    'fill': d3.scale.category20c(),
-    'highlight': [],
-    'labels': false,
-    'nodesize': 5,
-    'curved_paths': true
+    target: '#chart', // selector for element where svg should be added
+    width: 400,
+    height: 400,
+    fill: d3.scale.category20c(),
+    highlight: [],
+    labels: false,
+    nodesize: 5,
+    curved_paths: true,
+    node_info: '#node-info',
+    node_info_url: ''
   };
   $.extend(options, config);
+
+  function node_info(id) {
+    $(options.node_info).html('Loading...').load(options.node_info_url + "?id=" + id);
+  }
 
   var vis = d3.select(options.target)
     .append("svg:svg")
@@ -180,7 +186,7 @@ function init_graph(json) {
 
   var force = d3.layout.force()
       .charge(-1000)
-      .linkDistance(120)
+      .linkDistance(100)
       .gravity(0.5)   // 0.1 is the default
       .linkStrength(function(x) { return x.weight || 1; })
       .nodes(json.nodes)
@@ -245,6 +251,11 @@ function init_graph(json) {
         .attr("r", options.nodesize)
         .style("fill", function(d) { return options.fill(d.type); });
 
+    // mouseover for node  # IF defined
+    if (options.node_info_url) {
+      node.on("mouseover", function(d) { node_info(d.id); });
+    }
+
     // plain text labels reading left-to-right after the node
     /*
     node.append('svg:text')
@@ -286,13 +297,20 @@ function init_graph(json) {
       .attr('class', 'node-label');
       // NOTE: styles configured in css for easier override on hover/highlight
 
+      if (options.node_info_url) {
+         anchorNode.on("mouseover", function(d) {
+            // NOTE: might be nicer to handle styles in js
+            // bold the label when either node or text is moused over
+            node_info(d.node.id)}
+         );
+      }
+
   }
 
   vis.style("opacity", 1e-6)
     .transition()
       .duration(1000)
       .style("opacity", 1);
-
 
       var updateLink = function() {
         this.attr("x1", function(d) {
@@ -304,8 +322,8 @@ function init_graph(json) {
         }).attr("y2", function(d) {
           return d.target.y;
         });
-
       };
+
       var updatePath = function() {
         this.attr("d", function(d) {
           return "M {0},{1} L {2},{3}".format(d.source.x, d.source.y,
@@ -359,14 +377,17 @@ function init_graph(json) {
         });
 
         anchorNode.call(updateNode);
-        if (options.curved_paths) {
-          path.attr("d", linkArc);
-        } else {
-         path.call(updatePath);
-        }
         anchorLink.call(updateLink);
 
     }
+
+    if (options.curved_paths) {
+      path.attr("d", linkArc);
+    } else {
+      path.call(updatePath);
+    }
+
+
 
   });
 
