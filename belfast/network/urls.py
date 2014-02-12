@@ -15,4 +15,5 @@ urlpatterns = patterns('',
         {'mode': 'groupsheet-model'}, name='bg-gs-js'),
     url(r'^map/$', views.map, name='map'),
     url(r'^map.json$', views.map_js, name='map-js'),
+    url(r'^node/$', views.node_info, name='node-info')
 )

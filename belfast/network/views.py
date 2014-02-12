@@ -13,7 +13,7 @@ from belfast.util import network_data, rdf_data,  \
     rdf_data_lastmodified, network_data_lastmodified, normalize_whitespace
 from belfast.rdfns import BELFAST_GROUP_URI
 from belfast.groupsheets.rdfmodels import RdfGroupSheet
-from belfast.people.rdfmodels import RdfOrganization, find_places
+from belfast.people.rdfmodels import RdfOrganization, RdfPerson, find_places
 from belfast.network.util import annotate_graph
 
 
@@ -153,6 +153,19 @@ def group_people_js(request, mode='egograph'):
 
     data = json_graph.node_link_data(graph)
     return HttpResponse(json.dumps(data), content_type='application/json')
+
+def node_info(request):
+    node_id = request.GET.get('id', None)
+    # TODO: better to get from gexf or rdf ?
+    graph = gexf.read_gexf(settings.GEXF_DATA['full'])
+    node = graph.node[node_id]
+    context = {'node': node}
+    if node.get('type', None) == 'Person':
+        # init rdf person
+        person = RdfPerson(rdf_data(), rdflib.URIRef(node_id))
+        context['person'] = person
+    # TODO: handle other types? location, organization
+    return render(request, 'network/node_info.html', context)
 
 
 def map(request):
