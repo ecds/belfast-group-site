@@ -29,7 +29,7 @@ def list(request):
     # display a list of people one remove from belfast group
     people = profile_people()
     # filter to only people with a description
-    people = [p for p in people if p.description or p.dbpedia and p.dbpedia.description]
+    people = [p for p in people if p.has_profile]
     # find profile pictures
     pictures = ProfilePicture.objects.filter(person_uri__in=[p.identifier for p in people])
     pics = dict([(p.person_uri, p) for p in pictures])

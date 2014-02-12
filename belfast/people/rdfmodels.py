@@ -177,11 +177,16 @@ class RdfPerson(RdfEntity):
         # all persons with profiles should have local, slug-based uris
         return self.identifier.strip('/').split('/')[-1]
 
+    _current_site = None
+    @property
+    def current_site(self):
+        if self._current_site is None:
+            self._current_site = Site.objects.get(id=settings.SITE_ID)
+        return self._current_site
+
     @property
     def local_uri(self):
-        current_site = Site.objects.get(id=settings.SITE_ID)
-        return str(self.identifier).startswith('http://%s' % current_site.domain)
-
+        return str(self.identifier).startswith('http://%s' % self.current_site.domain)
 
     # NOTE: group sheet authors and other people with profiles on this site
     # should have first/last names added to the rdf data by the dataprep process
@@ -264,7 +269,21 @@ class RdfPerson(RdfEntity):
     def locations(self):
         return self.work_locations + self.home_locations
 
+    @property
+    def has_profile(self):
+        'boolean flag to indicate if this person should have a local profile page'
+        # current requirements: local uri and has a description
+        return self.local_uri and \
+           self.description_context or (self.dbpedia and self.dbpedia.description)
+
     # TODO: need access to groupsheets by this person
+
+    documents = rdfmap.ResourceList(rdfns.DC.creator, RdfResource, is_object=False)
+
+    @property
+    def groupsheets(self):
+        return [d for d in self.documents if rdfns.BG.GroupSheet in d.rdf_types]
+
 
 class RdfPoem(RdfEntity):
     author = rdfmap.Resource(rdfns.SCHEMA_ORG.author, RdfPerson)
