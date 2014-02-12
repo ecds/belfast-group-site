@@ -298,11 +298,11 @@ function init_graph(json) {
       // NOTE: styles configured in css for easier override on hover/highlight
 
       if (options.node_info_url) {
-         anchorNode.on("mouseover", function(d) {
+        anchorNode.on("mouseover", function(d) {
             // NOTE: might be nicer to handle styles in js
-            // bold the label when either node or text is moused over
-            node_info(d.node.id)}
-         );
+            // bold the label when either node or text is moused over...
+            node_info(d.node.id);
+        });
       }
 
   }
@@ -362,7 +362,8 @@ function init_graph(json) {
             d.x = d.node.x;
             d.y = d.node.y;
           } else {
-
+            // FIXME: this line results in an NS_ERROR_FAILURE in Firefox
+            // after toggling label display (but works fine in either mode initially?!?)
             var b = this.childNodes[1].getBBox();
 
             var diffX = d.x - d.node.x;
