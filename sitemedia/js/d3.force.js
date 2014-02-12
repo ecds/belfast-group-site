@@ -1,3 +1,13 @@
+if (!String.prototype.format) {
+  // convenience function for formatting string for svg:path start/end
+  String.prototype.format = function() {
+    var formatted = this;
+    for (var arg in arguments) {
+        formatted = formatted.replace("{" + arg + "}", arguments[arg]);
+    }
+    return formatted;
+  };
+}
 
 /* adapted from networkx js example:
 http://networkx.github.io/documentation/latest/examples/javascript/force.html
@@ -157,6 +167,7 @@ function ForceGraph(config) {
     'highlight': [],
     'labels': false,
     'nodesize': 5,
+    'curved_paths': true
   };
   $.extend(options, config);
 
@@ -180,10 +191,10 @@ function init_graph(json) {
   // force-adjusted labels
   // based on http://bl.ocks.org/MoritzStefaner/1377729
   // OPTIONALLY initialize force-directed labels
+  var label_nodes = [];
+  var label_links = [];
+  var force_labels;
   if (options.labels) {
-    var label_nodes = [];
-    var label_links = [];
-
     // generate labels based on actual nodes
     for(var i = 0; i < json.nodes.length; i++) {
       // add twice: once to track the node
@@ -199,7 +210,7 @@ function init_graph(json) {
     }
 
     // generate a secondary force-directed graph for the labels
-    var force_labels = d3.layout.force()
+    force_labels = d3.layout.force()
       .nodes(label_nodes)
       .links(label_links)
       .gravity(0)
@@ -211,17 +222,18 @@ function init_graph(json) {
 
   }
 
-  var link = vis.selectAll("line.link")
+  var path = vis.selectAll("path")
       .data(json.links)
-    .enter().append("svg:line")
+    .enter().append("svg:path")
       .attr("class", "link")
-//      .style("stroke-width", function(d) { return Math.sqrt(d.value); })
-// line width based on weight of the connection
+      // line width based on weight of the connection
       .style("stroke-width", function(d) { return Math.sqrt(d.weight || 1); })
-      .attr("x1", function(d) { return d.source.x; })
-      .attr("y1", function(d) { return d.source.y; })
-      .attr("x2", function(d) { return d.target.x; })
-      .attr("y2", function(d) { return d.target.y; });
+      .attr('source', function(d) { return d.source.id })
+      .attr('target', function(d) { return d.target.id })
+      .attr("d", function(d) {
+        return "M {0},{1} L {2},{3}".format(d.source.x, d.source.y,
+          d.target.x, d.target.y);
+      });
 
   var node = vis.selectAll("g.node")
       .data(json.nodes)
@@ -294,6 +306,20 @@ function init_graph(json) {
         });
 
       };
+      var updatePath = function() {
+        this.attr("d", function(d) {
+          return "M {0},{1} L {2},{3}".format(d.source.x, d.source.y,
+            d.target.x, d.target.y);
+        });
+      };
+      // logic for curved paths borrowed from http://bl.ocks.org/mbostock/1153292
+      function linkArc(d) {
+        var dx = d.target.x - d.source.x,
+        dy = d.target.y - d.source.y,
+        dr = Math.sqrt(dx * dx + dy * dy);
+        return "M{0},{1} A{2},{3} 0 0,1 {4},{5}".format(
+          d.source.x, d.source.y, dr, dr, d.target.x, d.target.y);
+      }
 
       var updateNode = function() {
         this.attr("transform", function(d) {
@@ -310,12 +336,6 @@ function init_graph(json) {
     node.call(updateNode);
     // update nodesize based on function/ui controls
     node.selectAll("circle").attr("r", options.nodesize);
-
-
-    link.attr("x1", function(d) { return d.source.x; })
-        .attr("y1", function(d) { return d.source.y; })
-        .attr("x2", function(d) { return d.target.x; })
-        .attr("y2", function(d) { return d.target.y; });
 
     if (options.labels) {
         anchorNode.each(function(d, i) {
@@ -339,7 +359,11 @@ function init_graph(json) {
         });
 
         anchorNode.call(updateNode);
-        link.call(updateLink);
+        if (options.curved_paths) {
+          path.attr("d", linkArc);
+        } else {
+         path.call(updatePath);
+        }
         anchorLink.call(updateLink);
 
     }

@@ -4,10 +4,12 @@ circle.node {
     stroke-width: 1.5px;
 }
 
-line.link {
+.link {
+    fill: none;
     stroke: #999;
     stroke-opacity: .6;
 }
+
 
 .node-label {
     fill: #adadad;
