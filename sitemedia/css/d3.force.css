@@ -6,7 +6,8 @@ circle.node {
 
 .link {
     fill: none;
-    stroke: #999;
+    /*stroke: #999;*/
+    stroke: #bed9e3;
     stroke-opacity: .6;
 }
 
@@ -32,5 +33,12 @@ circle.node {
 #graph-controls {
     border: 2px solid #efefef;
     padding: 10px;
-    width: 3in;
+    background-color: white;
+}
+
+#node-info {
+    padding: 10px;
+}
+#node-info h4 {
+    margin-bottom: 0;
 }
