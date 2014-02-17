@@ -5,5 +5,6 @@ urlpatterns = patterns('',
     url(r'^$', views.list, name='list'),
     url(r'^(?P<id>[a-z0-9:_-]+)/$', views.profile, name='profile'),
     url(r'^(?P<id>[a-z0-9:_-]+)/ego.json$', views.egograph_js, name='egograph-js'),
-    url(r'^(?P<id>[a-z0-9:_-]+)/ego-graph/$', views.egograph, name='egograph'),
+    # url(r'^(?P<id>[a-z0-9:_-]+)/ego-graph/$', views.egograph, name='egograph'),
+    url(r'^(?P<id>[a-z0-9:_-]+)/ego-graph/node/$', views.egograph_node_info, name='egograph-node'),
 )

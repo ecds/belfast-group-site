@@ -1,10 +1,11 @@
-from django.core.urlresolvers import reverse
-from django.shortcuts import render, get_object_or_404
-from django.http import Http404, HttpResponse
-from django.views.decorators.http import last_modified
+from django.conf import settings
 from django.contrib.sites.models import get_current_site
+from django.core.urlresolvers import reverse
+from django.http import Http404, HttpResponse
+from django.shortcuts import render, get_object_or_404
+from django.views.decorators.http import last_modified
 import json
-from networkx.readwrite import json_graph
+from networkx.readwrite import json_graph, gexf
 import rdflib
 
 from belfast import rdfns
@@ -12,7 +13,8 @@ from belfast.util import rdf_data, rdf_data_lastmodified, \
     network_data_lastmodified, local_uri
 from belfast.groupsheets.rdfmodels import get_rdf_groupsheets
 from belfast.people.models import ProfilePicture
-from belfast.people.rdfmodels import BelfastGroup, profile_people, RdfPerson
+from belfast.people.rdfmodels import BelfastGroup, profile_people, \
+  RdfPerson, RdfPoem
 from belfast.network.util import annotate_graph
 
 
@@ -82,7 +84,45 @@ def egograph_js(request, id):
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
+# NOTE: egograph view no longer in use, but might want to consider
+# switching network graph tab of profile page to be loaded via ajax
+
 # @last_modified(rdf_nx_lastmod)  # uses both rdf and gexf (?)
-def egograph(request, id):
-    person = get_object_or_404(Person, slug=id)
-    return render(request, 'people/ego_graph.html', {'person': person})
+# def egograph(request, id):
+#     person = get_object_or_404(Person, slug=id)
+#     return render(request, 'people/ego_graph.html', {'person': person})
+
+def egograph_node_info(request, id):
+    # id is the person to whom this node is connected
+    uri = local_uri(reverse('people:profile', args=[id]), request)
+    g = rdf_data()
+    ego_person = RdfPerson(g, rdflib.URIRef(uri))
+
+    # NOTE: some overlap here with networks node_info view
+
+    # id param is the node we want information had to
+    node_id = request.GET.get('id', None)
+    node_uri = rdflib.URIRef(node_id)
+    # TODO: better to get relations from gexf or rdf ?
+    graph = gexf.read_gexf(settings.GEXF_DATA['full'])
+    node = graph.node[node_id]
+    context = {'node': node}
+
+    if node.get('type', None) == 'Person':
+        # init rdf person
+        person = RdfPerson(rdf_data(), rdflib.URIRef(node_id))
+        context['person'] = person
+
+    # determine relation between node and ego-center
+    rels = set(g.predicates(ego_person.identifier, node_uri))
+    # TODO: may want to display other relationships?
+
+    # special case: if "mentions", should be a poem; find for display/link
+    if rdfns.SCHEMA_ORG.mentions in rels:
+        txts = set(g.subjects(rdfns.SCHEMA_ORG.mentions, node_uri)) \
+               - set([ego_person.identifier])
+        if txts:
+            context['poems'] = [RdfPoem(g, p) for p in txts]
+
+    return render(request, 'network/node_info.html', context)
+

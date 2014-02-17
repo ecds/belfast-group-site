@@ -287,7 +287,7 @@ class RdfPerson(RdfEntity):
 
 class RdfPoem(RdfEntity):
     author = rdfmap.Resource(rdfns.SCHEMA_ORG.author, RdfPerson)
-
+    title = rdfmap.Value(rdfns.SCHEMA_ORG.name, normalize=True)
 
 # FIXME! this is a hack; find a better way to do this...
 # patch in types to return for connected persons/orgs

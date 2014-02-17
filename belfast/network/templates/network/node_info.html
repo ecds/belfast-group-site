@@ -15,4 +15,9 @@
 {# display gexf node information as fallback/ minimum content? #}
 {# node stats? degree, connectedness? #}
 {% endif %}
+
+{% if poems %}
+<p>Mentioned in {% for p in poems %}
+ <a href="{{ p.identifier }}">{{ p.title }}</a>{% if not forloop.last %}; {% endif %}{% endfor %}.</p>
+{% endif %}
 </div>
