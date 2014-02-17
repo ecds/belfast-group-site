@@ -18,9 +18,13 @@ circle.node {
     font-size: 10pt;
 }
 
-.node-label:hover {
+.node-label:hover, .hover .node-label {
     fill: black;
     font-weight: bold;
+}
+
+.highlight {
+    border: 1px solid red;
 }
 
 .highlight .node-label {

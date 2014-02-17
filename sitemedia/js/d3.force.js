@@ -248,8 +248,8 @@ function init_graph(json) {
       .attr("class", "link")
       // line width based on weight of the connection
       .style("stroke-width", function(d) { return Math.sqrt(d.weight || 1); })
-      .attr('source', function(d) { return d.source.id })
-      .attr('target', function(d) { return d.target.id })
+      .attr('source', function(d) { return d.source.id; })
+      .attr('target', function(d) { return d.target.id; })
       .attr("d", function(d) {
         return "M {0},{1} L {2},{3}".format(d.source.x, d.source.y,
           d.target.x, d.target.y);
@@ -268,6 +268,19 @@ function init_graph(json) {
     // click for node info IF defined
     if (options.node_info_url) {
       node.on("click", function(d) { node_info(d.id); });
+    }
+
+    // highlight corresponding label on mouseover
+    function highlight_label(node, on_off) {
+        // find anchor node that corresponds to this one
+        var labels = d3.selectAll('g.anchorNode').filter(function(j, i) {
+           return j.node.id == node.id;
+        });
+        labels.classed('hover', on_off);
+    }
+    if (options.labels) {
+      node.on("mouseover", function(d) { highlight_label(d, true); });
+      node.on("mouseout", function(d) { highlight_label(d, false); });
     }
 
     // plain text labels reading left-to-right after the node
@@ -292,7 +305,7 @@ function init_graph(json) {
 
     var anchorLink = vis.selectAll("line.anchorLink").data(label_links);
 
-    var anchorNode = vis.selectAll("g.anchorNode")
+    var anchorNode = vis.selectAll(".anchorNode")
       .data(force_labels.nodes()).enter()
         .append("svg:g")
         .attr("class", function(d) {
