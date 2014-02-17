@@ -392,7 +392,7 @@ class ProfileUris(object):
         # ctx.add((uriref, rdflib.namespace.RDF.type, rdfns.SCHEMA_ORG.Person))
         # add full name as preferred label for local use
         name_triples = [
-            (uriref, rdflib.namespace.SKOS.preferredLabel, rdflib.Literal(full_name)),
+            (uriref, rdflib.namespace.SKOS.prefLabel, rdflib.Literal(full_name)),
             (uriref, rdfns.SCHEMA_ORG.givenName, rdflib.Literal(firstname)),
             (uriref, rdfns.SCHEMA_ORG.familyName, rdflib.Literal(lastname))
         ]
