@@ -110,8 +110,13 @@ class Rdf2Gexf(object):
         # NOTE: consider adding/calculating a preferredlabel
         # for important nodes in our data
 
-        # use name first, if we have one
-        name = self.graph.value(res, rdfns.SCHEMA_ORG.name)
+        # *first* use preferred label if available
+        name = self.graph.preferredLabel(res)
+
+        # second check for schema.org name, if we have one
+        if not name:
+            name = self.graph.value(res, rdfns.SCHEMA_ORG.name)
+
         if name:
             return normalize_whitespace(name)
 
@@ -228,9 +233,12 @@ class BelfastGroupGexf(object):
                 # same basic logic as for owners
                 owner_id = str(o)
                 if owner_id not in self.network:
-                    # TODO: use preferred label instead?
+                    # use preferred label if available; otherwise, use name
+                    name = graph.preferredLabel(o)
+                    if not name:
+                        name = graph.value(o, rdfns.SCHEMA_ORG.name)
                     self.network.add_node(owner_id,
-                        label=graph.value(o, rdfns.SCHEMA_ORG.name),
+                        label=name,
                         type='Person')
                 # increase connection weight by one for each groupsheet
                 self.edge_weights[(owner_id, bg_period)] += 1
