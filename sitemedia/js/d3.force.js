@@ -157,6 +157,17 @@ function ForceGraph(config) {
       Set labels to True for in-graph labels using force-directed layout
       (not recommended for large graphs).
 
+    Available options:
+
+      target: jquery selector for element where svg chart should be added
+      url: url for json data to be used for the graph
+      width: width of the svg element which will contain the graph
+      height: height of the svg element
+      highlight: list of node ids to be highlighted (labeled, bold)
+      labels: true/false; should force-directed labels be displayed
+      node_info_url: url for displaying node information; will be called
+        with node id as param, e.g. url?id=nodeid
+
   */
 
   var options = {
@@ -175,6 +186,9 @@ function ForceGraph(config) {
 
   function node_info(id) {
     $(options.node_info).html('Loading...').load(options.node_info_url + "?id=" + id);
+  }
+  if (! options.node_info_url) {
+    $(options.node_info).hide();
   }
 
   var vis = d3.select(options.target)
@@ -251,9 +265,9 @@ function init_graph(json) {
         .attr("r", options.nodesize)
         .style("fill", function(d) { return options.fill(d.type); });
 
-    // mouseover for node  # IF defined
+    // click for node info IF defined
     if (options.node_info_url) {
-      node.on("mouseover", function(d) { node_info(d.id); });
+      node.on("click", function(d) { node_info(d.id); });
     }
 
     // plain text labels reading left-to-right after the node
@@ -298,7 +312,7 @@ function init_graph(json) {
       // NOTE: styles configured in css for easier override on hover/highlight
 
       if (options.node_info_url) {
-        anchorNode.on("mouseover", function(d) {
+        anchorNode.on("click", function(d) {
             // NOTE: might be nicer to handle styles in js
             // bold the label when either node or text is moused over...
             node_info(d.node.id);

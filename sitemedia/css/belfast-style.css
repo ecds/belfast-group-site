@@ -375,3 +375,7 @@ footer {
 	padding: 5px 8px;
 	background-color: white;
 }
+
+.node-info-detail h4 {
+	display: inline-block;
+}
