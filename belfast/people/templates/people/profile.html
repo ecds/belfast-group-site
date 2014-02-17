@@ -7,7 +7,9 @@
 {% endblock %}
 
 {% block page-content %}
-<h1>{{ person.name }}</h1>
+
+<h1>{% if person.lastname and person.firstname %}{{ person.firstname }} {{ person.lastname }}
+{% else %} {{ person.name }}{% endif %}</h1>
 {% if pic %}
   <div class="thumbnail pull-right">
     <img src="{{ MEDIA_ROOT}}{{ pic.img.url }}" width="{{ pic.img.width }}" height="{{ pic.img.height }}"/>
