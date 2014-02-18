@@ -261,6 +261,10 @@ function init_graph(json) {
       .attr("class", function(d) { return "node " + d.type; })
       .style("fill", function(d) { return options.fill(d.type); });
 
+    if (options.node_info_url) {
+      node.classed('node-info-link', true);
+    }
+
     node.append("svg:circle")
         .attr("r", options.nodesize)
         .style("fill", function(d) { return options.fill(d.type); });
@@ -322,6 +326,9 @@ function init_graph(json) {
         return i % 2 === 0 ? "" : d.node.label;
       })
       .attr('class', 'node-label');
+      if (options.node_info_url) {
+        anchorNode.classed('node-info-link', true);
+      }
       // NOTE: styles configured in css for easier override on hover/highlight
 
       if (options.node_info_url) {

@@ -23,8 +23,8 @@ circle.node {
     font-weight: bold;
 }
 
-.highlight {
-    border: 1px solid red;
+.node-info-link:hover {
+    cursor: pointer;
 }
 
 .highlight .node-label {
