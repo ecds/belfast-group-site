@@ -22,7 +22,8 @@
             width: 1000,
             height: 500,
             highlight: ['{{ person.identifier }}'],
-            // labels: true,
+            labels: true,
+            label_minsize: 6,
             node_info_url: "{% url 'people:egograph-node'  id=person.slug %}"
         }
       });
