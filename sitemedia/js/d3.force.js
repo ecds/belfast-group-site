@@ -46,7 +46,7 @@ function ForceGraphControls(config) {
   };
 
   var size_attributes = {
-    degree: {label: 'degree', attr: 'degree'},
+    degree: {label: 'degree', attr: 'degree', default: true},
     in_degree: {label: 'in degree', attr: 'in_degree'},
     out_degree: {label: 'out degree', attr: 'out_degree'},
     betweenness: {label: 'betweenness', attr: 'betweenness'},
@@ -74,6 +74,9 @@ function ForceGraphControls(config) {
         // generate an input to select this feature as basis for size
         sizeopts[key].input = $("<input/>").attr('type', 'radio')
              .attr('name', 'node-size').attr('value', key);
+        if (size_attributes[key].default) {
+          sizeopts[key].input.attr('checked', 'checked');
+        }
         // TODO: label
         // generate scale for this feature based on observed min/max
         // convert degree or other attribute into relative node size
