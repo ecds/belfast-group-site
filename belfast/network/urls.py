@@ -2,7 +2,8 @@ from django.conf.urls import patterns, include, url
 from belfast.network import views
 
 urlpatterns = patterns('',
-    url(r'^$', views.force_graph, name='force-graph'),
+    url(r'^$', views.overview, name='overview'),
+    url(r'^full/$', views.force_graph, name='force-graph'),
     url(r'^chord/$', views.chord_diagram, name='chord'),
     url(r'^(?P<mode>full|adjacency).json$', views.full_js, name='js'),
 #    url(r'^adjacency.json$', views.adjacency_js, name='adjacency-js'),

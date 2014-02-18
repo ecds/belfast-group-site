@@ -28,5 +28,83 @@
     "content": "<p><strong>Marie Heaney</strong> was born Marie Devlin in Co. Tyrone. She trained as a teacher in Belfast and began her career in schools in Northern Ireland. In 1965 she and Seamus Heaney were married.</p>\r\n<p><strong>Seamus Heaney</strong> was born in Co. Derry in 1939. He studied at St. Columbs College, Derry, and at Queens University, Belfast. After graduating from Queens in 1961, he taught at St. Josephs College of Education in Belfast before taking a lectureship in the English Department at Queens from 1966-1972 (during the academic year 1970-1971 he held a visiting lectureship at the University of California at Berkeley). His first collection, <em>Eleven Poems,</em> was published as part of the Queens Festival pamphlet series, followed by <em>Death of a Naturalist</em> in 1966, and <em>Door Into the Dark</em> in 1969. He received the Eric Gregory Award in 1966, followed by the Cholomondeley Award, 1967, the Somerset Maugham Award, 1968, and the Geoffrey Faber Memorial Prize also in 1968.</p>\r\n<p><strong>Bernard McLaverty</strong> was born in Belfast in 1942 and educated at St. Malachys College. He worked for ten years as a medical laboratory technician before taking a B.A. degree in English at Queens University in 1974. A number of his short stories were broadcast on the BBC and Radio Eireann in the 1960s and were later collected in <em>Secrets and Other Stories</em> (1977) and in later collections.</p>\r\n<p><strong>Frank Ormsby</strong> was born in Co. Fermanagh in 1947 and educated at St. Michaels College, Enniskillen and at Queens University where he took an M.A. in English. In 1970 he took over the editorship of The Honest Ulsterman from James Simmons. His first collection of poems, <em>A Store of Candles</em> was published in 1977, five years after the Group had ceased to meet.</p>\r\n<p><strong>James Simmons</strong> was born in Derry in 1933 and educated at Campbell College, Belfast, and at Leeds University. During the years of the Belfast Group he published three collections of his poems: <em>Late But in Earnest</em> (1967), <em>In the Wilderness</em> (1969), and <em>Energy to Burn</em> (1971). During this period he also recorded two albums, <em>Resistance Cabaret</em> and <em>Love in the Post</em>, while also teaching in Lisburn. In the 1960's Simmons lived and taught in Nigeria. After returning to Northern Ireland, he founded the literary magazine <em>The Honest Ulsterman</em> which he edited for the first two years.</p>\r\n<p><strong>Arthur Terry </strong>was born in York in 1927. He studied modern languages at Cambridge from 1944 to 1947, and in 1950 accepted a teaching post at Queens University, Belfast. While Professor of Spanish at Queens University he published <em>An Anthology of Spanish Poetry, 1500-1700</em> (1965) and a history of Catalan Literature as part of the Literary History of Spain series from Ernest Benn (1972). He also published two translations of Spanish poems as part of the Queens Festival pamphlet series, <em>A Small War</em> (1966) and <em>The Sacrifice</em> (1967).</p>",
     "enable_comments": false
   }
-}
+},
+{
+  "pk": 3,
+  "model": "flatpages.flatpage",
+  "fields": {
+    "registration_required": false,
+    "title": "Networks & Maps",
+    "url": "/network/",
+    "template_name": "",
+    "sites": [
+      1
+    ],
+    "content": "<p>overview/intro content for BG network graphs and maps; something on how the data was collected?; overview/links to SNA resources?</p>",
+    "enable_comments": false
+  }
+ },
+{
+  "pk": 4,
+  "model": "flatpages.flatpage",
+  "fields": {
+    "registration_required": false,
+    "title": "Belfast Group Network graph",
+    "url": "/network/belfast-group/",
+    "template_name": "",
+    "sites": [
+      1
+    ],
+    "content": "<p>Force-directed network graph of people connected to the Belfast Group.  Nodes are colored by type.  Mouse over a label to see the text more clearly.</p>",
+    "enable_comments": false
+  }
+ },
+{
+  "pk": 5,
+  "model": "flatpages.flatpage",
+  "fields": {
+    "registration_required": false,
+    "title": "Belfast Group network based on the Group Sheets",
+    "url": "/network/belfast-group/groupsheets/",
+    "template_name": "",
+    "sites": [
+      1
+    ],
+    "content": "<p>This graph was generated based on the data of the group sheets themselves:  treating the two periods of the group as two separate entities, and inferring connections between the authors and owners of group sheets and the period of  the group that a particular document is associated with.  The weight of the connection is based on the number of groupsheets owned or authors, and co-authors and co-owners of a particular groupsheet are linked because presumably they attended the group together.</p>",
+    "enable_comments": false
+  }
+ },
+{
+  "pk": 6,
+  "model": "flatpages.flatpage",
+  "fields": {
+    "registration_required": false,
+    "title": "Belfast Group - Chord Diagram",
+    "url": "/network/chord/",
+    "template_name": "",
+    "sites": [
+      1
+    ],
+    "content": "<p>Chord diagram of people and organizations connected to the Belfast Group. Mouse over labels to see the connections specific to that person or entity; mouse over the smaller, unlabeled sections to see the name.</p>",
+    "enable_comments": false
+  }
+ },
+{
+  "pk": 7,
+  "model": "flatpages.flatpage",
+  "fields": {
+    "registration_required": false,
+    "title": "Places in the Network",
+    "url": "/network/map/",
+    "template_name": "",
+    "sites": [
+      1
+    ],
+    "content": "<p>brief intro text for map if needed</p>",
+    "enable_comments": false
+  }
+ }
+
+
+
 ]

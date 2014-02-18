@@ -2,9 +2,15 @@ $("document").ready(function(){
   var $poets = $("#poets");
 
   $(window).load(function(){
+    // home page images
    $poets.masonry({
       "itemSelector": 'figure',
       "columnWidth": 1
+    });
+   // profile list names and images
+   $("#bios").masonry({
+      "itemSelector": '.panel',
+      "columnWidth": 1,
     });
   });
 
@@ -18,14 +24,5 @@ $("document").ready(function(){
     $url = $(this).find('a').attr('href');
     window.location.assign($url);
   });
-
-
-  $(window).load(function(){
-   $("#bios").masonry({
-      "itemSelector": '.panel',
-      "columnWidth": 1,
-    });
-  });
-
 
 });

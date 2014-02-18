@@ -1,7 +1,7 @@
 {% extends 'page_base.html' %}
 {% load static %}
 
-{% block page-subtitle %} | Places in the Network{% endblock %}
+{% block page-subtitle %} | {{ flatpage.title }}{% endblock %}
 
 {% block head-extras %}
 <script type="text/javascript" src="//maps.google.com/maps/api/js?sensor=true"></script>
@@ -10,6 +10,10 @@
 {% endblock %}
 
 {% block page-content %}
+{% if flatpage %}
+  {% include "flatpages/snippets/flatpage_content.html" %}
+{% endif %}
+
 <div class="panel panel-default">
   <div class="panel-heading">A map of all places referenced in our data specific to
   the Belfast Group and the people associated with it.

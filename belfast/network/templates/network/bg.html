@@ -1,7 +1,7 @@
 {% extends 'page_base.html' %}
 {% load static %}
 
-{% block page-subtitle %} | Network Graph{% endblock %}
+{% block page-subtitle %} | {{ flatpage.title }}{% endblock %}
 
 {% block head-extras %}
   {{ block.super }}
@@ -10,21 +10,8 @@
 {% endblock %}
 
 {% block page-content %}
-
-
-<p>Force-directed network graph of people connected to the Belfast Group.
-  Notes are colored by type.  Mouse over a label to see the text more clearly.</p>
-
-  {# TODO: explanatory text; different by mode #}
-  {# if groupsheets mode, explain connection weight/inferrences #}
-{% if mode = 'groupsheet-model' %}
-<p>This graph was generated based on the data of the group sheets themselves:
-  treating the two periods of the group as two separate entities, and inferring
-  connections between the authors and owners of group sheets and the period of
-  the group that a particular document is associated with.  The weight of the
-  connection is based on the number of groupsheets owned or authors, and co-authors
-  and co-owners of a particular groupsheet are linked because presumably they
-  attended the group together.</p>
+{% if flatpage %}
+  {% include "flatpages/snippets/flatpage_content.html" %}
 {% endif %}
 
 {% include 'network/snippets/graph_with_controls.html' %}

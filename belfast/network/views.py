@@ -1,7 +1,8 @@
 from django.conf import settings
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.views.decorators.http import last_modified
+from django.contrib.flatpages.models import FlatPage
 import json
 import logging
 import networkx as nx
@@ -26,6 +27,20 @@ def rdf_lastmod(request, *args, **kwargs):
 
 def rdf_nx_lastmod(request, *args, **kwargs):
     return max(rdf_data_lastmodified(), network_data_lastmodified())
+
+def overview(request):
+    # get flatpage for this url; if not available, 404 (?)
+    # flatpage = FlatPage.objects.get(url=request.path, sites__id=settings.SITE_ID)
+    fpage = get_object_or_404(FlatPage, url=request.path, sites__id=settings.SITE_ID)
+    return render(request, 'network/overview.html', {'flatpage': fpage})
+
+
+def _get_flatpage(request):
+    # get flatpage for this url & site if it exists; otherwise, return none
+    try:
+        return FlatPage.objects.get(url=request.path, sites__id=settings.SITE_ID)
+    except FlatPage.DoesNotExist:
+        return None
 
 
 def _network_graph(min_degree=1, **kwargs):
@@ -118,11 +133,14 @@ def force_graph(request):
 # @last_modified(rdf_nx_lastmod)
 def chord_diagram(request):
     # circular chord chart of entire network
-    return render(request, 'network/chord.html')
+    fpage = _get_flatpage(request)
+    return render(request, 'network/chord.html', {'flatpage': fpage})
 
 
 # @last_modified(rdf_nx_lastmod)
 def group_people(request, mode='egograph'):
+    fpage = _get_flatpage(request)
+
     # graph of just people directly connected to the belfast group
     if mode == 'egograph':
         js_view = 'network:bg-js'
@@ -130,7 +148,7 @@ def group_people(request, mode='egograph'):
         js_view = 'network:bg-gs-js'
     return render(request, 'network/bg.html',
                   {'bg_uri': BELFAST_GROUP_URI,
-                  'js_view': js_view, 'mode': mode})
+                  'js_view': js_view, 'mode': mode, 'flatpage': fpage})
 
 
 # @last_modified(rdf_nx_lastmod)
@@ -176,6 +194,8 @@ def node_info(request):
 
 
 def map(request):
+    fpage = _get_flatpage(request)
+
     people = {}
     # semi-redundant with json view functionality, but easier to build filter
     for pl in find_places():
@@ -188,7 +208,8 @@ def map(request):
             if p.local_uri:
                 people[str(p.identifier)] = p.fullname
 
-    return render(request, 'network/map.html', {'people': people})
+    return render(request, 'network/map.html',
+                  {'people': people, 'flatpage': fpage})
 
 
 # @last_modified(rdf_lastmod)
