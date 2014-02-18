@@ -122,7 +122,9 @@ def egograph_node_info(request, id):
         txts = set(g.subjects(rdfns.SCHEMA_ORG.mentions, node_uri)) \
                - set([ego_person.identifier])
         if txts:
-            context['poems'] = [RdfPoem(g, p) for p in txts]
+            poems = [RdfPoem(g, p) for p in txts]
+            # explicitly skip any non-poems, just in case
+            context['poems'] = [p for p in poems if rdfns.FREEBASE["book/poem"] in p.rdf_types]
 
     return render(request, 'network/node_info.html', context)
 
