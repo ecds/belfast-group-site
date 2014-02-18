@@ -74,6 +74,8 @@
     <small><i>({% if person.dbpedia.wikipedia_url %}<a href="{{ person.dbpedia.wikipedia_url }}">Wikipedia</a>{% else %}Wikipedia{% endif %})</i></small></p>
 {% endif %}
 
+<div class="clearfix"></div>
+
 <ul class="nav nav-tabs" id="vizTab">
   {# only display connections & network tab if there are any #}
   {% if person.connected_people|length or person.connected_organizations|length %}
