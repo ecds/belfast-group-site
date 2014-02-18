@@ -3,6 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.views.decorators.http import last_modified
 from django.contrib.flatpages.models import FlatPage
+from django.contrib.sites.models import get_current_site
 import json
 import logging
 import networkx as nx
@@ -28,20 +29,31 @@ def rdf_lastmod(request, *args, **kwargs):
 def rdf_nx_lastmod(request, *args, **kwargs):
     return max(rdf_data_lastmodified(), network_data_lastmodified())
 
-def overview(request):
-    # get flatpage for this url; if not available, 404 (?)
-    # flatpage = FlatPage.objects.get(url=request.path, sites__id=settings.SITE_ID)
-    fpage = get_object_or_404(FlatPage, url=request.path, sites__id=settings.SITE_ID)
-    return render(request, 'network/overview.html', {'flatpage': fpage})
-
+def _relative_flatpage_url(request):
+    current_site = get_current_site(request)
+    url = request.path
+    # if running on a subdomain, search for flatpage with url without leading path
+    if '/' in current_site.domain:
+        parts = current_site.domain.rstrip('/').split('/')
+        suburl = '/%s/' % parts[-1]
+        if url.startswith(suburl):
+            url = request.path[len(suburl) - 1:]  # -1 to preserve leading /
+    return url
 
 def _get_flatpage(request):
     # get flatpage for this url & site if it exists; otherwise, return none
+    url = _relative_flatpage_url(request)
     try:
-        return FlatPage.objects.get(url=request.path, sites__id=settings.SITE_ID)
+        return FlatPage.objects.get(url=url, sites__id=settings.SITE_ID)
     except FlatPage.DoesNotExist:
         return None
 
+def overview(request):
+    # get flatpage for this url; if not available, 404 (?)
+    # flatpage = FlatPage.objects.get(url=request.path, sites__id=settings.SITE_ID)
+    fpage = get_object_or_404(FlatPage,
+        url=_relative_flatpage_url(request), sites__id=settings.SITE_ID)
+    return render(request, 'network/overview.html', {'flatpage': fpage})
 
 def _network_graph(min_degree=1, **kwargs):
     graph = network_data().copy()   # don't modify the original network
