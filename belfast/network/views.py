@@ -134,10 +134,11 @@ def group_people(request, mode='egograph'):
 
 
 # @last_modified(rdf_nx_lastmod)
-def group_people_js(request, mode='egograph'):
+def group_people_js(request, mode='egograph', output='full'):
     if mode == 'egograph':
         belfast_group = RdfOrganization(network_data().copy(), BELFAST_GROUP_URI)
         graph = belfast_group.ego_graph(radius=1, types=['Person', 'Organization'])
+
         # annotate nodes in graph with degree
         # FIXME: not a directional graph; in/out degree not available
         graph = annotate_graph(graph,
@@ -151,7 +152,13 @@ def group_people_js(request, mode='egograph'):
             fields=['degree', #'in_degree', 'out_degree',
                    'betweenness_centrality'])
 
-    data = json_graph.node_link_data(graph)
+    if output == 'full':
+        data = json_graph.node_link_data(graph)
+    if output == 'adjacency':
+        # adjacency matrix for generating chord diagram
+        matrix = nx.linalg.graphmatrix.adjacency_matrix(graph)
+        data = matrix.tolist()
+
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 def node_info(request):
