@@ -37,6 +37,13 @@ function ForceGraphControls(config) {
     label_toggle.attr('checked', 'checked');
   }
   options.graph_options.labels = $("#graph-labels").is(":checked");
+  options.graph_options.labels_visible = function() {
+    if ($("#graph-labels").is(":checked")) {
+      return 'visible';
+    } else {
+      return 'hidden';
+    }
+  };
 
   var size_attributes = {
     degree: {label: 'degree', attr: 'degree'},
@@ -130,9 +137,12 @@ function ForceGraphControls(config) {
   force = launch_graph(options.graph_options);
 
   // if in-graph label option is toggled, update label setting and relaunch the graph
+  // temporarily disable to see if we can make it dynamic
   label_toggle.change(function() {
-    options.graph_options.labels = $(this).is(':checked');
-    launch_graph(options.graph_options);
+      // temporarily changing to see if we can make this dynamic
+      force.resume();
+    // options.graph_options.labels = $(this).is(':checked');
+    // launch_graph(options.graph_options);
   });
 
   // if degree is selected or slider changes, resume the graph
@@ -214,7 +224,7 @@ function init_graph(json) {
   var label_nodes = [];
   var label_links = [];
   var force_labels;
-  if (options.labels) {
+  // if (options.labels) {
     // generate labels based on actual nodes
     for(var i = 0; i < json.nodes.length; i++) {
       // add twice: once to track the node
@@ -240,7 +250,7 @@ function init_graph(json) {
       .size([options.width, options.height])
       .start();
 
-  }
+  // } end if labels
 
   var path = vis.selectAll("path")
       .data(json.links)
@@ -305,7 +315,7 @@ function init_graph(json) {
 
     node.call(force.drag);
 
-  if (options.labels) {
+  // if (options.labels) {
 
     var anchorLink = vis.selectAll("line.anchorLink").data(label_links);
 
@@ -325,7 +335,8 @@ function init_graph(json) {
       anchorNode.append("svg:text").text(function(d, i) {
         return i % 2 === 0 ? "" : d.node.label;
       })
-      .attr('class', 'node-label');
+      .attr('class', 'node-label')
+      .attr('visibility', options.labels_visible());
       if (options.node_info_url) {
         anchorNode.classed('node-info-link', true);
       }
@@ -339,7 +350,7 @@ function init_graph(json) {
         });
       }
 
-  }
+  // }  endif labels
 
   vis.style("opacity", 1e-6)
     .transition()
@@ -389,7 +400,14 @@ function init_graph(json) {
     // update nodesize based on function/ui controls
     node.selectAll("circle").attr("r", options.nodesize);
 
-    if (options.labels) {
+    // update label visibility
+    // console.log('updating visibility : ' + options.labels_visible());
+    anchorNode.selectAll('.node-label').attr('visibility', options.labels_visible());
+
+    if (options.labels_visible() == 'visible') {
+      console.log('upating anchornoade placenment');
+      // updating the force-directed graph only needs to happen if some
+      // or all labels are visible
         anchorNode.each(function(d, i) {
           if (i % 2 === 0) {
             //node: position where the real version of this node is
