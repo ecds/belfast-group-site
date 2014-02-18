@@ -51,7 +51,8 @@ circle.node {
 }
 .range-slider {
     border: 0;
-    color: #f6931f;
+    /*color: #f6931f;*/
+    color: #428bca;
     font-weight: bold;
 }
 
