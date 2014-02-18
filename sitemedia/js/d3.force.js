@@ -255,7 +255,7 @@ function init_graph(json) {
   var force = d3.layout.force()
       .charge(-1000)
       .linkDistance(100)
-      .gravity(1.0)   // 0.1 is the default
+      .gravity(0.5)   // 0.1 is the default
       .linkStrength(function(x) { return x.weight || 1; })
       .nodes(json.nodes)
       .links(json.links)
