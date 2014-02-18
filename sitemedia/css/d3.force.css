@@ -39,6 +39,21 @@ circle.node {
     padding: 10px;
     background-color: white;
 }
+/*#graph-controls p {
+    padding: 0;
+    border: 0;
+
+}
+*/
+#vislabel-size {
+    display: inline;
+    width: 2em;
+}
+.range-slider {
+    border: 0;
+    color: #f6931f;
+    font-weight: bold;
+}
 
 #node-info {
     padding: 5px;

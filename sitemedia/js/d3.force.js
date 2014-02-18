@@ -30,20 +30,17 @@ function ForceGraphControls(config) {
   // than a certain threshold. (?)
   var label_toggle = $("<input/>").attr('type', 'checkbox').attr('id', 'graph-labels');
   var p = $("<p>").append(label_toggle).append(" display labels <br/>");
-  p.append($("<small>(not recommended for large graphs)</small>"));
+  // don't show warning if labels are enabled by default
+  if ( ! options.graph_options.labels) {
+    var labeltip = $("<small>(not recommended for large graphs)</small>").attr('id', 'label-tip');
+    p.append(labeltip);
+  }
   controls.append(p);
   // if labels is specified as true in user-config, start with it checked
   if (options.graph_options.labels) {
     label_toggle.attr('checked', 'checked');
   }
   options.graph_options.labels = $("#graph-labels").is(":checked");
-  options.graph_options.labels_visible = function() {
-    if ($("#graph-labels").is(":checked")) {
-      return 'visible';
-    } else {
-      return 'hidden';
-    }
-  };
 
   var size_attributes = {
     degree: {label: 'degree', attr: 'degree', default: true},
@@ -60,6 +57,32 @@ function ForceGraphControls(config) {
     var key;
     var initial_range = [3, 20];
     var sizeopts = {};
+
+    // slider control for label visibility by node size
+    var initial_labelsize = initial_range[0];
+    if (options.graph_options.label_minsize) {
+      initial_labelsize = options.graph_options.label_minsize;
+    }
+    var labelsizediv = $('<div>if node size is </div>').attr('id', 'vislabelsize-controls');
+    // labelsizediv.append("if node size >= ");
+    labelsizediv.append($("<input/>").attr('type', 'text').attr('value', initial_labelsize)
+      .attr('id', 'vislabel-size').attr('class', 'range-slider'));
+    labelsizediv.append(" or greater");
+    labelsizediv.append($("<div> </div>").attr('id', 'vislabelsize-range'));
+    if (! options.graph_options.labels) {
+      labelsizediv.hide();  // ugh; mixing jquery and d3 control styles throughout
+    }
+    controls.append(labelsizediv);
+    $("#vislabelsize-range").slider({
+        min: initial_range[0],  // if any smaller than 3 or so, color becomes invisible
+        max: initial_range[1],
+        values: initial_labelsize,
+        slide: function(event, ui) {
+          $("#vislabel-size").val(ui.value);
+        }
+    });
+    controls.append($('<hr/>'));
+
 
     for (key in size_attributes) {
       field_opts = size_attributes[key];
@@ -97,7 +120,7 @@ function ForceGraphControls(config) {
     controls.append(p2);
     // slider control for min/max node size
     controls.append($("<input/>").attr('type', 'text')
-      .attr('id', 'range').attr('style', 'border: 0; color: #f6931f; font-weight: bold;'));
+      .attr('id', 'range').attr('class', 'range-slider'));
     controls.append($("<div> </div>").attr('id', 'nodesize-range'));
     $("#nodesize-range").slider({
         range: true,
@@ -125,6 +148,25 @@ function ForceGraphControls(config) {
       return 5;  // default size
     };
 
+    options.graph_options.labels_visible = function(d) {
+    if ($("#graph-labels").is(":checked")) {
+      if (typeof(d)==='undefined') {
+        // generic - are labels enabled or not
+        return 'visible';
+      } else {
+        // specific node: check aginst current user-configured size
+        if (options.graph_options.nodesize(d.node) >= $("#vislabel-size").val()) {
+          return 'visible';
+        } else {
+          return 'hidden';
+        }
+      }
+    } else {
+      return 'hidden';
+    }
+  };
+
+
 
   // declare variable to hold the forcedirected graph once it's launched
   var force;
@@ -142,10 +184,9 @@ function ForceGraphControls(config) {
   // if in-graph label option is toggled, update label setting and relaunch the graph
   // temporarily disable to see if we can make it dynamic
   label_toggle.change(function() {
-      // temporarily changing to see if we can make this dynamic
       force.resume();
-    // options.graph_options.labels = $(this).is(':checked');
-    // launch_graph(options.graph_options);
+      labelsizediv.toggle();  // toggle display of control for labels by size
+      $('#label-tip').toggle();
   });
 
   // if degree is selected or slider changes, resume the graph
@@ -191,7 +232,7 @@ function ForceGraph(config) {
     highlight: [],
     labels: false,
     nodesize: 5,
-    curved_paths: true,
+    curved_paths: false,
     node_info: '#node-info',
     node_info_url: ''
   };
@@ -214,7 +255,7 @@ function init_graph(json) {
   var force = d3.layout.force()
       .charge(-1000)
       .linkDistance(100)
-      .gravity(0.5)   // 0.1 is the default
+      .gravity(1.0)   // 0.1 is the default
       .linkStrength(function(x) { return x.weight || 1; })
       .nodes(json.nodes)
       .links(json.links)
@@ -309,16 +350,13 @@ function init_graph(json) {
         .text(function(d) { return ' ' + d.label ;});
     */
 
-  // when not using force-directed graph labels, add node label
-  // for display as hover text
-  if (! options.labels) {
-    node.append("title")
-      .text(function(d) { return d.label; });
-  }
+  // add node label for display as hover text
+  // (needs to be always present since force-directed labels will always
+  // be added but may not all be visible)
+  node.append("title")
+    .text(function(d) { return d.label; });
 
-    node.call(force.drag);
-
-  // if (options.labels) {
+  node.call(force.drag);
 
     var anchorLink = vis.selectAll("line.anchorLink").data(label_links);
 
@@ -339,7 +377,7 @@ function init_graph(json) {
         return i % 2 === 0 ? "" : d.node.label;
       })
       .attr('class', 'node-label')
-      .attr('visibility', options.labels_visible());
+      .attr('visibility', function(d) { return options.labels_visible(d); });
       if (options.node_info_url) {
         anchorNode.classed('node-info-link', true);
       }
@@ -347,13 +385,10 @@ function init_graph(json) {
 
       if (options.node_info_url) {
         anchorNode.on("click", function(d) {
-            // NOTE: might be nicer to handle styles in js
-            // bold the label when either node or text is moused over...
             node_info(d.node.id);
         });
       }
 
-  // }  endif labels
 
   vis.style("opacity", 1e-6)
     .transition()
@@ -404,21 +439,18 @@ function init_graph(json) {
     node.selectAll("circle").attr("r", options.nodesize);
 
     // update label visibility
-    // console.log('updating visibility : ' + options.labels_visible());
-    anchorNode.selectAll('.node-label').attr('visibility', options.labels_visible());
+    anchorNode.selectAll('.node-label')
+       .attr('visibility', function(d) { return options.labels_visible(d); });
 
-    if (options.labels_visible() == 'visible') {
-      console.log('upating anchornoade placenment');
-      // updating the force-directed graph only needs to happen if some
-      // or all labels are visible
+      // NOTE: would be nice if we could skip this if labels aren't visible
+      // (slow for large graphs), but in some cases that results in the
+      // label graph getting disconnected from the main graph
         anchorNode.each(function(d, i) {
           if (i % 2 === 0) {
-            //node: position where the real version of this node is
+            // node: position where the real version of this node is
             d.x = d.node.x;
             d.y = d.node.y;
           } else {
-            // FIXME: this line results in an NS_ERROR_FAILURE in Firefox
-            // after toggling label display (but works fine in either mode initially?!?)
             var b = this.childNodes[1].getBBox();
 
             var diffX = d.x - d.node.x;
@@ -435,7 +467,7 @@ function init_graph(json) {
         anchorNode.call(updateNode);
         anchorLink.call(updateLink);
 
-    }
+    // }
 
     if (options.curved_paths) {
       path.attr("d", linkArc);
