@@ -66,6 +66,7 @@ class RdfEntity(RdfResource):
 
         connections = {}
         for node in neighbors:
+            weight = 0
             # don't include the current person in their own connections
             if node == self.nx_node_id:
                 continue
@@ -88,17 +89,23 @@ class RdfEntity(RdfResource):
             for edge in all_edges:
                 src, target, data = edge
                 if self.nx_node_id in edge and 'label' in data:
+                    weight += data['weight']
                     rels.add(data['label'])
 
-            connections[res] = rels
+            # connections[res] = {'rels': rels, 'weight': weight}
+            connections[res] = (rels, weight)
 
-        return connections
+        # sort by weight so strongest connections will be listed first
+        conn =  sorted(connections.items(), key=lambda x: x[1][1], reverse=True)
+
+        return conn
 
     @cached_property
     def connected_people(self):
-        '''dictionary of people (as :class:`RdfPerson`) connected to
-        this person, with a list of relationship terms indicating
-        how they are connected.'''
+        '''List of tuples of people (as :class:`RdfPerson`) connected to
+        this person, with an associated tuple containing a list of
+        relationship terms indicating how they are connected and the
+        cumulative weight of the connection, sorted by strongest connection.'''
         start = time.time()
         conn = self.connections(rdfns.SCHEMA_ORG.Person, self._person_type)
         logger.debug('Found %d people in %.02f sec' % (len(conn),
@@ -107,9 +114,10 @@ class RdfEntity(RdfResource):
 
     @cached_property
     def connected_organizations(self):
-        '''dictionary of organizations (as :class:`RdfOrganization`)
-        this person is connected to, with a list of terms indicating
-        how they are connected.'''
+        '''List of tuples of organizations (as :class:`RdfOrganization`)
+        this person is connected to, with an associated tuple with a list
+        of terms indicating how they are connected and the weight of the connection,
+        sorted by strongest connection.'''
         start = time.time()
         conn = self.connections(rdfns.SCHEMA_ORG.Organization, self._org_type)
         logger.debug('Found %d organizations in %.02f sec' % (len(conn),

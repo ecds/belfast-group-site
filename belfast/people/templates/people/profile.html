@@ -109,7 +109,7 @@
   {% if person.connected_people %}
     <h4>People</h4>
     <ul>
-    {% for conn, rel in person.connected_people.iteritems %}
+    {% for conn, rel_info in person.connected_people %}
         <li>
           {% if conn.has_profile %} {# if connected person has a profile, link to it #}
           <a href="{{ conn.identifier }}">{{ conn.fullname }}</a>
@@ -119,7 +119,8 @@
           {% if not conn.local_uri %}
             <small>&lt;{{ conn.identifier }}&gt;</small>
           {% endif %}
-            {% if rel %} - {{ rel|join:', '}}{% endif %}
+            {% if rel_info.0 %} - {{ rel_info.0|join:', '}}{% endif %}
+          {% if debug %}<small>(weight: {{ rel_info.1 }})</small>{% endif %}
         </li>
     {% endfor %}
     </ul>
@@ -128,10 +129,11 @@
   {% if person.connected_organizations %}
     <h4>Organizations</h4>
     <ul>
-    {% for conn, rel in person.connected_organizations.iteritems %}
+    {% for conn, rel_info in person.connected_organizations %}
         <li>{{ conn.name }}
             <small>&lt;{{ conn.identifier }}&gt;</small>
-            {% if rel %} - {{ rel|join:', '}}{% endif %}
+            {% if rel_info %} - {{ rel_info.0|join:', '}}{% endif %}
+            {% if debug %}<small>(weight: {{ rel_info.1 }})</small>{% endif %}
         </li>
     {% endfor %}
     </ul>
