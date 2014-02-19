@@ -451,7 +451,14 @@ function init_graph(json) {
             d.x = d.node.x;
             d.y = d.node.y;
           } else {
-            var b = this.childNodes[1].getBBox();
+            var childNode = this.childNodes[1];
+            bounds = childNode.getBoundingClientRect();
+            // Workaround for Firefox with getBBox on non-rendered svg elements;
+            // - if node isn't currently visible or rendered, skip it.
+            if (bounds.height === 0 && bounds.width === 0) {
+              return;
+            }
+            var b = childNode.getBBox();
 
             var diffX = d.x - d.node.x;
             var diffY = d.y - d.node.y;
