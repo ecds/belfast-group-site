@@ -110,8 +110,15 @@
     <h4>People</h4>
     <ul>
     {% for conn, rel in person.connected_people.iteritems %}
-        <li>{{ conn.fullname }}
+        <li>
+          {% if conn.has_profile %} {# if connected person has a profile, link to it #}
+          <a href="{{ conn.identifier }}">{{ conn.fullname }}</a>
+          {% else %}
+            {{ conn.fullname }}
+          {% endif %}
+          {% if not conn.local_uri %}
             <small>&lt;{{ conn.identifier }}&gt;</small>
+          {% endif %}
             {% if rel %} - {{ rel|join:', '}}{% endif %}
         </li>
     {% endfor %}
