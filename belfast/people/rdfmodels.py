@@ -125,11 +125,11 @@ class RdfLocation(RdfEntity):
     latitude = rdfmap.Value(rdfns.GEO.lat, rdflib.XSD.double)
     longitude = rdfmap.Value(rdfns.GEO.long, rdflib.XSD.double)
 
-
+    # property to get preferred label value inherited from base rdf model class
 
     def __unicode__(self):
         return self.geonames_name \
-            or self.graph.preferredLabel(self) \
+            or self.preferred_label \
             or self.dbpedia_name \
             or self.name or self.identifier
 

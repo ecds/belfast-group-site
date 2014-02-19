@@ -19,8 +19,15 @@ class RdfResource(rdflib.resource.Resource):
     _name = rdfmap.Value(rdfns.SCHEMA_ORG.name)
 
     @property
+    def preferred_label(self):
+        labels = self.graph.preferredLabel(self)
+        # list of tuples: label type (preflabel or label), value
+        if labels:
+            return labels[0][1]
+
+    @property
     def name(self):
-        l = self.graph.preferredLabel(self.identifier)
+        l = self.preferred_label
         return l if l else self._name
 
 

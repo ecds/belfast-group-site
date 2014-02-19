@@ -109,9 +109,14 @@ class Rdf2Gexf(object):
     def _node_label(self, res):
         # NOTE: consider adding/calculating a preferredlabel
         # for important nodes in our data
+        name = None
 
         # *first* use preferred label if available
-        name = self.graph.preferredLabel(res)
+        names = self.graph.preferredLabel(res)
+        # returns list of labelprop (preflabel or label), value
+        # if we got any matches, grab the first value
+        if names:
+            name = names[0][1]
 
         # second check for schema.org name, if we have one
         if not name:
