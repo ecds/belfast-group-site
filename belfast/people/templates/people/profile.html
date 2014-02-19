@@ -116,9 +116,18 @@
           {% else %}
             {{ conn.fullname }}
           {% endif %}
-          {% if not conn.local_uri %}
-            <small>&lt;{{ conn.identifier }}&gt;</small>
+
+          {# link to viaf, wikipedia with icons #}
+          {% if conn.viaf_uri %}
+          <a href="{{ conn.viaf_uri }}"><img src="{% static 'img/viaf.png' %}" alt="VIAF"/></a>
           {% endif %}
+          {% if conn.dbpedia_uri %}
+            {# link to wikipedia page if we can; if not, link to dbpedia #}
+            <a href="{% firstof conn.dbpedia.wikipedia_url conn.dbpedia %}">
+              <img src="{% static 'img/wikipedia.png' %}" alt="Wikipedia"/>
+            </a>
+          {% endif %}
+
             {% if rel_info.0 %} - {{ rel_info.0|join:', '}}{% endif %}
           {% if debug %}<small>(weight: {{ rel_info.1 }})</small>{% endif %}
         </li>
@@ -131,7 +140,15 @@
     <ul>
     {% for conn, rel_info in person.connected_organizations %}
         <li>{{ conn.name }}
-            <small>&lt;{{ conn.identifier }}&gt;</small>
+            {# link to viaf, wikipedia with icons #}
+            {% if conn.viaf_uri %}
+              <a href="{{ conn.viaf_uri }}"><img src="{% static 'img/viaf.png' %}" alt="VIAF"/></a>
+            {% endif %}
+            {% if conn.dbpedia_uri %}
+            {# link to wikipedia page if we can; if not, link to dbpedia #}
+              <a href="{% firstof conn.dbpedia.wikipedia_url conn.dbpedia %}"><img src="{% static 'img/wikipedia.png' %}" alt="Wikipedia"/></a>
+            {% endif %}
+
             {% if rel_info %} - {{ rel_info.0|join:', '}}{% endif %}
             {% if debug %}<small>(weight: {{ rel_info.1 }})</small>{% endif %}
         </li>

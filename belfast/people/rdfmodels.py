@@ -164,17 +164,37 @@ class RdfLocation(RdfEntity):
         return [RdfPerson(self.graph, r.identifier)
                 for r in set(self.born_here + self.worked_here + self.home_here)]
 
-class RdfOrganization(RdfEntity):
-    # specify expected rdf type?
-    pass
-    # inherits standard name property
-
 
 class DBpediaEntity(RdfEntity):
 
     description = rdfmap.Value(rdfns.DBPEDIA_OWL.abstract)     # FIXME: how to specify language?
     wikipedia_url = rdfmap.Value(rdfns.FOAF.isPrimaryTopicOf)
     thumbnail = rdfmap.Value(rdfns.DBPEDIA_OWL.thumbnail)
+
+
+class RdfOrganization(RdfEntity):
+    # specify expected rdf type?
+    # inherits standard name property
+
+    # FIXME: copied from rdfperson; move somewhere common
+    same_as = rdfmap.ValueList(rdflib.OWL.sameAs, transitive=True)
+
+    @property
+    def viaf_uri(self):
+        for uri in self.same_as:
+            if 'viaf.org' in uri:
+                return uri
+
+    @property
+    def dbpedia_uri(self):
+        for uri in self.same_as:
+            if 'dbpedia.org' in uri:
+                return uri
+
+    @property
+    def dbpedia(self):
+        if self.dbpedia_uri is not None:
+            return DBpediaEntity(self.graph, self.dbpedia_uri)
 
 
 class RdfPerson(RdfEntity):
