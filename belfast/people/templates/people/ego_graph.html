@@ -2,8 +2,11 @@
 {# structured for inclusion as a profile tab #}
 
 <p>Force-directed ego graph of people, places, and organizations directly connected to
-  <b>{{ person.fullname }}</b>.
-  Nodes are colored by type.  Mouse over a label to see the text more clearly.</p>
+  <b>{{ person.fullname }}</b>.</p>
+
+<p>Nodes are colored by type.  Mouse over a label to see the text more clearly.
+  You can drag nodes to move them apart and investigate connections;
+  double-click a fixed node to return it back to automatic placement.</p>
 
 {% include 'network/snippets/graph_with_controls.html' %}
 

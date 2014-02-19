@@ -1,7 +1,12 @@
 /* based on d3.js force-directed graph example */
-circle.node {
-    stroke: #fff;
-    stroke-width: 1.5px;
+.node {
+    /*stroke: #fff;*/
+    /*stroke-width: 1.5px;*/
+}
+
+.node.fixed {
+   stroke: #000;
+   stroke-width: 1.5px;
 }
 
 .link {

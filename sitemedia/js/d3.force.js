@@ -262,6 +262,18 @@ function init_graph(json) {
       .size([options.width, options.height])
       .start();
 
+  // "sticky" behavior on drag/double-click from http://bl.ocks.org/mbostock/3750558
+  function dblclick(d) {
+    d3.select(this).classed("fixed", d.fixed = false);
+  }
+
+  function dragstart(d) {
+    d3.select(this).classed("fixed", d.fixed = true);
+  }
+
+  var drag = force.drag()
+    .on("dragstart", dragstart);
+
   // force-adjusted labels
   // based on http://bl.ocks.org/MoritzStefaner/1377729
   // OPTIONALLY initialize force-directed labels
@@ -313,7 +325,9 @@ function init_graph(json) {
       .data(json.nodes)
     .enter().append("svg:g")
       .attr("class", function(d) { return "node " + d.type; })
-      .style("fill", function(d) { return options.fill(d.type); });
+      .style("fill", function(d) { return options.fill(d.type); })
+      .on("dblclick", dblclick)
+      .call(drag);
 
     if (options.node_info_url) {
       node.classed('node-info-link', true);
