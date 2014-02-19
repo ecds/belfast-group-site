@@ -77,19 +77,34 @@
 <div class="clearfix"></div>
 
 <ul class="nav nav-tabs" id="vizTab">
-  {# only display connections & network tab if there are any #}
-  {% if person.connected_people|length or person.connected_organizations|length %}
-    <li class="active"><a href="#connections">Connections</a></li>
-    <li><a href="#graph">Network Graph</a></li>
-  {% endif %}
   {% if groupsheets %}
-    <li><a href="#groupsheets">Group Sheets</a></li>
+    <li class="active"><a href="#groupsheets">Group Sheets</a></li>
   {% endif %}
+    {# only display connections & network tab if there are any #}
+  {% if person.connected_people|length or person.connected_organizations|length %}
+    <li {% if not groupsheets %}class="active"{% endif %}><a href="#graph">Network Graph</a></li>
+    <li><a href="#connections">Connections</a></li>
+  {% endif %}
+
 </ul>
 
 <div class="tab-content">
+    {% if groupsheets %}
+    <div class="tab-pane active" id="groupsheets">
+        <ul class="groupsheet-list">
+            {% for doc in groupsheets %}
+            <li>{% include 'groupsheets/snippets/list_groupsheet.html' with profile=True %}</li>
+            {% endfor %}
+        </ul>
+    </div>
+  {% endif %}
+
   {% if person.connected_people|length or person.connected_organizations|length %}
-  <div class="tab-pane active" id="connections">
+  <div class="tab-pane {% if not groupsheets %}active{% endif %}" id="graph">
+    {% include "people/ego_graph.html" %}
+  </div>
+
+  <div class="tab-pane" id="connections">
 
   {% if person.connected_people %}
     <h4>People</h4>
@@ -116,20 +131,8 @@
   {% endif %}
   </div>
 
-  <div class="tab-pane" id="graph">
-    {% include "people/ego_graph.html" %}
-  </div>
   {% endif %}
 
-  {% if groupsheets %}
-    <div class="tab-pane {% if not person.connected_people|length and not person.connected_organizations|length %}active{% endif %}" id="groupsheets">
-        <ul class="groupsheet-list">
-            {% for doc in groupsheets %}
-            <li>{% include 'groupsheets/snippets/list_groupsheet.html' with profile=True %}</li>
-            {% endfor %}
-        </ul>
-    </div>
-  {% endif %}
 
 </div>
 <script>
