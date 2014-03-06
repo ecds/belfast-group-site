@@ -143,7 +143,7 @@ class Command(BaseCommand):
 
         if all_steps or options['gexf']:
             # generate gexf
-            self.stdout.write('-- Generating network graph and saving as GEXF')
+            self.stdout.write('-- Generating network graphs and saving as GEXF')
             nx.Rdf2Gexf(graph, settings.GEXF_DATA['full'])
             nx.BelfastGroupGexf(graph, settings.GEXF_DATA['bg1'])
 
