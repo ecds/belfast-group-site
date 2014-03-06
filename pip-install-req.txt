@@ -2,7 +2,7 @@ Django
 django-tinymce
 eulexistdb
 rdflib<=4.1.0
-PIL
+Pillow
 # for sleepycat/berkeleydb persistence
 bsddb3
 networkx
