@@ -89,7 +89,7 @@ class RdfEntity(RdfResource):
             for edge in all_edges:
                 src, target, data = edge
                 if self.nx_node_id in edge and 'label' in data:
-                    weight += data['weight']
+                    weight += data.get('weight', 1)  # assume default of 1 if not set
                     rels.add(data['label'])
 
             # connections[res] = {'rels': rels, 'weight': weight}

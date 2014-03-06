@@ -252,7 +252,7 @@ class ProfileUrisTest(TestCase):
             self.assert_(current_site.domain in str(uri),
                 'local uri %s should be based on current site domain %s' %
                 (uri, current_site.domain))
-            self.assertNotEqual(None, graph.value(uri, rdflib.namespace.SKOS.preferredLabel),
+            self.assertNotEqual(None, graph.value(uri, rdflib.namespace.SKOS.prefLabel),
                 'preferredLabel should be set for people with local uris')
             self.assert_((uri, rdflib.RDF.type, rdfns.SCHEMA_ORG.Person) in graph,
                 'schema.org/Person type should be associated with local uri')

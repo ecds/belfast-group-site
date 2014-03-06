@@ -6,6 +6,7 @@ from networkx.readwrite import gexf
 from os import path
 import rdflib
 import shutil
+from unittest import skip
 import tempfile
 
 from belfast.people.rdfmodels import RdfPerson, RdfLocation, RdfOrganization
@@ -49,25 +50,28 @@ class PeopleViewsTest(TestCase):
         self.assertContains(
             response, '<h1>%s</h1>' % self.person.name, html=True,
             msg_prefix='name should be used for profile page title')
-        self.assertContains(
-            response, 'Born %s' % self.person.birthdate,
-            msg_prefix='birthdate should be included if present')
+        # RDF birthdate now suppressed on profile page
+        # self.assertContains(
+        #     response, 'Born %s' % self.person.birthdate,
+        #     msg_prefix='birthdate should be included if present')
         self.assertContains(
             response, self.person.dbpedia.description,
             msg_prefix='dbpedia description should be included on profile')
-        self.assertContains(
-            response, '<p><b>Occupation:</b> %s</p>' % self.person.occupation[0],
-            msg_prefix='occupations should be listed')
+        # RDF occupation now suppressed on profile page
+        # self.assertContains(
+        #     response, '<p><b>Occupation:</b> %s</p>' % self.person.occupation[0],
+        #     msg_prefix='occupations should be listed')
         # locations
-        for loc in self.person.locations:
-            # for some reason, dbpedia name isn't coming through in test data
-            # just skip it for now
-            if loc.name is None:
-                continue
+        # RDF locations now suppressed on profile page
+        # for loc in self.person.locations:
+        #     # for some reason, dbpedia name isn't coming through in test data
+        #     # just skip it for now
+        #     if loc.name is None:
+        #         continue
 
-            self.assertContains(
-                response, loc.name,
-                msg_prefix='location %s should be listed on profile' % loc.name)
+        #     self.assertContains(
+        #         response, loc.name,
+        #         msg_prefix='location %s should be listed on profile' % loc.name)
 
         # connected people
         for p in self.person.connected_people:
@@ -107,15 +111,15 @@ class RdfPersonTest(TestCase):
         self.assertEqual(rdflib.URIRef('http://dbpedia.org/resource/Michael_Longley'),
                          self.person.dbpedia_uri)
 
-
+    @skip
     def test_locations(self):
+        # RDF locations now suppressed from profile page
         birthplace = self.person.birthplace
         self.assert_(isinstance(birthplace, RdfLocation))
         self.assertEqual('Belfast, Northern Ireland', unicode(birthplace.name))
 
         # set of home and work locations
         locations = self.person.locations
-        print 'locations = ', locations
         self.assertEqual(5, len(locations))
         self.assert_(isinstance(locations[0], RdfLocation))
         loc_names = [unicode(l.name) for l in locations]
@@ -137,9 +141,9 @@ class RdfPersonTest(TestCase):
         # TODO: regenerate text fixture (at least gexf) based on current process
         person = RdfPerson(self.graph, rdflib.URIRef('http://viaf.org/viaf/39398205/'))
         people = person.connected_people
-        self.assert_(isinstance(people.keys()[0], RdfPerson))
+        self.assert_(isinstance(people[0][0], RdfPerson))
         # convert into dict of string, list for easier testing
-        names = dict((unicode(p.name), rels) for p, rels in people.iteritems())
+        names = dict((unicode(p.name), relweight[0]) for p, relweight in people)
         self.assert_('Edna Longley' in names)
         self.assert_('Seamus Heaney' in names)
         self.assert_('Arthur Terry' in names)
@@ -159,8 +163,8 @@ class RdfPersonTest(TestCase):
         # same note as above for gexf / local uri
         person = RdfPerson(self.graph, rdflib.URIRef('http://viaf.org/viaf/39398205/'))
         orgs = person.connected_organizations
-        self.assert_(isinstance(orgs.keys()[0], RdfOrganization))
-        names = dict((unicode(o.name), rels) for o, rels in orgs.iteritems())
+        self.assert_(isinstance(orgs[0][0], RdfOrganization))
+        names = dict((unicode(o.name), relweight[0]) for o, relweight in orgs)
         self.assert_('Belfast Group' in names)
         self.assert_('Royal Society of Literature' in names)
         self.assert_('Seamus Heaney' not in names)
@@ -170,16 +174,16 @@ class RdfPersonTest(TestCase):
 class ProfilePictureTest(TestCase):
 
     person_uri = 'http://example.com/people/michael-longley/'
-    # using site media as fixture for now; update if changed
-    img_fixture = path.join(settings.BASE_DIR, '..', 'sitemedia', 'img', 'ml.png')
-    img2_fixture = path.join(settings.BASE_DIR, '..', 'sitemedia', 'img', 'sh.png')
+    # using test image as fixture for now
+    img_fixture = path.join(settings.BASE_DIR, 'people', 'fixtures', 'test.png')
+    # img2_fixture = path.join(settings.BASE_DIR, '..', 'sitemedia', 'img', 'sh.png')
 
 
     def setUp(self):
         self.tmpfile = tempfile.NamedTemporaryFile(suffix='.png', dir=settings.MEDIA_ROOT)
         shutil.copyfile(self.img_fixture, self.tmpfile.name)
         self.tmpfile2 = tempfile.NamedTemporaryFile(suffix='.png', dir=settings.MEDIA_ROOT)
-        shutil.copyfile(self.img2_fixture, self.tmpfile2.name)
+        shutil.copyfile(self.img_fixture, self.tmpfile2.name)
 
     def tearDown(self):
         del self.tmpfile
