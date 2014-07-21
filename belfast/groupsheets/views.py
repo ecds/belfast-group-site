@@ -153,7 +153,7 @@ def list_groupsheets(request):
                 # groupsheets may have multiple authors, so make sure
                 # we get the correct label for the active filter
                 if str(a.identifier) == author_uri:
-                    filters[a.name] = '?' + urllib.urlencode(args)
+                    filters["%s, %s" % (a.lastname, a.firstname)] = '?' + urllib.urlencode(args)
                     break
 
     if filter_source is not None:
