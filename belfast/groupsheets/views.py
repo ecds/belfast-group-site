@@ -142,7 +142,7 @@ def list_groupsheets(request):
         args = url_args.copy()
         del args['edition']
         filter_args = urllib.urlencode(args)
-        filters['digital edition'] = '?' + filter_args if filter_args else ''
+        filters['digital edition'] = '?' + (filter_args if filter_args else '')
     if filter_author is not None:
         args = url_args.copy()
         del args['author']
