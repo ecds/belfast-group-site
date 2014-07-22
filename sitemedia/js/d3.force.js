@@ -262,6 +262,8 @@ function init_graph(json) {
       .size([options.width, options.height])
       .start();
 
+  $('.graph-loading').hide();   // hide loading indicator once graph is initialized
+
   // "sticky" behavior on drag/double-click from http://bl.ocks.org/mbostock/3750558
   function dblclick(d) {
     d3.select(this).classed("fixed", d.fixed = false);

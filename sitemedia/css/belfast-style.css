@@ -262,6 +262,13 @@ font-family: 'PT Mono', courier, sans-serif;
 /** end poetry style **/
 
 
+.graph-loading {
+    font-size: 35px;
+    line-height: 300px;
+    vertical-align: middle;
+}
+
+
 
 @media print{
 	#poets figure{
