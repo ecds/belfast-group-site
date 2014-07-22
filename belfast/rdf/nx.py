@@ -219,9 +219,19 @@ class BelfastGroupGexf(object):
                 author_id = str(a)  # stringify author uri
                 # if not in the network, add it
                 if author_id not in self.network:
-                    # TODO: use preferred label instead?
+                    name = None
+                    # use preferred label instead if possible
+                    names = graph.preferredLabel(a)
+                    # returns list of labelprop (preflabel or label), value
+                    # if we got any matches, grab the first value
+                    if names:
+                        name = names[0][1]
+                    if not name:
+                        name = graph.value(a, rdfns.SCHEMA_ORG.name)
+
                     self.network.add_node(author_id,
-                        label=graph.value(a, rdfns.SCHEMA_ORG.name),
+                        # label=graph.value(a, rdfns.SCHEMA_ORG.name),
+                        label=name,
                         type='Person')
                 # increase connection weight by one for each groupsheet
                 self.edge_weights[(author_id, bg_period)] += 1
@@ -239,7 +249,12 @@ class BelfastGroupGexf(object):
                 owner_id = str(o)
                 if owner_id not in self.network:
                     # use preferred label if available; otherwise, use name
-                    name = graph.preferredLabel(o)
+                    names = graph.preferredLabel(o)
+                    # returns list of labelprop (preflabel or label), value
+                    # if we got any matches, grab the first value
+                    if names:
+                        name = names[0][1]
+
                     if not name:
                         name = graph.value(o, rdfns.SCHEMA_ORG.name)
                     self.network.add_node(owner_id,
