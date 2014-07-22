@@ -4,9 +4,40 @@
      <div id="network-graph"></div>
   </div>
   <div class="col-md-3">
-    <div id="graph-controls"> </div>
-    <div id="node-info">
-        <small>Click on a node or node label for more information</small>
+    <div id="graph-controls">
+        <a class="lead pull-right" data-toggle="modal" data-target="#graph-help" title="Help and Usage">
+            <span class="glyphicon glyphicon-info-sign"></span>
+        </a>
+
     </div>
+
+  <!-- Modal help text -->
+  <div class="modal" id="graph-help" tabindex="-1" role="dialog" aria-labelledby="modal-label" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" id="modal-label">Network Graph Help</h4>
+          </div>
+          <div class="modal-body">
+
+            <p>Nodes in the graph are positioned based on the strength of connection between individuals or organizations, with an attempt to avoid overlapping labels for readability.</p>
+
+            <p>You can change the appearance of the graph in a number of different ways in order to explore its content. Clicking on any individual node will fix it in place (this is indicated by a black outline) and you can drag nodes to different positions on the graph. Doing this may help you see which individuals are connected to one another. You can make the nodes float freely again by double-clicking on them.</p>
+
+            <p>You can resize nodes based on available network properties, and you can turn the labels on or off, making it easier to identify the authors or to see the connections between them. When labels are turned off, you can hover over a particular node on the graph and see the name of the person it represents. You can also set the labels to appear only on nodes that are a particular size.</p>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+       </div>
+      </div>
+  </div>
+
+  <div id="node-info">
+    <small>Click on a node or node label for more information</small>
+  </div>
+
   </div>
 </div>
