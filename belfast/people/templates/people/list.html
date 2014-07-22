@@ -22,7 +22,7 @@
           <div class="caption">
             <a href="{{ person }}">
             {% if person.lastname and person.firstname %}
-              {{ person.lastname }}, {{ person.firstname }}
+              {{ person.firstname }} {{ person.lastname }}
             {% else %} {{ person.name }}
             {% endif %}
             </a>
