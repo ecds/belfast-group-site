@@ -8,7 +8,7 @@ by default; use page_rdf_type to override with a webpage subclass.
 {# additional namespaces (primarly for semantic web/RDFa) #}
 {% for prefix, ns in extra_ns.iteritems %}xmlns:{{ prefix}}="{{ ns }}" {% endfor %}>
   <head>
-    <title>{% block page-title %}The Belfast Group{% block page-subtitle %}{% endblock %}{% endblock %}</title>
+    <title>{% block page-title %}Belfast Group Poetry|Networks{% block page-subtitle %}{% endblock %}{% endblock %}</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/ico" href="{% static 'img/favicon.ico' %}" />
@@ -41,7 +41,7 @@ by default; use page_rdf_type to override with a webpage subclass.
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="{% url 'site-index' %}">The Belfast Group</a>
+        <a class="navbar-brand" href="{% url 'site-index' %}">Belfast Group Poetry|<i>Networks</i></a>
       </div>
 
       <!-- Collect the nav links, forms, and other content for toggling -->

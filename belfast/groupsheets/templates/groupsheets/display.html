@@ -1,7 +1,7 @@
 {% extends 'page_base.html' %}
 {% load tei %} {% load static %}
 
-{% block page-subtitle %} | {{ document.title }}{% endblock %}
+{% block page-subtitle %} : {{ document.title }}{% endblock %}
 
 {% block head-extras %}
   {% if document.ark %}
