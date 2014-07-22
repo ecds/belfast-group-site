@@ -11,7 +11,11 @@ by default; use page_rdf_type to override with a webpage subclass.
     <title>{% block page-title %}Belfast Group Poetry|Networks{% block page-subtitle %}{% endblock %}{% endblock %}</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/ico" href="{% static 'img/favicon.ico' %}" />
+    {% if debug %}
+      <link rel="icon" type="image/ico" href="{% static 'img/favicon-dev.ico' %}" />
+    {% else %}
+      <link rel="icon" type="image/ico" href="{% static 'img/favicon.ico' %}" />
+    {% endif %}
 
     {# bootstrap v2 #}
     {# <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" media="screen"/> #}
