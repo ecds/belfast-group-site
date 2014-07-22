@@ -1,15 +1,17 @@
 {# common template logic for displaying flatpages, for embedding in other templates #}
 {% if perms.flatpages.change_flatpage or perms.flatpages.add_flatpage %}
-    <div class="pull-right">
+    <div class="pull-right well well-sm">
       {% if perms.flatpages.change_flatpage %}
-      <p><a href="{% url 'admin:flatpages_flatpage_change' flatpage.id %}">edit this page</a></p>
+      <p><a class="btn btn-default btn-sm" href="{% url 'admin:flatpages_flatpage_change' flatpage.id %}">
+        <span class="glyphicon glyphicon-edit"></span> edit this page</a></p>
       {% endif %}
       {% if perms.flatpages.add_flatpage %}
-      <p><a href="{% url 'admin:flatpages_flatpage_add' %}">add a page</a></p>
+      <p><a class="btn btn-default btn-sm" href="{% url 'admin:flatpages_flatpage_add' %}">
+        <span class="glyphicon glyphicon-plus"></span> add a page</a></p>
       {% endif %}
     </div>
 {% endif %}
 
-<div class="span7">
+<div class="text-content">
   {{ flatpage.content|safe }}
 </div>

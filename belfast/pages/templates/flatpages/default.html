@@ -4,19 +4,5 @@
 
 {% block page-content %}
   <h1 property="schema:name">{{ flatpage.title }}</h1>
-
-  {% if perms.flatpages.change_flatpage or perms.flatpages.add_flatpage %}
-    <div class="pull-right">
-      {% if perms.flatpages.change_flatpage %}
-      <p><a href="{% url 'admin:flatpages_flatpage_change' flatpage.id %}">edit this page</a></p>
-      {% endif %}
-      {% if perms.flatpages.add_flatpage %}
-      <p><a href="{% url 'admin:flatpages_flatpage_add' %}">add a page</a></p>
-      {% endif %}
-    </div>
-  {% endif %}
-
-  <div class="span7">
-    {{ flatpage.content }}
-  </div>
+  {% include "flatpages/snippets/flatpage_content.html" %}
 {% endblock %}
