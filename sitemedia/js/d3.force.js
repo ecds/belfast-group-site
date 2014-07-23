@@ -233,6 +233,9 @@ function ForceGraph(config) {
     labels: false,
     nodesize: 5,
     curved_paths: false,
+    gravity: 0.5,
+    link_distance: 100,
+    charge: -1000,
     node_info: '#node-info',
     node_info_url: ''
   };
@@ -253,9 +256,9 @@ function ForceGraph(config) {
 function init_graph(json) {
 
   var force = d3.layout.force()
-      .charge(-1000)
-      .linkDistance(100)
-      .gravity(0.5)   // 0.1 is the default
+      .charge(options.charge)
+      .linkDistance(options.link_distance)
+      .gravity(options.gravity)   // 0.1 is the default
       .linkStrength(function(x) { return x.weight || 1; })
       .nodes(json.nodes)
       .links(json.links)
