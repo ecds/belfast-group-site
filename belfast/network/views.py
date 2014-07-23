@@ -16,7 +16,7 @@ from belfast.util import network_data, rdf_data,  \
 from belfast.rdfns import BELFAST_GROUP_URI
 from belfast.groupsheets.rdfmodels import RdfGroupSheet
 from belfast.people.rdfmodels import RdfOrganization, RdfPerson, find_places
-from belfast.network.util import annotate_graph
+from belfast.network.util import annotate_graph, filter_graph
 
 
 logger = logging.getLogger(__name__)
@@ -166,8 +166,24 @@ def group_people(request, mode='egograph'):
 # @last_modified(rdf_nx_lastmod)
 def group_people_js(request, mode='egograph', output='full'):
     if mode == 'egograph':
+        degree = request.GET.get('degree', 1)
+        extra_opts = {}
+        try:
+            degree = int(degree)
+            # currently only support 1 or 2 degree
+            degree = max(1, min(degree, 2))
+            # NOTE: degree 2 graph is large enough that it *must* be filtered
+            # to be sensible and usable on the webpage;
+            # by trial & error, I found a minimum degree of 5 to be reasonable
+            if degree == 2:
+                extra_opts['min_degree'] = 5
+        except ValueError:
+            # if a value is passed that can't be converted to int, fallback to 1
+            degree = 1
+
         belfast_group = RdfOrganization(network_data().copy(), BELFAST_GROUP_URI)
-        graph = belfast_group.ego_graph(radius=1, types=['Person', 'Organization'])
+        graph = belfast_group.ego_graph(radius=degree, types=['Person', 'Organization'],
+                                        **extra_opts)
 
         # annotate nodes in graph with degree
         # FIXME: not a directional graph; in/out degree not available
