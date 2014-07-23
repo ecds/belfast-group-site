@@ -4,9 +4,11 @@
 <p>Force-directed ego graph of people, places, and organizations directly connected to
   <b>{{ person.fullname }}</b>.</p>
 
+{% comment %} {# this help text should be redundant now that there is help info included in graph controls #}
 <p>Nodes are colored by type.  Mouse over a label to see the text more clearly.
   You can drag nodes to move them apart and investigate connections;
   double-click a fixed node to return it back to automatic placement.</p>
+{% endcomment %}
 
 {% include 'network/snippets/graph_with_controls.html' %}
 
@@ -27,8 +29,10 @@
             height: 500,
             highlight: ['{{ person.identifier }}'],
             labels: true,
-            label_minsize: 6,
-            node_info_url: "{% url 'people:egograph-node'  id=person.slug %}"
+            node_info_url: "{% url 'people:egograph-node'  id=person.slug %}",
+            gravity: 1.0,
+            link_distance: 75,
+            charge: -500
         }
       });
    </script>
