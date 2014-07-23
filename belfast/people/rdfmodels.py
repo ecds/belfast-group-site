@@ -10,6 +10,7 @@ from belfast import rdfns
 from belfast.rdf import rdfmap
 from belfast.rdf.models import RdfResource
 from belfast.util import rdf_data, network_data, cached_property
+from belfast.network.util import filter_graph
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +27,7 @@ class RdfEntity(RdfResource):
         'node identifier for this person in network graphs'
         return unicode(self.identifier)
 
-    def ego_graph(self, radius=1, types=None):
+    def ego_graph(self, radius=1, types=None, min_degree=None):
         'generate an undirected ego graph around the current person'
         # TODO: options to specify distance
         network = network_data()
@@ -44,8 +45,12 @@ class RdfEntity(RdfResource):
         # to make it possible to find all neighbors,
         # not just outbound connections
         # (should be a way to get this from a digraph...)
-        return nx.ego_graph(undirected_net, self.nx_node_id,
+
+        eg = nx.ego_graph(undirected_net, self.nx_node_id,
                             radius=radius)
+        if min_degree is not None:
+            return filter_graph(eg, min_degree=min_degree)
+        return eg
 
     def connections(self, rdftype=None, resource=rdflib.resource.Resource):
         '''Generate a dictionary of connected entities (direct neighbors
