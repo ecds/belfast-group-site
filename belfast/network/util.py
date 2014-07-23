@@ -35,3 +35,16 @@ def annotate_graph(graph, fields=[]):
             graph.node[node]['eigenvector_centrality'] = eigenv[node]
 
     return graph
+
+
+def filter_graph(graph, min_degree):
+    # filter a network graph by minimum degree
+    nodes_to_keep = []
+    degree = graph.degree()
+    # iterate through the graph and identify nodes we want to keep
+    for node in graph.nodes():
+        if degree[node] >= min_degree:
+            nodes_to_keep.append(node)
+
+    # generate and return a subgraph with only those nodes and connecting edges
+    return graph.subgraph(nodes_to_keep)
