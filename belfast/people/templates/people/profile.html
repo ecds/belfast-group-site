@@ -21,7 +21,7 @@
         width="{{ pic.img.width }}" height="{{ pic.img.height }}"
         property="schema:contentUrl"/>
     <div class="caption">
-      <h4 property="schema:caption">{{ pic.title }}</h3>
+      <h4 property="schema:caption">{{ pic.title }}</h4>
       <ul class="list-inline small">
         {% if pic.date %}<li property="schema:dateCreated">{{ pic.date }}</li>{% endif %}
         {% if pic.creator %}<li property="schema:author">{{ pic.creator }}</li>{% endif %}
