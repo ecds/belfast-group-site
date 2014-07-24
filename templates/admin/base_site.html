@@ -1,0 +1,27 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Belfast Group Poetry|Networks') }}{% endblock %}
+
+{% block extrastyle %}
+    {# <link href="{% static 'eultheme/css/bootstrap.min.css' %}" rel="stylesheet"/> #}
+    {% if debug %}
+      <link rel="icon" type="image/ico" href="{% static 'img/favicon-dev.ico' %}" />
+    {% else %}
+      <link rel="icon" type="image/ico" href="{% static 'img/favicon.ico' %}" />
+    {% endif %}
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Belfast Group Poetry|<i>Networks</i> administration') }}</a></h1>
+{% endblock %}
+
+{% block nav-global %}
+<p>
+    <a href="{% url 'site-index' %}">Home</a> |
+    <a href="{% url 'overview' as overview_url %}">Overview</a> |
+    <a href="{% url 'groupsheets:list' as groupsheet_list %}">Group Sheets</a> |
+    <a href="{% url 'people:list' as people_list %}">Bios</a> |
+    <a href="{% url 'network:overview' as network_url %}">Networks &amp; Maps</a>
+</p>
+{% endblock %}
