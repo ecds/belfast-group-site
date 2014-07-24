@@ -18,12 +18,33 @@ function ForceGraphControls(config) {
     target: '#graph-controls',
     graph_options: {
       target: '#chart',  // needs a default here so we can remove svg (?)
+      degree_toggles: [],  // list of integer values, e.g. [1, 2]
     }
   };
   $.extend(options, config);
 
   var controls = $(options.target);
   controls.append($("<h4>Graph Settings</h4>"));
+
+  // one/two-degree toggle if configured
+  if (options.graph_options.degree_toggles) {
+    var dgr = $("<p>");
+    var degree_val;
+    for (var i = 0; i < options.graph_options.degree_toggles.length; i++) {
+      degree_val = options.graph_options.degree_toggles[i];
+      var input = $("<input/>").attr('type', 'radio').attr('name', 'ego-degree')
+         .attr('value', degree_val);
+         if (i === 0) { input.attr('checked', 'checked'); }
+      dgr.append(input);
+      dgr.append(" " + degree_val + "-degree ");
+    }
+    // dgr.append($("<input/>").attr('type', 'radio').attr('name', 'ego-degree').attr('value', 1).attr('checked', 'checked'));
+    // dgr.append(" 1-degree ");
+    // dgr.append($("<input/>").attr('type', 'radio').attr('name', 'ego-degree').attr('value', 2));
+    // dgr.append(" 2-degree ");
+    controls.append(dgr);
+    var ego_degree = $("input[name='ego-degree']");
+  }
 
   // checkbox to toggle in-graph labels
   // TODO: perhaps this could default to checked for graphs smaller
@@ -180,6 +201,27 @@ function ForceGraphControls(config) {
 
   // initial launch; store force graph object for later interactions
   force = launch_graph(options.graph_options);
+
+  if (options.graph_options.degree_toggles) {
+    // reload data when 1/2 degree is changed
+    ego_degree.change(function() {
+       // value of the radio button is the degree to use
+       var new_degree = $(this).attr('value');
+       var base_url = options.graph_options.url;
+      // strip out previous ?degree=N option if any
+      if (base_url.indexOf('?') != -1) {
+        base_url = base_url.substring(0, base_url.indexOf('?'));
+      }
+      $.extend(options.graph_options, {
+        url: base_url + '?degree=' + new_degree
+      });
+      // clear out previously loaded data to force loading new json
+      delete options.graph_options.data;
+      $('.graph-loading').show();   // show loading indicator while graph is re-initialized
+      launch_graph(options.graph_options);
+    });
+  }
+
 
   // if in-graph label option is toggled, update label setting and relaunch the graph
   // temporarily disable to see if we can make it dynamic
