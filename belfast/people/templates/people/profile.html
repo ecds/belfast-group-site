@@ -7,21 +7,31 @@
 {% endblock %}
 
 {% block page-content %}
+<div rel="schema:about">
+  <div typeof="schema:Person">
 
 <h1>{% if person.lastname and person.firstname %}{{ person.firstname }} {{ person.lastname }}
-{% else %} {{ person.name }}{% endif %}</h1>
+<meta property="schema:familyName" content="{{ person.lastname }}"/>
+<meta property="schema:givenName" content="{{ person.firstname }}"/>
+{% else %} <span property="schema:name">{{ person.name }}</a>{% endif %}</h1>
 {% if pic %}
-  <div class="thumbnail pull-right">
-    <img src="{{ MEDIA_ROOT}}{{ pic.img.url }}" width="{{ pic.img.width }}" height="{{ pic.img.height }}"/>
+<div rel="schema:image">
+  <div typeof="schema:ImageObject" class="thumbnail pull-right">
+    <img src="{{ MEDIA_ROOT}}{{ pic.img.url }}"
+        width="{{ pic.img.width }}" height="{{ pic.img.height }}"
+        property="schema:contentUrl"/>
     <div class="caption">
-      <h4>{{ pic.title }}</h3>
+      <h4 property="schema:caption">{{ pic.title }}</h3>
       <ul class="list-inline small">
-        {% if pic.date %}<li>{{ pic.date }}</li>{% endif %}
-        {% if pic.creator %}<li>{{ pic.creator }}</li>{% endif %}
+        {% if pic.date %}<li property="schema:dateCreated">{{ pic.date }}</li>{% endif %}
+        {% if pic.creator %}<li property="schema:author">{{ pic.creator }}</li>{% endif %}
         {% if pic.publisher %}
-        <li>
-          {% if pic.publisher_url %}<a href="{{ pic.publisher_url }}">{{ pic.publisher }}</a>
-          {% else %}{{ pic.publisher }}{% endif %}
+        <li rel="schema:publisher">
+          <span typeof="schema:Organization">
+          {% if pic.publisher_url %}
+          <a property="schema:url" href="{{ pic.publisher_url }}"><span property="schema:name">{{ pic.publisher }}</span></a>
+          {% else %}<span property="schema:name">{{ pic.publisher }}</a>{% endif %}
+          </span>
         </li>
         {% endif %}
       </ul>
@@ -31,6 +41,7 @@
       <p><i class="small">{{ pic.permissions }}</i></p>
     </div>
   </div>
+</div>
 {% endif %}
 
 {% comment %}  {# Using local profile images instead of dbpedia thumbnails #}
@@ -64,8 +75,18 @@
 {% endif %}
 {% endcomment %}
 
+{# keeping redundant rdf info invisible, but make some of it available via rdfa #}
+{% for occ in person.occupation %}
+  <span property="schema:jobTitle" content="{{ occ }}"/>
+{% endfor %}
+{% if person.birthdate %}<span property="schema:birthDate" content="{{ person.birthdate }}"/>{% endif %}
+
+{% if person.dbpedia_uri %}<a property="schema:sameAs" href="{{ person.dbpedia_uri}}"></a>{% endif %}
+{% if person.viaf_uri %}<a property="schema:sameAs" href="{{ person.viaf_uri}}"></a>{% endif %}
+
+
 {% if person.description %}
- <p class="description">{{ person.description }}
+ <p property="schema:description" class="description">{{ person.description }}
     <small><i>(<a href="{{ person.description_context }}">{{ person.desc_context_name }}</a>)</i></small> {# should be safe to assume for now ... #}
     {# TODO: should really link to the findingaids where the description comes from #}
  </p>
@@ -158,6 +179,9 @@
   </div>
 
   {% endif %}
+
+  </div> {# person #}
+</div> {# about #}
 
 
 </div>

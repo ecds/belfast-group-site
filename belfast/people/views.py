@@ -62,7 +62,7 @@ def profile(request, id):
 
     return render(request, 'people/profile.html',
                   {'person': person, 'groupsheets': groupsheets,
-                  'pic': pic})
+                  'pic': pic, 'page_rdf_type': 'schema:ProfilePage'})
 
 
 # @last_modified(rdf_nx_lastmod)  # uses both rdf and gexf
