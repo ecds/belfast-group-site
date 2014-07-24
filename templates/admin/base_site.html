@@ -19,9 +19,9 @@
 {% block nav-global %}
 <p>
     <a href="{% url 'site-index' %}">Home</a> |
-    <a href="{% url 'overview' as overview_url %}">Overview</a> |
-    <a href="{% url 'groupsheets:list' as groupsheet_list %}">Group Sheets</a> |
-    <a href="{% url 'people:list' as people_list %}">Bios</a> |
-    <a href="{% url 'network:overview' as network_url %}">Networks &amp; Maps</a>
+    <a href="{% url 'overview' %}">Overview</a> |
+    <a href="{% url 'groupsheets:list' %}">Group Sheets</a> |
+    <a href="{% url 'people:list' %}">Bios</a> |
+    <a href="{% url 'network:overview' %}">Networks &amp; Maps</a>
 </p>
 {% endblock %}
