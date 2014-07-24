@@ -31,7 +31,12 @@
         height: 450,
         highlight: ['{{ bg_uri }}', 'Belfast Group, 1966-1972', 'Belfast Group, 1963-1966'],
         labels: true,
-        node_info_url: "{% url 'network:node-info' %}"
+        {% if mode == 'egograph' %}
+        degree_toggles: [1, 2],    // enable toggling between one- and two- degree egographs
+        {% endif %}
+        node_info_url: "{% url 'network:node-info' %}",
+        gravity: 1.0,
+        link_distance: 200,
       }
     });
    </script>
