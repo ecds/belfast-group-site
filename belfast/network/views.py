@@ -280,6 +280,13 @@ def map_js(request):
         if not people and not texts:
             continue
 
+        if people and texts:
+            icon = 'bio-text'
+        elif people:
+            icon = 'bio'
+        else:
+            icon = 'text'
+
         info = {
             'latitude': pl.latitude,
             'longitude': pl.longitude,
@@ -289,7 +296,9 @@ def map_js(request):
             # properties to affect display
             'tags': tags,
             # icon color so we can use different icons on the map by type (?)
-            'icon_color': 'blue' if texts else 'red'
+            'icon_color': 'blue' if texts else 'red',
+            'icon': icon
+
         }
         markers.append(info)
 
