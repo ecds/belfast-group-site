@@ -103,8 +103,20 @@
     "content": "<p>brief intro text for map if needed</p>",
     "enable_comments": false
   }
- }
-
-
-
+ },
+{
+  "pk": 8,
+  "model": "flatpages.flatpage",
+  "fields": {
+    "registration_required": false,
+    "title": "Credits",
+    "url": "/credits/",
+    "template_name": "",
+    "sites": [
+      1
+    ],
+    "content": "<p>credits place-holder page</p>",
+    "enable_comments": false
+  }
+}
 ]
