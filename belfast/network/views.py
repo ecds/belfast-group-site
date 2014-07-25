@@ -202,7 +202,10 @@ def group_people_js(request, mode='egograph', output='full'):
         data = json_graph.node_link_data(graph)
     if output == 'adjacency':
         # adjacency matrix for generating chord diagram
-        matrix = nx.linalg.graphmatrix.adjacency_matrix(graph)
+        matrix = nx.convert_matrix.to_numpy_matrix(graph)
+
+        # NOTE: this also works, but as of networx 1.9 requires scipy
+        # matrix = nx.linalg.graphmatrix.adjacency_matrix(graph)
         data = matrix.tolist()
 
     return HttpResponse(json.dumps(data), content_type='application/json')
