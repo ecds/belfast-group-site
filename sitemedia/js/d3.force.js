@@ -24,7 +24,6 @@ function ForceGraphControls(config) {
   $.extend(options, config);
 
   var controls = $(options.target);
-  controls.append($("<h4>Graph Settings</h4>"));
 
   // one/two-degree toggle if configured
   if (options.graph_options.degree_toggles) {
