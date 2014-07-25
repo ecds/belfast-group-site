@@ -10,7 +10,9 @@
 
 {% with min_degree=3 %}
 
- <div id="chart"></div>
+ <div id="chart">
+  <div class="graph-loading text-center">Loading...</div>
+ </div>
 
   <script src="{% static 'js/d3.min.js' %}" charset="utf-8"></script>
   <link type="text/css" href="{% static 'css/d3.chord.css' %}" rel="stylesheet" media="screen"/>
