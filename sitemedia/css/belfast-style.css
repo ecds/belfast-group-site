@@ -378,6 +378,17 @@ footer {
 }
 
 
+@media (max-width:992px){
+    div#node-info {
+        float: left;
+        width: 50%;
+    }
+    div#graph-controls {
+        float: right;
+        width: 50%;
+    }
+}
+
 
 /** local/dev additions */
 
