@@ -10,6 +10,11 @@ Initial setup
 
   pip install -r pip-install-req.txt
 
+.. Note::
+
+   Setting up the virtualenv and installing dependencies is handled by
+   the fabric deploy script when deploying to QA or production.
+
 * Copy ``belfast/localsettings.py.dist`` to ``belfast/localsettings.py``
   and customize as needed.
 
