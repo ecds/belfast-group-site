@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import patterns, url
 from django.contrib.flatpages import views as fpviews
 
 
@@ -7,4 +7,6 @@ urlpatterns = patterns('',
         name='overview'),
     url(r'^biographies/$', fpviews.flatpage, {'url': '/biographies/'},
         name='bios'),
+    url(r'^credits/$', fpviews.flatpage, {'url': '/credits/'},
+        name='credits'),
 )
