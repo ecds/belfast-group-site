@@ -8,7 +8,9 @@ from urlparse import urlparse
 from networkx.readwrite import gexf
 
 from django.conf import settings
+from django.contrib.flatpages.models import FlatPage
 from django.contrib.sites.models import Site, get_current_site
+
 
 logger = logging.getLogger(__name__)
 
@@ -94,4 +96,26 @@ class cached_property(object):
             return self
         obj.__dict__[self.__name__] = result = self.fget(obj)
         return result
+
+
+def relative_flatpage_url(request):
+    # generate the relative url for a flatpage, taking into account subdomain
+    current_site = get_current_site(request)
+    url = request.path
+    # if running on a subdomain, search for flatpage with url without leading path
+    if '/' in current_site.domain:
+        parts = current_site.domain.rstrip('/').split('/')
+        suburl = '/%s/' % parts[-1]
+        if url.startswith(suburl):
+            url = request.path[len(suburl) - 1:]  # -1 to preserve leading /
+    return url
+
+def get_flatpage(request):
+    # get flatpage for this url & site if it exists; otherwise, return none
+    url = relative_flatpage_url(request)
+    try:
+        return FlatPage.objects.get(url=url, sites__id=settings.SITE_ID)
+    except FlatPage.DoesNotExist:
+        return None
+
 
