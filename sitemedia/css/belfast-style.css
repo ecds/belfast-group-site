@@ -4,7 +4,7 @@ body {
 }
 
 a{
-	color: #11a7e4;
+	color: #11A7E4;
 }
 
 .btn{
@@ -121,7 +121,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 	}
 }
 
-@media (min-width: 768px) {
+@media (min-width: 993px) {
 	.navbar-nav{
 		float: right;
 	}
@@ -163,7 +163,15 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 	}
 }
 .navbar-brand{
-	font-size: 1.5em;
+	font-size: 1em;
+	font-weight: 600;
+}
+
+@media(min-width:480px){
+	.navbar-brand{
+		font-size: 1.5em;
+		font-weight: normal;
+	}
 }
 
 .headline {
@@ -378,7 +386,8 @@ footer {
 }
 
 
-@media (max-width:992px){
+
+@media (max-width:993px){
     div#node-info {
         float: left;
         width: 50%;
@@ -387,6 +396,199 @@ footer {
         float: right;
         width: 50%;
     }
+
+	.list-label{
+		width:100%;
+		padding-left:5px;
+		border-bottom: 1px solid #D7EFF8;
+	}
+    .sidenav.affix {
+        position:relative!important;
+    }
+    .sidenav.affix li,
+	.sidenav.affix-top li{
+        display:inline-block;
+        margin-bottom: 5px;
+	}
+	.sidenav.affix li a,
+	.sidenav.affix-top li a{
+		background-color: #EAEEF5;
+		border-radius: 7px;
+	}
+
+	.sidenav.affix li.active a,
+	.sidenav.affix-top li.active a{
+		background-color: #EAEEF5;
+		color: #11A7E4;
+	}
+	.local-sidenav .sidenav.affix li.active,
+	.local-sidenav .sidenav.affix-top li.active{
+		border:none;
+		background: transparent;
+	}
+	.sidenav.affix li a:hover,
+	.sidenav.affix li a:focus,
+	.sidenav.affix li.active a:hover,
+	.sidenav.affix li.active a:focus,
+	.sidenav.affix-top li a:hover,
+	.sidenav.affix-top li a:focus,
+	.sidenav.affix-top li.active a:hover,
+	.sidenav.affix-top li.active a:focus{
+		background-color: #C2D4F3;
+		border-radius: 7px;
+		color: #4A6F91;
+	}
+
+}
+
+
+@media (min-width: 767px) and (max-width:992px){
+    .navbar-nav {
+		float: left;
+		margin: 0;
+		width:100%;
+	}
+    .navbar-collapse.collapse {
+        max-height: 340px;
+        padding-right: 15px;
+        padding-left: 15px;
+        overflow-x: visible;
+        border-top: 1px solid rgba(0, 0, 0, 0);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        -webkit-overflow-scrolling: touch;
+        display: none!important;
+        height: 0!important;
+    }
+    
+    .navbar-toggle {
+        display: block;
+    }
+    .container>.navbar-header, .container>.navbar-collapse {
+        margin-right: 0;
+        margin-left: 0;
+    
+        width: 100%;
+}
+    .nav>li>a {
+        position: relative;
+        display: block;
+        padding: 10px 15px;
+    }
+    .navbar-nav>li>a {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        line-height: 20px;
+    }
+    .nav>li>a {
+        position: relative;
+        display: block;
+        padding: 10px 15px;
+    }
+    .navbar-nav>li {
+		float: none;
+	
+	}
+	.navbar-nav li.search form{
+		width:80%;
+		float: left!important;
+		padding-bottom:2em;
+	}
+	.navbar-nav li.search form input{
+		width:80%;
+		
+	}
+}
+
+@media(min-width:768px){
+	.collaspe-section.collasped {
+	    display: block!important;
+	}
+}
+
+.nav-list.sidenav.affix,
+.nav-list.sidenav.affix.relative{
+	position: relative!important;
+}
+
+@media(min-width:994px){
+	.nav-list.sidenav.affix {
+		position: fixed!important;
+	}
+	.nav-list.sidenav.affix.relative{
+		position: relative!important;
+	}
+}
+
+.toggle-section{
+	display: none;
+}
+
+.toggle-section .up, .toggle-section.collasped .dwn{
+	display: none;
+}
+
+.toggle-section.collasped .up, .toggle-section .dwn{
+	display: block;
+}
+
+@media(max-width:767px){
+
+	.toggle-section{
+		display: inline-block;
+	}
+
+    .sidebar ul{
+        padding:0;
+        margin-left:-5px;
+    }
+    .sidebar ul li {
+        padding: 5px;
+        background: #EBEBEB;
+        float: left;
+        margin: 5px;
+        display: block; 
+        float: left; 
+        border-radius: 5px;
+        position: relative;
+    }
+    .sidebar p {
+        float: left;
+        width: 100%;
+        clear: both;
+    
+        padding: 10px 0;
+        margin: 0;
+	}
+    .sidebar,
+    .sidebar+div {
+        float: left;
+        width:100%;
+    }
+}
+
+
+div#top {
+	top: -50px;
+	position: relative;
+	display: block;
+}
+
+a.to-top {
+    font-size: 12px;
+    vertical-align: middle;
+    color:#CCC;
+	display:inline-block;
+}
+
+a.to-top:hover, 
+a.to-top:active{
+    color:#11A7E4;
+}
+
+@media (min-width:768px){
+	a.to-top{
+		display:none;
+	}
 }
 
 

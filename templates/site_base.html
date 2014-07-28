@@ -25,11 +25,12 @@ by default; use page_rdf_type to override with a webpage subclass.
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" />
     {# Custom CSS for the 'Belfast' Template #}
     <link href="{% static 'css/belfast-style.css' %}" rel="stylesheet" />
+    <link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic' rel='stylesheet' type='text/css'>
 
     {# <link href="{% static 'css/local.css' %}" rel="stylesheet" media="screen"/> #}
     <script src="{% static 'js/jquery.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    {# <script src="{% static 'js/bootstrap.js' %}"></script> #}
+    <script src="{% static 'js/belfast.js' %}"></script>
 
     {% block head-extras %}{% endblock %}
   </head>
@@ -52,8 +53,11 @@ by default; use page_rdf_type to override with a webpage subclass.
       <div class="collapse navbar-collapse navbar-ex1-collapse">
 
         <ul class="nav navbar-nav">
+          {% comment %}
           {% url 'site-index' as index_url %}
           <li><a {% if request.path = index_url %} class="current"{% endif %} href="{{ index_url }}">Home</a></li>
+          {% endcomment %}
+
           {% url 'overview' as overview_url %}
           <li><a {% if request.path = overview_url %} class="current"{% endif %} href="{{ overview_url }}">Overview</a></li>
           {% url 'groupsheets:list' as groupsheet_list %}

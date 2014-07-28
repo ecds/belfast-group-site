@@ -4,57 +4,63 @@
 {% block page-subtitle %} : Group Sheets{% endblock %}
 
 {% block page-content %}
+
 <div class="row">
+  <div class="col-md-9 col-sm-12">
+    <h1 class="hidden-md hidden-lg">Group Sheets</h1>
+  </div>
+</div>
 
+<div class="row">
   <div class="col-md-3 col-sm-4 sidebar">
-    <h4>Filter groupsheets</h4>
+    <h4>Filter groupsheets <a href="#" class="toggle-section"><span class="glyphicon glyphicon-chevron-down dwn"></span><span class="glyphicon glyphicon-chevron-up up"></span></a></h4>
+    <div class="collaspe-section collasped" style="display:none;">
+        {% if filters %}{# display filters currently in effect, with link to remove #}
+          <ul>
+            {% for label, link in filters.iteritems %}
+            <li>{{ label }} <a class="small" href="{{ link }}"><span class="glyphicon glyphicon-remove-sign"></span></a></li>
+            {% endfor %}
+        </ul>
+        {% endif %}
 
-    {% if filters %}{# display filters currently in effect, with link to remove #}
-      <ul>
-        {% for label, link in filters.iteritems %}
-        <li>{{ label }} <a class="small" href="{{ link }}"><span class="glyphicon glyphicon-remove-sign"></span></a></li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+        <hr/>
+        {% if facets.digital %}
+        <p><a href="?edition=digital{{ url_suffix }}">digital editions</a> ({{ facets.digital }})</p>
+        {% endif %}
 
-    <hr/>
-    {% if facets.digital %}
-    <p><a href="?edition=digital{{ url_suffix }}">digital editions</a> ({{ facets.digital }})</p>
-    {% endif %}
+        {% if facets.time_periods %}
+        <p><b>Time Period</b></p>
+        <ul>
+            {% for f in facets.time_periods|dictsort:"time_period" %}
+            <li><a href="?dates={{ f.time_period|default:"undetermined" }}{{ url_suffix }}">{{ f.time_period|default:"Undetermined" }}</a> ({{ f.total }})</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
 
-    {% if facets.time_periods %}
-    <p><b>Time Period</b></p>
-    <ul>
-        {% for f in facets.time_periods|dictsort:"time_period" %}
-        <li><a href="?dates={{ f.time_period|default:"undetermined" }}{{ url_suffix }}">{{ f.time_period|default:"Undetermined" }}</a> ({{ f.total }})</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+        {% if facets.authors %}
+        <p><b>Author</b></p>
+        <ul>
+            {% for f in facets.authors|dictsortreversed:"total" %}
+            <li><a href="?author={{ f.author.slug }}{{ url_suffix }}">{{ f.author.lastname }}, {{ f.author.firstname }}</a> ({{ f.total }})</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
 
-    {% if facets.authors %}
-    <p><b>Author</b></p>
-    <ul>
-        {% for f in facets.authors|dictsortreversed:"total" %}
-        <li><a href="?author={{ f.author.slug }}{{ url_suffix }}">{{ f.author.lastname }}, {{ f.author.firstname }}</a> ({{ f.total }})</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-
-    {% if facets.sources %}
-    <p><b>Source</b></p>
-    <ul>
-        {% for s in facets.sources|dictsortreversed:"total" %}  {# TODO: need to use short names here! #}
-        <li><a href="?source={{ s.source.identifier|urlencode }}{{ url_suffix }}">{{ s.source.name }}</a> ({{ s.total }})</li>
-        {# NOTE: urlencode required since collection URIs include #anchors which otherwise get lost #}
-        {% endfor %}
-    </ul>
-    {% endif %}
-
+        {% if facets.sources %}
+        <p><b>Source</b></p>
+        <ul>
+            {% for s in facets.sources|dictsortreversed:"total" %}  {# TODO: need to use short names here! #}
+            <li><a href="?source={{ s.source.identifier|urlencode }}{{ url_suffix }}">{{ s.source.name }}</a> ({{ s.total }})</li>
+            {# NOTE: urlencode required since collection URIs include #anchors which otherwise get lost #}
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
   </div> {# end sidebar #}
 
   <div class="col-md-9 col-sm-8">
 
-    <h1 property="schema:name">Group Sheets</h1>
+    <h2 property="schema:name" class="h1 hidden-sm hidden-xs">Group Sheets</h1>
 
     <p>Displaying {{ documents|length }} group sheet{{ documents|pluralize }}.</p>
 

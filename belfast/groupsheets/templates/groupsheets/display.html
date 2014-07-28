@@ -17,6 +17,8 @@
 {% block body-attrs %}data-spy="scroll" data-target=".local-sidenav" data-offset-top="200"{% endblock %}
 
 {% block page-content %}
+<div class="row" id="top">
+  </div>
   <div class="row">
   <div class="contents col-md-4 local-sidenav">
     {# use toc item titles for RDF title list #}
@@ -28,12 +30,12 @@
 
     {# NOTE: there is a table of contents item list, but it does not include ids #}
     {# generating toc from the actual poems instead #}
-    <ul class="nav nav-list sidenav affix">
+    <ul class="nav nav-list sidenav">
         <li><h4>{{ document.toc.title }}</h4></li> {# heading must be in list to stay fixed #}
         {% for poem in document.poems %}
         {# display authors by section if groupsheet has multiple authors #}
         {% if document.multi_author %}
-          {% ifchanged %}<li>{{ poem.byline }}</li>{% endifchanged %}
+          {% ifchanged %}<li class="list-label">{{ poem.byline }}</li>{% endifchanged %}
         {% endif %}
           <li><a href="#{{ poem.id }}">{{ poem.title|default:'[untitled]' }}</a></li>
         {% endfor %}
@@ -67,7 +69,7 @@
         <hr/>
         <a name="{{ poem.id }}">
           {% if poem.title %}
-            <h3 property="schema:name">{{ poem.title_node|format_tei }}</h3>
+            <h3><span property="schema:name">{{ poem.title_node|format_tei }}</span> <a href="#top" class="to-top"><span class="glyphicon glyphicon-chevron-up"></span>Back to top</a></h3>
           {% endif %}
         </a>
         {{ poem.body|format_tei }}

@@ -1,28 +1,49 @@
 $("document").ready(function(){
-  var $poets = $("#poets");
 
-  $(window).load(function(){
-    // home page images
-   $poets.masonry({
-      "itemSelector": 'figure',
-      "columnWidth": 1
-    });
-   // profile list names and images
-   $("#bios").masonry({
-      "itemSelector": '.panel',
-      "columnWidth": 1,
-    });
+  $("a.toggle-section").on('click',function(evt){
+    evt.preventDefault();
+    var $this = $(this),
+        $collaspeSection = $(".collaspe-section");
+
+      $collaspeSection.toggleClass('collasped');
+      $(this).toggleClass('collasped');
+
+      if($collaspeSection.hasClass('collasped')){
+        $collaspeSection.slideUp();
+      }
+      else{
+        $collaspeSection.slideDown();
+      }
+
   });
 
-  $poets.on('mouseover','figure',function(){
-    $(this).siblings("figure").children('img').stop().animate({"opacity":0.5});
-  })
-  .on('mouseout','figure',function(){
-    $(this).siblings("figure").children('img').stop().animate({"opacity":1});
-  })
-  .on('click','figure',function(){
-    $url = $(this).find('a').attr('href');
-    window.location.assign($url);
+  $(".nav-list.sidenav").affix({
+     offset: {
+      top: 0,
+      bottom: function () {
+        return (this.bottom = $('.footer').outerHeight(true))
+      }
+    }
   });
 
-});
+  function checkWindowHeight(){
+    var $window = $(window),
+        $sidenav = $('.nav-list.sidenav');
+
+        console.log($window.height())
+        console.log($sidenav.height()+100)
+    if($window.height() < $sidenav.height()+$sidenav.offset().top){
+      $sidenav.addClass('relative');
+    }
+    else{
+      $sidenav.removeClass('relative');
+    }
+  }
+
+  checkWindowHeight();
+
+  $(window).resize(function(){
+    checkWindowHeight();
+  });
+
+});//end doc.ready
