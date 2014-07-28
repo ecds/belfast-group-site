@@ -1,10 +1,12 @@
 from collections import defaultdict
+from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.db.models import Count
 from django.shortcuts import render
 from django.http import Http404, HttpResponse
 from django.views.decorators.http import last_modified
+from django.contrib.flatpages.models import FlatPage
 from django.contrib.sites.models import get_current_site
+
 from eulexistdb.exceptions import DoesNotExist, ExistDBException
 import logging
 import urllib
@@ -73,6 +75,13 @@ def teixml(request, name):
 def list_groupsheets(request):
     # without filters, find all group sheets
     # results = GroupSheet.objects.all()
+
+    # get flatpage for this url, if any
+    try:
+        flatpage = FlatPage.objects.get(url=request.path, sites__id=settings.SITE_ID)
+    except FlatPage.DoesNotExist:
+        flatpage = None
+
     url_args = {}
     filters = {}
     filter_digital = request.GET.get('edition', None)
@@ -176,7 +185,8 @@ def list_groupsheets(request):
 
     return render(request, 'groupsheets/list.html',
                   {'documents': results, 'facets': facets,
-                   'url_suffix': url_suffix, 'filters': filters})
+                   'url_suffix': url_suffix, 'filters': filters,
+                   'flatpage': flatpage})
 
 
 def search(request):

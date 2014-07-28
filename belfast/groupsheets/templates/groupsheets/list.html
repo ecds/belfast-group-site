@@ -4,6 +4,13 @@
 {% block page-subtitle %} : Group Sheets{% endblock %}
 
 {% block page-content %}
+
+  <h1 property="schema:name">Group Sheets</h1>
+  {% if flatpage %}
+    {% include "flatpages/snippets/flatpage_content.html" %}
+  {% endif %}
+<div class="clearfix"></div>
+
 <div class="row">
 
   <div class="col-md-3 col-sm-4 sidebar">
@@ -53,8 +60,6 @@
   </div> {# end sidebar #}
 
   <div class="col-md-9 col-sm-8">
-
-    <h1 property="schema:name">Group Sheets</h1>
 
     <p>Displaying {{ documents|length }} group sheet{{ documents|pluralize }}.</p>
 
