@@ -12,7 +12,8 @@ import rdflib
 from StringIO import StringIO
 
 from belfast.util import network_data, rdf_data,  \
-    rdf_data_lastmodified, network_data_lastmodified, normalize_whitespace
+    rdf_data_lastmodified, network_data_lastmodified, normalize_whitespace, \
+    relative_flatpage_url, get_flatpage
 from belfast.rdfns import BELFAST_GROUP_URI
 from belfast.groupsheets.rdfmodels import RdfGroupSheet
 from belfast.people.rdfmodels import RdfOrganization, RdfPerson, find_places
@@ -29,30 +30,12 @@ def rdf_lastmod(request, *args, **kwargs):
 def rdf_nx_lastmod(request, *args, **kwargs):
     return max(rdf_data_lastmodified(), network_data_lastmodified())
 
-def _relative_flatpage_url(request):
-    current_site = get_current_site(request)
-    url = request.path
-    # if running on a subdomain, search for flatpage with url without leading path
-    if '/' in current_site.domain:
-        parts = current_site.domain.rstrip('/').split('/')
-        suburl = '/%s/' % parts[-1]
-        if url.startswith(suburl):
-            url = request.path[len(suburl) - 1:]  # -1 to preserve leading /
-    return url
-
-def _get_flatpage(request):
-    # get flatpage for this url & site if it exists; otherwise, return none
-    url = _relative_flatpage_url(request)
-    try:
-        return FlatPage.objects.get(url=url, sites__id=settings.SITE_ID)
-    except FlatPage.DoesNotExist:
-        return None
 
 def overview(request):
     # get flatpage for this url; if not available, 404 (?)
     # flatpage = FlatPage.objects.get(url=request.path, sites__id=settings.SITE_ID)
     fpage = get_object_or_404(FlatPage,
-        url=_relative_flatpage_url(request), sites__id=settings.SITE_ID)
+        url=relative_flatpage_url(request), sites__id=settings.SITE_ID)
     return render(request, 'network/overview.html', {'flatpage': fpage})
 
 def _network_graph(min_degree=1, **kwargs):
@@ -145,13 +128,13 @@ def force_graph(request):
 # @last_modified(rdf_nx_lastmod)
 def chord_diagram(request):
     # circular chord chart of entire network
-    fpage = _get_flatpage(request)
+    fpage = get_flatpage(request)
     return render(request, 'network/chord.html', {'flatpage': fpage})
 
 
 # @last_modified(rdf_nx_lastmod)
 def group_people(request, mode='egograph'):
-    fpage = _get_flatpage(request)
+    fpage = get_flatpage(request)
 
     # graph of just people directly connected to the belfast group
     if mode == 'egograph':
@@ -225,7 +208,7 @@ def node_info(request):
 
 
 def map(request):
-    fpage = _get_flatpage(request)
+    fpage = get_flatpage(request)
 
     people = {}
     # semi-redundant with json view functionality, but easier to build filter

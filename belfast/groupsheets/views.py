@@ -1,11 +1,8 @@
 from collections import defaultdict
-from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from django.http import Http404, HttpResponse
 from django.views.decorators.http import last_modified
-from django.contrib.flatpages.models import FlatPage
-from django.contrib.sites.models import get_current_site
 
 from eulexistdb.exceptions import DoesNotExist, ExistDBException
 import logging
@@ -16,7 +13,7 @@ from belfast.groupsheets.forms import KeywordSearchForm
 from belfast.groupsheets.rdfmodels import TeiGroupSheet, TeiDocument, \
     get_rdf_groupsheets, groupsheet_by_url
 from belfast.util import rdf_data_lastmodified, network_data_lastmodified, \
-    local_uri
+    local_uri, get_flatpage
 
 logger = logging.getLogger(__name__)
 
@@ -77,10 +74,7 @@ def list_groupsheets(request):
     # results = GroupSheet.objects.all()
 
     # get flatpage for this url, if any
-    try:
-        flatpage = FlatPage.objects.get(url=request.path, sites__id=settings.SITE_ID)
-    except FlatPage.DoesNotExist:
-        flatpage = None
+    flatpage = get_flatpage(request)
 
     url_args = {}
     filters = {}
