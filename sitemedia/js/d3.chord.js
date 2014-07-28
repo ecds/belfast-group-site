@@ -103,6 +103,8 @@ return d3.json(config.nodes, function(data) {
     function mouseout(d, i) {
       chord.classed("fade", false);
     }
+
+   $('.graph-loading').hide();   // hide loading indicator once graph is initialized
   });  // matrix data
 }); // node info
 

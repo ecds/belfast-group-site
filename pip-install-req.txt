@@ -5,17 +5,15 @@ rdflib<=4.1.0
 Pillow
 # for sleepycat/berkeleydb persistence
 bsddb3
-networkx
+networkx>=1.9
 eulcommon
 html5lib
 progressbar
-
 
 # additional rdf script reqs
 requests>=1.1
 BeautifulSoup4
 SPARQLWrapper
 
-# for graph matrices?
+# for graph matrices
 numpy
-#scipy (?)

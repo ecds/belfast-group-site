@@ -28,11 +28,10 @@ $("document").ready(function(){
 
   function checkWindowHeight(){
     var $window = $(window),
-        $sidenav = $('.nav-list.sidenav');
+        $sidenav = $('.sidenav'),
+        offset = $sidenav.offset();
 
-        console.log($window.height())
-        console.log($sidenav.height()+100)
-    if($window.height() < $sidenav.height()+$sidenav.offset().top){
+    if($window.height() < $sidenav.height()+offset.top){
       $sidenav.addClass('relative');
     }
     else{

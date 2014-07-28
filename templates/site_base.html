@@ -53,11 +53,6 @@ by default; use page_rdf_type to override with a webpage subclass.
       <div class="collapse navbar-collapse navbar-ex1-collapse">
 
         <ul class="nav navbar-nav">
-          {% comment %}
-          {% url 'site-index' as index_url %}
-          <li><a {% if request.path = index_url %} class="current"{% endif %} href="{{ index_url }}">Home</a></li>
-          {% endcomment %}
-
           {% url 'overview' as overview_url %}
           <li><a {% if request.path = overview_url %} class="current"{% endif %} href="{{ overview_url }}">Overview</a></li>
           {% url 'groupsheets:list' as groupsheet_list %}
@@ -67,6 +62,8 @@ by default; use page_rdf_type to override with a webpage subclass.
           <li><a {% if request.path = people_list %} class="current"{% endif %} href="{{ people_list }}">Bios</a></li>
           {% url 'network:overview' as network_url %}
           <li><a {% if request.path = network_url %} class="current"{% endif %} href="{{ network_url }}">Networks &amp; Maps</a></li>
+          {% url 'credits' as credits_url %}
+          <li><a {% if request.path = credits_url %} class="current"{% endif %} href="{{ credits_url }}">Credits</a></li>
           <li class="search">
             <form class="form-search navbar-search pull-right" action="{% url 'groupsheets:search' %}">
               {{ kwsearch_form.keywords }}
@@ -110,6 +107,21 @@ by default; use page_rdf_type to override with a webpage subclass.
     });
     </script>
 {% block endbody %}{% endblock %}
+
+
+{% if not debug %}   {# google analytics code #}
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+ })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-51682905-3', 'auto');
+ga('send', 'pageview');
+
+</script>
+{% endif %}
+
 </body>
 
 </html>
