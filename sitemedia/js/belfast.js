@@ -17,32 +17,36 @@ $("document").ready(function(){
 
   });
 
-  $(".nav-list.sidenav").affix({
-     offset: {
-      top: 0,
-      bottom: function () {
-        return (this.bottom = $('.footer').outerHeight(true))
+  var $sidenav = $(".nav-list.sidenav");
+
+  if($sidenav.length>0){
+    $(".nav-list.sidenav").affix({
+       offset: {
+        top: 0,
+        bottom: function () {
+          return (this.bottom = $('.footer').outerHeight(true))
+        }
+      }
+    });
+
+    function checkWindowHeight(){
+      var $window = $(window),
+          $sidenav = $('.sidenav'),
+          offset = $sidenav.offset();
+
+      if($window.height() < $sidenav.height()+offset.top){
+        $sidenav.addClass('relative');
+      }
+      else{
+        $sidenav.removeClass('relative');
       }
     }
-  });
 
-  function checkWindowHeight(){
-    var $window = $(window),
-        $sidenav = $('.sidenav'),
-        offset = $sidenav.offset();
-
-    if($window.height() < $sidenav.height()+offset.top){
-      $sidenav.addClass('relative');
-    }
-    else{
-      $sidenav.removeClass('relative');
-    }
-  }
-
-  checkWindowHeight();
-
-  $(window).resize(function(){
     checkWindowHeight();
-  });
+
+    $(window).resize(function(){
+      checkWindowHeight();
+    });
+  }
 
 });//end doc.ready
