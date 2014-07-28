@@ -6,6 +6,11 @@ DEPLOYNOTES
 Initial setup
 -------------
 
+* Installing bsddb3 requires to point to the local path of Berkeley DB
+
+  brew install berkeley-db
+  BERKELEYDB_DIR=$(brew --cellar)/berkeley-db/5.3.28 pip install bsddb3
+
 * Install python dependencies (virtualenv is recommended)::
 
   pip install -r pip-install-req.txt
