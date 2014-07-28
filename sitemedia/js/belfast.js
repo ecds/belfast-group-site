@@ -24,7 +24,7 @@ $("document").ready(function(){
         $collaspeSection = $(".collaspe-section");
 
       $collaspeSection.toggleClass('collasped');
-      $(this).toggleClass('collasped');
+      $(this).toggleClass('collasped active');
 
       if($collaspeSection.hasClass('collasped')){
         $collaspeSection.slideUp();

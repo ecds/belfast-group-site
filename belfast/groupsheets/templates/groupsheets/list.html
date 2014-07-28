@@ -14,7 +14,7 @@
 
 <div class="row">
   <div class="col-md-3 col-sm-4 sidebar">
-    <h4>Filter groupsheets <a href="#" class="toggle-section"><span class="glyphicon glyphicon-chevron-down dwn"></span><span class="glyphicon glyphicon-chevron-up up"></span></a></h4>
+    <h4>Filter groupsheets <a href="#" class="toggle-section btn btn-primary"><span class="glyphicon glyphicon-chevron-down dwn"></span><span class="glyphicon glyphicon-chevron-up up"></span></a></h4>
     <div class="collaspe-section collasped" style="display:none;">
         {% if filters %}{# display filters currently in effect, with link to remove #}
           <ul>
@@ -26,7 +26,9 @@
 
         <hr/>
         {% if facets.digital %}
-        <p><a href="?edition=digital{{ url_suffix }}">digital editions</a> ({{ facets.digital }})</p>
+        <ul>
+            <li><a href="?edition=digital{{ url_suffix }}">digital editions</a> ({{ facets.digital }})</li>
+        </ul>
         {% endif %}
 
         {% if facets.time_periods %}
