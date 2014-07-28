@@ -43,24 +43,9 @@ function ForceGraphControls(config) {
     // dgr.append(" 2-degree ");
     controls.append(dgr);
     var ego_degree = $("input[name='ego-degree']");
+    controls.append($('<hr/>'));
   }
 
-  // checkbox to toggle in-graph labels
-  // TODO: perhaps this could default to checked for graphs smaller
-  // than a certain threshold. (?)
-  var label_toggle = $("<input/>").attr('type', 'checkbox').attr('id', 'graph-labels');
-  var p = $("<p>").append(label_toggle).append(" display labels <br/>");
-  // don't show warning if labels are enabled by default
-  if ( ! options.graph_options.labels) {
-    var labeltip = $("<small>(not recommended for large graphs)</small>").attr('id', 'label-tip');
-    p.append(labeltip);
-  }
-  controls.append(p);
-  // if labels is specified as true in user-config, start with it checked
-  if (options.graph_options.labels) {
-    label_toggle.attr('checked', 'checked');
-  }
-  options.graph_options.labels = $("#graph-labels").is(":checked");
 
   var size_attributes = {
     degree: {label: 'degree', attr: 'degree', default: true},
@@ -78,16 +63,53 @@ function ForceGraphControls(config) {
     var initial_range = [3, 20];
     var sizeopts = {};
 
+    // slider control for node visibility by size
+    var initial_nodesize = initial_range[0];
+    var visnodediv = $('<div>display nodes with size >= </div>').attr('id', 'visnodesize-controls');
+    visnodediv.append($("<input/>").attr('type', 'text').attr('value', initial_nodesize)
+      .attr('id', 'visnode-size').attr('class', 'range-slider'));
+    // visnodediv.append(" or greater");
+    visnodediv.append($("<div> </div>").attr('id', 'visnodesize-range'));
+
+    controls.append(visnodediv);
+    $("#visnodesize-range").slider({
+        min: initial_range[0],  // if any smaller than 3 or so, color becomes invisible
+        max: initial_range[1],
+        values: initial_nodesize,
+        slide: function(event, ui) {
+          $("#visnode-size").val(ui.value);
+        }
+    });
+    controls.append($('<hr/>'));
+
+
+    // checkbox to toggle in-graph labels
+    // TODO: perhaps this could default to checked for graphs smaller
+    // than a certain threshold. (?)
+    var label_toggle = $("<input/>").attr('type', 'checkbox').attr('id', 'graph-labels');
+    var p = $("<p>").append(label_toggle).append(" display labels <br/>");
+    // don't show warning if labels are enabled by default
+    if ( ! options.graph_options.labels) {
+      var labeltip = $("<small>(not recommended for large graphs)</small>").attr('id', 'label-tip');
+      p.append(labeltip);
+    }
+    controls.append(p);
+    // if labels is specified as true in user-config, start with it checked
+    if (options.graph_options.labels) {
+      label_toggle.attr('checked', 'checked');
+    }
+    options.graph_options.labels = $("#graph-labels").is(":checked");
+
     // slider control for label visibility by node size
     var initial_labelsize = initial_range[0];
     if (options.graph_options.label_minsize) {
       initial_labelsize = options.graph_options.label_minsize;
     }
-    var labelsizediv = $('<div>if node size is </div>').attr('id', 'vislabelsize-controls');
+    var labelsizediv = $('<div>if node size >= </div>').attr('id', 'vislabelsize-controls');
     // labelsizediv.append("if node size >= ");
     labelsizediv.append($("<input/>").attr('type', 'text').attr('value', initial_labelsize)
       .attr('id', 'vislabel-size').attr('class', 'range-slider'));
-    labelsizediv.append(" or greater");
+    // labelsizediv.append(" or greater");
     labelsizediv.append($("<div> </div>").attr('id', 'vislabelsize-range'));
     if (! options.graph_options.labels) {
       labelsizediv.hide();  // ugh; mixing jquery and d3 control styles throughout
@@ -168,6 +190,7 @@ function ForceGraphControls(config) {
       return 5;  // default size
     };
 
+    // method to determine if a label should be visible with current settings
     options.graph_options.labels_visible = function(d) {
     if ($("#graph-labels").is(":checked")) {
       if (typeof(d)==='undefined') {
@@ -186,6 +209,26 @@ function ForceGraphControls(config) {
     }
   };
 
+    // method to determine if a node should be visible with current settings
+    options.graph_options.node_visible = function(d) {
+      if (typeof(d) ==='undefined') {
+        // generic - are nodes visible or not
+        return 'visible';
+      } else {
+        // specific node: check aginst current user-configured minimum size
+        if (options.graph_options.nodesize(d) >= $("#visnode-size").val()) {
+          return 'visible';
+        } else {
+          return 'hidden';
+        }
+      }
+  };
+
+  // method to determine visibility based on two conditions
+  options.graph_options.both_visible = function(a, b) {
+      // if they match, doesn't matter which one we return; if they don't, one is hidden
+      if (a == b) { return a; } else { return 'hidden'; }
+  };
 
 
   // declare variable to hold the forcedirected graph once it's launched
@@ -237,6 +280,25 @@ function ForceGraphControls(config) {
     sizeopts[key].input.change(force.resume());
   }
   $("#nodesize-range").slider().on('slidechange', function(event, ui) {
+    force.resume();
+  });
+
+  // update visible nodes, links, and label nodes when slider changes
+  $("#visnodesize-range").slider().on('slidechange', function(event, ui) {
+    var min_visible = ui.value;  // slider value is minimum visible node size
+
+    var node = d3.selectAll("g.node")
+        .attr('visibility', function(d) { return options.graph_options.node_visible(d); });
+    var label_node = d3.selectAll("g.anchorNode")
+        .attr('visibility', function(d) { return options.graph_options.node_visible(d.node); });
+
+    var link = d3.selectAll("path.link")
+        .attr('visibility', function(d) {
+          // a link should be visible if both source and target nodes are visible
+          var src_vis = options.graph_options.node_visible(d.source);
+          var tgt_vis = options.graph_options.node_visible(d.target);
+          return options.graph_options.both_visible(src_vis, tgt_vis);
+        });
     force.resume();
   });
 
@@ -437,7 +499,11 @@ function init_graph(json) {
         return i % 2 === 0 ? "" : d.node.label;
       })
       .attr('class', 'node-label')
-      .attr('visibility', function(d) { return options.labels_visible(d); });
+      .attr('visibility', function(d) {
+          return options.both_visible(options.labels_visible(d),
+                             options.node_visible(d.node));
+      });
+
       if (options.node_info_url) {
         anchorNode.classed('node-info-link', true);
       }
@@ -500,7 +566,10 @@ function init_graph(json) {
 
     // update label visibility
     anchorNode.selectAll('.node-label')
-       .attr('visibility', function(d) { return options.labels_visible(d); });
+       .attr('visibility', function(d) {
+          return options.both_visible(options.labels_visible(d),
+                             options.node_visible(d.node));
+        });
 
       // NOTE: would be nice if we could skip this if labels aren't visible
       // (slow for large graphs), but in some cases that results in the

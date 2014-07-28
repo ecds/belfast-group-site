@@ -50,7 +50,7 @@
 
 }
 */
-#vislabel-size {
+#vislabel-size, #visnode-size {
     display: inline;
     width: 2em;
 }
