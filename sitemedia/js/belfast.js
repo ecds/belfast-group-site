@@ -1,14 +1,21 @@
 $("document").ready(function(){
 
-  var $bios = $("#bios");
 
-  if($bios.length>0){
-
-   $("#bios").masonry({
-      "itemSelector": '.panel',
-      "columnWidth": 1,
-      "gutter": 10
+  var $poets = $("#poets");
+  if($poets.length>0){
+   $poets.masonry({
+      "itemSelector": 'figure',
+      "columnWidth": 1
     });
+  }
+
+  var $bios = $("#bios");
+  if($bios.length>0){
+   $bios.masonry({
+      "itemSelector": '.panel',
+      "columnWidth": 40,
+      "gutter": 10
+    })
   }
 
   $("a.toggle-section").on('click',function(evt){

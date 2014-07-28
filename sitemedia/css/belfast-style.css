@@ -18,6 +18,9 @@ a{
 	color: #1090C4;
 	background-color: #F5F5F5;
 	border-color: #B3B3B3;
+	max-width: 100%;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open .dropdown-toggle.btn-primary {
 	color: #009EDF;
@@ -121,7 +124,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 	}
 }
 
-@media (min-width: 993px) {
+@media (min-width: 992px) {
 	.navbar-nav{
 		float: right;
 	}
@@ -320,9 +323,12 @@ footer {
 }
 
 .footer{
+	position: relative;
+	display: block;
 	background-color: #161616;
 	color: #64838F;
 }
+
 
 /* RESPONSIVE CSS */
 
@@ -363,7 +369,6 @@ footer {
 	.navbar-fixed-top{
 		position: relative;
 	}
-
 }
 
 
@@ -395,6 +400,9 @@ footer {
 
 
 @media (max-width:993px){
+	.tooltip.in{
+		display: none!important;
+	}
     div#node-info {
         float: left;
         width: 50%;
@@ -449,7 +457,7 @@ footer {
 }
 
 
-@media (min-width: 767px) and (max-width:992px){
+@media (min-width: 767px) and (max-width:991px){
     .navbar-nav {
 		float: left;
 		margin: 0;
@@ -578,9 +586,26 @@ footer {
 	margin-bottom: 10px;
 }
 
-#bios .thumbnail.text-center {
+#bios .thumbnail {
 	white-space: nowrap;
 	margin-bottom: 0px;
+	padding: 0;
+	overflow: hidden;
+	box-shadow: 0 3px 7px 0px rgba(49, 49, 49, 0.14);
+	background: #F3F3F3;
+}
+
+.panel .thumbnail{
+    transition:opacity 0.2s ease;
+    opacity: 0.8;
+}
+.panel .thumbnail:hover, 
+.panel .thumbnail:focus{
+    opacity: 1;
+}
+
+#bios .panel .thumbnail:hover{
+    box-shadow: 0 3px 7px 0px rgba(49, 49, 49, 0.21);
 }
 
 
