@@ -45,3 +45,9 @@ coverage.xml
 .pydevproject
 
 design_originals/style-tile/img/Icon
+
+belfast.db
+
+gexf/belfastgroup.gexf
+
+gexf/bg1.gexf
