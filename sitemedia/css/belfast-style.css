@@ -567,6 +567,18 @@ footer {
 }
 
 
+#bios .panel{
+	margin-bottom: 10px;
+}
+
+#bios .thumbnail.text-center {
+	white-space: nowrap;
+	margin-bottom: 0px;
+}
+
+
+
+
 div#top {
 	top: -50px;
 	position: relative;

@@ -1,5 +1,16 @@
 $("document").ready(function(){
 
+  var $bios = $("#bios");
+
+  if($bios.length>0){
+
+   $("#bios").masonry({
+      "itemSelector": '.panel',
+      "columnWidth": 1,
+      "gutter": 10
+    });
+  }
+
   $("a.toggle-section").on('click',function(evt){
     evt.preventDefault();
     var $this = $(this),
