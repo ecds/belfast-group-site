@@ -236,19 +236,27 @@ def get_rdf_groupsheets(author=None, has_url=None, source=None, coverage=None):
         WHERE {
             ?ms rdf:type <%(bg)s> .
             ?ms dc:creator ?author .
-            ?author schema:familyName ?name
+            ?author schema:familyName ?name .
+            ?ms dc:title ?title .
+            OPTIONAL { ?title rdf:first ?first_title } .
+            BIND (COALESCE(?first_title, "") AS ?first_title1) .
+            BIND (concat(str(?first_title1), str(?title)) as ?sort_title)
             %(filter)s
-        } ORDER BY ?name
+        } ORDER BY ?name ?sort_title
         ''' % {'schema': rdfns.SCHEMA_ORG, 'dc': rdfns.DC,
                'rdf': rdflib.RDF, 'bg': rdfns.BG.GroupSheet,
                'filter': fltr}
-    # TODO: use OPTIONAL {...} for author/name to include anonymous groupsheet?
+
+    # NOTE: some group sheets have rdf:sequence for titles, others have literal titles
+    # combining first title in sequence (if present) with dc:title literal
+    # so literal and sequence titles can be sorted together
+
+    # TODO: use OPTIONAL {...} for author/name to include anonymous groupsheet
+    # but FIXME: making author optional results in *many* more group sheets, check
+    # rdf data/prep logic, cleanup...
 
     logger.debug(query)
     res = g.query(query)
-
-    # FIXME: restricting to ms with author loses one anonymous sheet;
-    # how to make optional?
 
     logger.debug('Found %d group sheets in %.02f sec' % (len(res),
                  time.time() - start))
