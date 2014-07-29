@@ -138,8 +138,8 @@ function ForceGraphControls(config) {
         sizeopts[key].min_max = minmax;
 
         // generate an input to select this feature as basis for size
-        sizeopts[key].input = $("<input/>").attr('type', 'radio')
-             .attr('name', 'node-size').attr('value', key);
+        sizeopts[key].input = $("<input/>").attr({
+          type: 'radio', name: 'node-size', value: key, id: key});
         if (size_attributes[key].default) {
           sizeopts[key].input.attr('checked', 'checked');
         }
@@ -154,11 +154,10 @@ function ForceGraphControls(config) {
 
     // adjust node size
     var p2 = $("<p/>").append("Size nodes by: <br/>");
-    // TODO: have an option to switch back to all the same size?
-    // var none = $("<input/>").attr('type', 'radio').attr('name', 'node-size').attr('value', 'none');
-
     for (key in sizeopts) {
-      p2.append(sizeopts[key].input).append(' ' + size_attributes[key].label + ' ');
+      p2.append($('<label/>').attr('class', 'radio-inline')
+        .append(sizeopts[key].input, size_attributes[key].label)
+      );
     }
     controls.append(p2);
     // slider control for min/max node size
