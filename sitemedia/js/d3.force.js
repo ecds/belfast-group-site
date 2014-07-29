@@ -44,10 +44,6 @@ function ForceGraphControls(config) {
       dgr.append(input);
       dgr.append(" " + degree_val + "-degree ");
     }
-    // dgr.append($("<input/>").attr('type', 'radio').attr('name', 'ego-degree').attr('value', 1).attr('checked', 'checked'));
-    // dgr.append(" 1-degree ");
-    // dgr.append($("<input/>").attr('type', 'radio').attr('name', 'ego-degree').attr('value', 2));
-    // dgr.append(" 2-degree ");
     controls.append(dgr);
     var ego_degree = $("input[name='ego-degree']");
     controls.append($('<hr/>'));
@@ -75,7 +71,6 @@ function ForceGraphControls(config) {
     var visnodediv = $('<div>display nodes with size >= </div>').attr('id', 'visnodesize-controls');
     visnodediv.append($("<input/>").attr('type', 'text').attr('value', initial_nodesize)
       .attr('id', 'visnode-size').attr('class', 'range-slider'));
-    // visnodediv.append(" or greater");
     visnodediv.append($("<div> </div>").attr('id', 'visnodesize-range'));
 
     controls.append(visnodediv);
@@ -131,7 +126,6 @@ function ForceGraphControls(config) {
         }
     });
     controls.append($('<hr/>'));
-
 
     for (key in size_attributes) {
       field_opts = size_attributes[key];
@@ -272,28 +266,15 @@ function ForceGraphControls(config) {
   }
 
 
-  // if in-graph label option is toggled, update label setting and relaunch the graph
-  // temporarily disable to see if we can make it dynamic
+  // if in-graph label option is toggled, update label setting and resume the graph
   label_toggle.change(function() {
       force.resume();
       labelsizediv.toggle();  // toggle display of control for labels by size
       $('#label-tip').toggle();
   });
 
-  // if degree is selected or slider changes, resume the graph
-  // (force node size to be recalculated using existing function)
-  for (key in sizeopts) {
-    // bind change method for all resize-attribute inputs
-    sizeopts[key].input.change(force.resume());
-  }
-  $("#nodesize-range").slider().on('slidechange', function(event, ui) {
-    force.resume();
-  });
-
-  // update visible nodes, links, and label nodes when slider changes
-  $("#visnodesize-range").slider().on('slidechange', function(event, ui) {
-    var min_visible = ui.value;  // slider value is minimum visible node size
-
+  // function to update visible nodes, links, and label nodes when controls change
+  function update_visible_nodes() {
     var node = d3.selectAll("g.node")
         .attr('visibility', function(d) { return options.graph_options.node_visible(d); });
     var label_node = d3.selectAll("g.anchorNode")
@@ -307,6 +288,28 @@ function ForceGraphControls(config) {
           return options.graph_options.both_visible(src_vis, tgt_vis);
         });
     force.resume();
+  }
+
+  function resume_update() {
+    // resume the graph so any size changes take effect
+    force.resume();
+    // update node visibility (which could change based on node sizes)
+    update_visible_nodes();
+  }
+
+
+  // if degree is selected or slider changes, resume the graph
+  // (force node size to be recalculated using existing function)
+  for (key in sizeopts) {
+    // bind change method for all resize-attribute inputs
+    sizeopts[key].input.change(resume_update());
+  }
+  $("#nodesize-range").slider().on('slidechange', function(event, ui) {
+    resume_update();
+  });
+
+  $("#visnodesize-range").slider().on('slidechange', function(event, ui) {
+    update_visible_nodes();
   });
 
   // method to resize svg & force graph based on parent container
