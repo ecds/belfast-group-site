@@ -130,7 +130,7 @@ class Rdf2Gexf(object):
             # if title is a bnode, convert from list/collection
             if isinstance(title, rdflib.BNode):
                 title_list = RdfCollection(self.graph, title)
-                title = 'group sheet: ' + '; '.join(title_list)
+                title = 'Group sheet: ' + '; '.join(title_list)
                 # truncate list if too long
                 if len(title) > 50:
                     title = title[:50] + ' ...'

@@ -31,7 +31,7 @@ class Command(BaseCommand):
         make_option('-q', '--queens', action='store_true',
             help='Convert Queens University Belfast collection to RDF'),
         make_option('-i', '--identify', action='store_true',
-            help='Identify group sheets'),
+            help='Identify Group sheets'),
         make_option('-s', '--smush', action='store_true',
             help='Smush groupsheet URIs and generate local profile URIs'),
         make_option('-r', '--related', action='store_true',

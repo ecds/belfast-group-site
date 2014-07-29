@@ -14,7 +14,7 @@
 
 <div class="row">
   <div class="col-md-3 col-sm-4 sidebar">
-    <h4>Filter groupsheets <a href="#" class="toggle-section btn btn-primary"><span class="glyphicon glyphicon-chevron-down dwn"></span><span class="glyphicon glyphicon-chevron-up up"></span></a></h4>
+    <h4>Filter Group sheets <a href="#" class="toggle-section btn btn-primary"><span class="glyphicon glyphicon-chevron-down dwn"></span><span class="glyphicon glyphicon-chevron-up up"></span></a></h4>
     <div class="collaspe-section collasped" style="display:none;">
         {% if filters %}{# display filters currently in effect, with link to remove #}
           <ul>
@@ -63,7 +63,7 @@
 
   <div class="col-md-9 col-sm-8">
 
-    <h2>Displaying {{ documents|length }} group sheet{{ documents|pluralize }}.</h2>
+    <h2>Displaying {{ documents|length }} Group sheet{{ documents|pluralize }}.</h2>
 
     <ul class="groupsheet-list">
         {% for doc in documents %}
