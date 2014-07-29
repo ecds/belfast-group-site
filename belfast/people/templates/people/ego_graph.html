@@ -25,7 +25,7 @@
         graph_options: {
             url: "{% url 'people:egograph-js' id=person.slug %}",
             target: "#network-graph",
-            width: 1000,
+            width: 'auto',
             height: 500,
             highlight: ['{{ person.identifier }}'],
             labels: true,

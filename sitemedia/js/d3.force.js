@@ -19,9 +19,16 @@ function ForceGraphControls(config) {
     graph_options: {
       target: '#chart',  // needs a default here so we can remove svg (?)
       degree_toggles: [],  // list of integer values, e.g. [1, 2]
+      width: 'auto',  // FIXME: not getting picked up and must be set in calling code for some reason
     }
   };
   $.extend(options, config);
+
+  // special config for auto width: set graph width based on parent container size
+  if (options.graph_options.width == 'auto') {
+    options.resize = true;
+    options.graph_options.width = parseInt(d3.select(options.graph_options.target).style('width'), 10);
+  }
 
   var controls = $(options.target);
 
@@ -302,6 +309,21 @@ function ForceGraphControls(config) {
     force.resume();
   });
 
+  // method to resize svg & force graph based on parent container
+  function resize() {
+    var width = parseInt(d3.select(options.graph_options.target).style('width'), 10);
+    var dims = force.size();
+    // reset width of force-directed graph (used to calculate center of graph)
+    force.size([width, dims[1]]);  // preserve current height
+    force.resume();   // resume in case graph has stabilized, so it will redraw
+    $('svg').width(width);
+  }
+
+  // when using auto width, resize svg & force graph on window resize
+  if (options.resize) {
+    d3.select(window).on('resize', resize);
+  }
+
   });  //end json load
 }
 
@@ -350,11 +372,14 @@ function ForceGraph(config) {
   if (! options.node_info_url) {
     $(options.node_info).hide();
   }
+  // calculate width based on parent container
+  var width = parseInt(d3.select(options.target).style('width'), 10);
 
   var vis = d3.select(options.target)
     .append("svg:svg")
       .attr("width", options.width)
       .attr("height", options.height);
+
 
 function init_graph(json) {
 
