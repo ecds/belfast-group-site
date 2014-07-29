@@ -83,7 +83,8 @@ by default; use page_rdf_type to override with a webpage subclass.
   <div class="footer">
     <div class="container">
       <!-- FOOTER -->
-      <footer>
+      <footer class="row">
+        <div class="col-xs-12 col-sm-10">
         <p>
           <a href="http://digitalscholarship.emory.edu/">Emory Center for Digital Scholarship</a>
           &#xb7; {# middot #}
@@ -92,9 +93,19 @@ by default; use page_rdf_type to override with a webpage subclass.
           <a href="http://marbl.library.emory.edu">Manuscript, Archives, and Rare Books Library</a>
           &#xb7;
           <a href="http://www.emory.edu/">Emory University</a>
-          {# TODO: include DiSC/ECDS here ? #}
         </p>
-        <p class="pull-right">{{ SW_VERSION }}</p>
+        </div>
+
+      <div class="col-xs-12 col-sm-2">
+        <div class="lits">
+          <p>Powered by:</p>
+          <img src="{% static 'img/LITS-logo.png' %}"/>
+
+          <p id="sw_version" class="pull-right">{{ SW_VERSION }}</p>
+        </div>
+
+      </div>
+
       </footer>
       <!-- /END OF FOOTER -->
     </div><!-- /container -->
