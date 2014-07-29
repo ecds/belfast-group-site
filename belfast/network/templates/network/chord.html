@@ -18,10 +18,30 @@
   <link type="text/css" href="{% static 'css/d3.chord.css' %}" rel="stylesheet" media="screen"/>
    <script type="text/javascript" src="{% static 'js/d3.chord.js' %}"></script>
    <script type="text/javascript">
-      ChordDiagram({
+      var options = {
+        target: '#chart',
         matrix: "{% url 'network:bg-js-matrix' %}",
         nodes: "{% url 'network:bg-js' %}",
-      });
+        max_size: 720,
+      };
+      ChordDiagram(options);
+
+      function resize_chorddiagram() {
+        console.log('resizing');
+        var width = d3.min([options.max_size, parseInt(d3.select(options.target).style('width'), 10)]);
+        var current_width = d3.min([options.max_size, parseInt(d3.select(options.target + ' svg').style('width'), 10)]);
+        // chord diagram has to be reloaded in order to set size
+        // this is expensive, so only resize if we're actually changing width
+        if (width != current_width) {
+            d3.select(options.target + ' svg').remove();
+            $('.graph-loading').show();   // show loading indicator while graph is re-initialized
+            ChordDiagram(options);
+        }
+
+      }
+
+      d3.select(window).on('resize', resize_chorddiagram);
+
    </script>
 
 {% endwith %}

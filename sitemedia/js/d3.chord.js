@@ -10,8 +10,8 @@ function ChordDiagram(config) {
   */
 
   var options = {
-    'width': 720,
-    'height': 720,
+    target: '#chart',
+    'max_size': 720,
     'fill': d3.scale.category20c(),  // was using category20 before...
     // NOTE: assigning separate color by id for now,
     // but if dataset is large enough should probably be by category
@@ -19,6 +19,10 @@ function ChordDiagram(config) {
   };
   $.extend(options, config);
 
+  // special config for auto width/height: base on parent container size
+  var width = d3.min([options.max_size, parseInt(d3.select(options.target).style('width'), 10)]);
+  console.log('width = ' + width);
+  options.width = options.height = width;
 
 var outerRadius = Math.min(options.width, options.height) / 2 - 10,
     innerRadius = outerRadius - 24;
@@ -37,7 +41,7 @@ var layout = d3.layout.chord()
 var path = d3.svg.chord()
     .radius(innerRadius);
 
-var svg = d3.select("#chart").append("svg")
+var svg = d3.select(options.target).append("svg")
     .attr("width", options.width)
     .attr("height", options.height)
   .append("g")
