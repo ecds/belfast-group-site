@@ -600,6 +600,7 @@ footer {
 .panel .thumbnail{
     transition:opacity 0.2s ease;
     opacity: 0.8;
+    padding: 0;
 }
 .panel .thumbnail:hover,
 .panel .thumbnail:focus{
@@ -627,6 +628,15 @@ a.to-top {
 a.to-top:hover,
 a.to-top:active{
     color:#11A7E4;
+}
+
+.thumbnail a {
+    position: relative;
+    width: 100%;
+    display: block;
+}
+.thumbnail a img {
+    max-width: 100%;
 }
 
 @media (min-width:768px){
