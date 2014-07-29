@@ -280,8 +280,7 @@ font-family: 'PT Mono', courier, sans-serif;
 }
 
 
-
-@media print{
+@media print {
 	#poets figure{
 		width: 200px;
 		float: left !important;
@@ -291,6 +290,9 @@ font-family: 'PT Mono', courier, sans-serif;
 	}
 	#poets figure img{
 		max-width: 100%;
+	}
+	.text-content {
+		font-size: 14px;
 	}
 }
 
@@ -474,14 +476,14 @@ footer {
         display: none!important;
         height: 0!important;
     }
-    
+
     .navbar-toggle {
         display: block;
     }
     .container>.navbar-header, .container>.navbar-collapse {
         margin-right: 0;
         margin-left: 0;
-    
+
         width: 100%;
 }
     .nav>li>a {
@@ -501,7 +503,7 @@ footer {
     }
     .navbar-nav>li {
 		float: none;
-	
+
 	}
 	.navbar-nav li.search form{
 		width:80%;
@@ -510,7 +512,7 @@ footer {
 	}
 	.navbar-nav li.search form input{
 		width:80%;
-		
+
 	}
 }
 
@@ -561,8 +563,8 @@ footer {
         background: #EBEBEB;
         float: left;
         margin: 5px;
-        display: block; 
-        float: left; 
+        display: block;
+        float: left;
         border-radius: 5px;
         position: relative;
     }
@@ -570,7 +572,7 @@ footer {
         float: left;
         width: 100%;
         clear: both;
-    
+
         padding: 10px 0;
         margin: 0;
 	}
@@ -599,7 +601,7 @@ footer {
     transition:opacity 0.2s ease;
     opacity: 0.8;
 }
-.panel .thumbnail:hover, 
+.panel .thumbnail:hover,
 .panel .thumbnail:focus{
     opacity: 1;
 }
@@ -622,7 +624,7 @@ a.to-top {
 	display:inline-block;
 }
 
-a.to-top:hover, 
+a.to-top:hover,
 a.to-top:active{
     color:#11A7E4;
 }
