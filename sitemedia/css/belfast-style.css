@@ -592,9 +592,13 @@ footer {
 	white-space: nowrap;
 	margin-bottom: 0px;
 	padding: 0;
-	overflow: hidden;
+	/* overflow: hidden; */
 	box-shadow: 0 3px 7px 0px rgba(49, 49, 49, 0.14);
 	background: #F3F3F3;
+	min-height: 180px;
+	width: 180px;
+	position: relative;
+	float: left;
 }
 
 .panel .thumbnail{
@@ -634,9 +638,41 @@ a.to-top:active{
     position: relative;
     width: 100%;
     display: block;
+    height: 100%;
+    float: left;
 }
 .thumbnail a img {
     max-width: 100%;
+    width: 100%;
+}
+
+#bios .thumbnail a img {
+    border-radius: 3px 3px 0 0;
+}
+
+#bios .thumbnail .caption {
+    width: 100%;
+    position: relative;
+    left: 0;
+    float: left;
+    display: block;
+    height: 160px;
+}
+
+#bios .thumbnail a+.caption {
+    padding-top: 9px;
+    height: auto;
+}
+
+#bios .caption a {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 50%;
+}
+#bios .thumbnail a+.caption a {
+    position: relative;
 }
 
 @media (min-width:768px){
