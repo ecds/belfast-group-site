@@ -82,7 +82,7 @@ def _network_graph(min_degree=1, **kwargs):
     return graph
 
 
-# @last_modified(rdf_nx_lastmod)
+@last_modified(rdf_nx_lastmod)
 def full_js(request, mode):
     # mode options:
     #  full (node & link data) or adjacency (adjacency matrix)
@@ -108,7 +108,7 @@ def full_js(request, mode):
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 
-# @last_modified(rdf_nx_lastmod)
+@last_modified(rdf_nx_lastmod)
 def full_gexf(request):
     # generate same network graph as gexf for download/use in tools like gephi
     graph = _network_graph()
@@ -119,20 +119,19 @@ def full_gexf(request):
     return response
 
 
-# @last_modified(rdf_nx_lastmod)
+@last_modified(rdf_nx_lastmod)
 def force_graph(request):
     # force directed graph of entire network
     return render(request, 'network/graph.html')
 
 
-# @last_modified(rdf_nx_lastmod)
+@last_modified(rdf_nx_lastmod)
 def chord_diagram(request):
     # circular chord chart of entire network
     fpage = get_flatpage(request)
     return render(request, 'network/chord.html', {'flatpage': fpage})
 
-
-# @last_modified(rdf_nx_lastmod)
+@last_modified(rdf_nx_lastmod)
 def group_people(request, mode='egograph'):
     fpage = get_flatpage(request)
 
@@ -146,7 +145,7 @@ def group_people(request, mode='egograph'):
                   'js_view': js_view, 'mode': mode, 'flatpage': fpage})
 
 
-# @last_modified(rdf_nx_lastmod)
+@last_modified(rdf_nx_lastmod)
 def group_people_js(request, mode='egograph', output='full'):
     if mode == 'egograph':
         degree = request.GET.get('degree', 1)
@@ -193,6 +192,8 @@ def group_people_js(request, mode='egograph', output='full'):
 
     return HttpResponse(json.dumps(data), content_type='application/json')
 
+
+@last_modified(rdf_nx_lastmod)
 def node_info(request):
     node_id = request.GET.get('id', None)
     # TODO: better to get from gexf or rdf ?
@@ -226,7 +227,7 @@ def map(request):
                   {'people': people, 'flatpage': fpage})
 
 
-# @last_modified(rdf_lastmod)
+@last_modified(rdf_lastmod)
 def map_js(request):
     places = find_places()
     # places = Place.objects.all()

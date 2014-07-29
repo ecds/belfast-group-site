@@ -59,16 +59,19 @@ def local_uri(path, request=None):
 
 def rdf_data_lastmodified():
     # get a last modification time for rdf data, based on the
-    # most recently modified file
-    # TODO: store date last looded in the database instead?
-    filelist = os.listdir(settings.RDF_DATA_DIR)
-    filelist = filter(lambda x: not os.path.isdir(x) and x.endswith('.xml'), filelist)
-    newest = max([os.stat(os.path.join(settings.RDF_DATA_DIR, x)).st_mtime for x in filelist])
+    # most recently modified file in the db
+    # TODO: store date last loaded in the database instead?
+    filelist = os.listdir(settings.RDF_DATABASE)
+    # filelist = filter(lambda x: not os.path.isdir(x) and x.endswith('.xml'), filelist)
+    newest = max([os.stat(os.path.join(settings.RDF_DATABASE, x)).st_mtime for x in filelist])
     return datetime.fromtimestamp(newest)
 
 def network_data_lastmodified():
-    # last modification time for nx network data, based on the gexf file
-    return datetime.fromtimestamp(os.stat(settings.GEXF_DATA).st_mtime)
+    # last modification time for nx network data, based on the gexf files
+    filelist = os.listdir(settings.GEXF_DATA_DIR)
+    # filelist = filter(lambda x: not os.path.isdir(x) and x.endswith('.xml'), filelist)
+    newest = max([os.stat(os.path.join(settings.GEXF_DATA_DIR, x)).st_mtime for x in filelist])
+    return datetime.fromtimestamp(newest)
 
 
 _NX_GRAPH = None
