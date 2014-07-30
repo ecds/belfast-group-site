@@ -649,3 +649,29 @@ class HarvestRelated(object):
 
             if progress:
                 progress.finish()
+
+
+
+class GroupBios(object):
+
+    def __init__(self, graph, files):
+        triple_count = 0
+        for filepath in files:
+            tmp_graph = rdflib.ConjunctiveGraph()
+            # parse the file into a temporary rdf graph
+            with open(filepath) as bio:
+                tmp_graph.parse(file=bio, format='rdfa')
+
+            # find the identifier we want to use for graph context
+            graph_id = list(tmp_graph.subjects(rdflib.RDF.type, rdfns.SCHEMA_ORG.WebPage))[0]
+
+            # create a new context in our data store and copy all the data over
+            g = rdflib.Graph(graph.store, graph_id)
+            for triple in tmp_graph:
+                g.add(triple)
+
+            triple_count += len(g)
+
+        print 'Added %d triples' % triple_count
+
+
