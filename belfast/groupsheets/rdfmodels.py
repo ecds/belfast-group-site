@@ -247,6 +247,9 @@ def get_rdf_groupsheets(author=None, has_url=None, source=None, coverage=None):
                'rdf': rdflib.RDF, 'bg': rdfns.BG.GroupSheet,
                'filter': fltr}
 
+    # FIXME: some untitled Group sheets have *no* title; fix query so title is not required
+    # (sort untitled either beginning or end of list...  end probably?)
+
     # NOTE: some group sheets have rdf:sequence for titles, others have literal titles
     # combining first title in sequence (if present) with dc:title literal
     # so literal and sequence titles can be sorted together
