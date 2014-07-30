@@ -87,8 +87,11 @@
 
 {% if person.description %}
  <p property="schema:description" class="description">{{ person.description }}
-    <small><i>(<a href="{{ person.description_context }}">{{ person.desc_context_name }}</a>)</i></small> {# should be safe to assume for now ... #}
-    {# TODO: should really link to the findingaids where the description comes from #}
+  {% if person.description_context and person.desc_context_name %}
+    {# link to the source of the description *if* it has a label (i.e., findingaid where the description comes from) #}
+    <small><i>(<a href="{{ person.description_context }}">{{ person.desc_context_name }}</a>)</i></small>
+  {% endif %}
+
  </p>
 {% elif person.dbpedia.description %}
  <p>{{ person.dbpedia.description }}
