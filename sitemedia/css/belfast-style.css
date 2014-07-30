@@ -321,7 +321,7 @@ font-family: 'PT Mono', courier, sans-serif;
 
 
 footer {
-	margin: 50px 0;
+	margin: 50px 0 0;
 }
 
 .footer{
@@ -697,7 +697,7 @@ a.to-top:active{
 #sw_version {
   opacity: 0.6;
   font-size: 12px;
-  margin-top: 3em;
+  margin-top: 2em;
 }
 
 .lits{
@@ -707,7 +707,7 @@ a.to-top:active{
     color: #FFF;
     opacity: 0.6;
     max-width:200px;
-    padding-bottom:24px
+    /*padding-bottom:24px*/
 }
 .lits img{
     width: 100%;
