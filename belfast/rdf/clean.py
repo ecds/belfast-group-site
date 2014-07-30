@@ -136,15 +136,27 @@ class SmushGroupSheets(object):
         if title:
             # single literal
             if isinstance(title, rdflib.Literal):
+                normalized_title = normalize_whitespace(title)
+                # if normalized title is different, update value in graph
+                if unicode(title) != normalized_title:
+                    print '** replacing "%s" with normalized version "%s"' % (title, normalized_title)
+                    graph.set((uri, rdfns.DC.title, rdflib.Literal(normalized_title)))
                 titles.append(normalize_whitespace(title))
+
 
             # otherwise, assuming node is an rdf sequence
             else:
                 # convert from resource to standard blank node
                 # since collection doesn't seem to handle resource
                 # create a collection to allow treating as a list
-                titles.extend([normalize_whitespace(t) for t in
-                              rdfcollection.Collection(graph, title)])
+                title_collection = rdfcollection.Collection(graph, title)
+                for t in title_collection:
+                    normalized_title = normalize_whitespace(t)
+                    if unicode(t) != normalized_title:
+                        print '** replacing "%s" with normalized version "%s"' % (t, normalized_title)
+                        index = title_collection.index(t)
+                        title_collection[index] = rdflib.Literal(normalized_title)
+                    titles.append(normalized_title)
 
         # ignore title order for the purposes of de-duping
         # - sort titles so we can get a consistent MD5
@@ -176,7 +188,9 @@ class SmushGroupSheets(object):
 
         # if not at least one title or title and author, skip this ms
         if not titles and not author:
+            logger.warn('No titles or author found for Group sheet %s' % uri)
             return
+
         logger.debug('author %s titles %s' % (author, titles))
 
         m = hashlib.md5()
@@ -358,9 +372,9 @@ class ProfileUris(object):
             PREFIX rdf: <%(rdf)s>
             SELECT DISTINCT ?person
             WHERE {
-                ?person rdf:type <schema:Person> .
+                ?person rdf:type schema:Person .
                 ?person ?rel <%(bg_uri)s>
-                FILTER regex(str(?author), "^(?!http://%(local_domain)s)")
+                FILTER regex(str(?person), "^(?!http://%(local_domain)s)")
             }''' % {'schema': rdfns.SCHEMA_ORG,
                     'rdf': rdflib.RDF, 'bg_uri': rdfns.BELFAST_GROUP_URI,
                     'local_domain': self.current_site.domain}
@@ -368,7 +382,7 @@ class ProfileUris(object):
         if res:
             logger.debug('Found %d people connected to the Belfast Group in %.02f sec' % (len(res),
                 time.time() - start))
-        people |= set([r['people'] for r in res])
+        people |= set([r['person'] for r in res])
 
         return people
 
