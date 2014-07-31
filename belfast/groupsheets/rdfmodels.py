@@ -238,10 +238,20 @@ def get_rdf_groupsheets(author=None, has_url=None, source=None, coverage=None):
             ?ms rdf:type <%(bg)s> .
             ?ms dc:creator ?author .
             ?author schema:familyName ?name .
-            ?ms dc:title ?title .
-            OPTIONAL { ?title rdf:first ?first_title } .
+            # some Group sheets are untitled; make title optional so we don't lose those
+            OPTIONAL {
+               ?ms dc:title ?title .
+               # some Group sheets have only one title while others have a list
+               OPTIONAL {
+                  ?title rdf:first ?first_title
+               }
+            } .
+            # untitled should sort *after* other titles; set default string of ZZ
+            BIND (COALESCE(?title, "ZZ") AS ?title1) .
+            # first title default to empty string
             BIND (COALESCE(?first_title, "") AS ?first_title1) .
-            BIND (concat(str(?first_title1), str(?title)) as ?sort_title)
+            # sort on first title (if list) or only title, together
+            BIND (concat(str(?first_title1), str(?title1)) as ?sort_title)
             %(filter)s
         } ORDER BY ?name ?sort_title
         ''' % {'schema': rdfns.SCHEMA_ORG, 'dc': rdfns.DC,
