@@ -1,11 +1,13 @@
 {# snippet to display a single rdf groupsheet #}
 {% load groupsheet_tags %}
 <p>
-  {% if not profile or doc.author_list|length != 1 %}
-  {% for author in doc.author_list %}
-     <b>{{ author.lastname }}, {{ author.firstname }}</b>{% if not forloop.last %}; {% endif %}
-     {# FIXME: logic for profile page? list all authors or only other authors than profile? #}
-  {% endfor %}
+  {% if not profile  or doc.author_list|length != 1 %} {# suppress single author on profile page list #}
+      {% for author in doc.author_list %}
+        <b>{{ author.lastname }}, {{ author.firstname }}</b>{% if not forloop.last %}; {% endif %}
+        {# NOTE: on profile page, should we list all authors or only other authors than profile? #}
+      {% empty %}
+        <b>Anonymous</b>
+      {% endfor %}
   {% endif %}
 {% for t in doc.title_list %}  {# list of titles if multiple #}
 "{{ t }},"
