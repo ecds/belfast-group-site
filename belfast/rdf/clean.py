@@ -139,7 +139,8 @@ class SmushGroupSheets(object):
                 normalized_title = normalize_whitespace(title)
                 # if normalized title is different, update value in graph
                 if unicode(title) != normalized_title:
-                    print '** replacing "%s" with normalized version "%s"' % (title, normalized_title)
+                    logger.debug('Replacing title "%s" with normalized version "%s"' \
+                                 % (title, normalized_title))
                     graph.set((uri, rdfns.DC.title, rdflib.Literal(normalized_title)))
                 titles.append(normalize_whitespace(title))
 
