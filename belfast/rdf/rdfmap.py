@@ -39,6 +39,15 @@ class Value(object):
 
 
 class Resource(object):
+    '''RDF descriptor to access an RDF resoure for a specified predicate.
+
+    :params predicate: RDF predicate URI to be used for identifying the resource
+    :params resource_type: class to be used for initializing RDF resource
+        (i.e. a subclass of :class:`belfast.rdf.models.RdfResource` or
+        the more general :class:`rdflib.resource.Resource`)
+    :params is_object: boolean flag, indicates whether resource is the
+        object or subject of the specified predicate (defaults to object)
+    '''
 
     def __init__(self, predicate, resource_type, is_object=True):
         self.predicate = predicate
@@ -61,19 +70,38 @@ class Resource(object):
 
 
 class ResourceList(object):
+    '''RDF descriptor to access multiple values for the same predicate as a list.
 
-    def __init__(self, predicate, resource_type, is_object=True):
+    :params predicate: RDF predicate URI to be used for identifying resources
+    :params resource_type: class to be used for initializing RDF resource
+        (i.e. a subclass of :class:`belfast.rdf.models.RdfResource` or
+        the more general :class:`rdflib.resource.Resource`)
+    :params is_object: boolean flag, indicates whether resources are
+        objects or subjects of the specified predicate (defaults to object)
+    :params sort: optional sort parameter, for sorting results after they are
+        identified and initialized as the requested resource type; should be
+        a key or lambda that can be passed to :meth:`sorted`
+
+    '''
+
+    def __init__(self, predicate, resource_type, is_object=True, sort=None):
         self.predicate = predicate
         self.resource_type = resource_type
         self.is_object = is_object
+        self.sort = sort
 
     def __get__(self, obj, objtype):
         if self.is_object:
             meth = obj.objects
         else:
             meth = obj.subjects
-        return [self.resource_type(obj.graph, o.identifier)
-                for o in meth(self.predicate)]
+
+        results = [self.resource_type(obj.graph, o.identifier)
+                   for o in meth(self.predicate)]
+        if self.sort:
+            return sorted(results, key=self.sort)
+        else:
+            return results
 
 
 class Sequence(object):
