@@ -183,7 +183,8 @@ class RdfGroupSheet(RdfResource):
     # single author
     author = rdfmap.Resource(rdfns.DC.creator, RdfPerson)
     # author list - a very few groupsheets have multiple authors
-    author_list = rdfmap.ResourceList(rdfns.DC.creator, RdfPerson)
+    author_list = rdfmap.ResourceList(rdfns.DC.creator, RdfPerson,
+        sort=lambda author: author.lastname)
 
     # single title as literal value
     title = rdfmap.Value(rdfns.DC.title)
