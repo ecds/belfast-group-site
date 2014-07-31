@@ -14,6 +14,7 @@ from belfast.groupsheets.rdfmodels import TeiGroupSheet, Contents, \
     Poem, id_from_ark, RdfGroupSheet, get_rdf_groupsheets
 from belfast.groupsheets.forms import KeywordSearchForm
 from belfast.groupsheets.templatetags.tei import format_tei
+from belfast.groupsheets.templatetags.groupsheet_tags import natural_date
 
 FIXTURE_DIR = path.join(path.dirname(path.abspath(__file__)), 'fixtures')
 
@@ -276,3 +277,20 @@ class FormatTeiTestCase(unittest.TestCase):
         # needs *both* line formatting and rend indent formatting
         self.assert_(format.startswith('<p><span style="padding-left:2.5em">'))
         self.assert_(format.endswith('</span></p>'))
+
+
+class TestGroupsheetTagsTemplateTags(TestCase):
+
+    def test_natural_date(self):
+        # year only
+        self.assertEqual('1980', natural_date('1980'))
+        self.assertEqual('1980', natural_date('1980-00-00'))
+
+        self.assertEqual('May 1964', natural_date('1964-05'))
+        self.assertEqual('May 1964', natural_date('1964-05-00'))
+
+        self.assertEqual('01 Apr 1973', natural_date('1973-04-01'))
+
+        self.assertEqual('1971/1972', natural_date('1971/1972'))
+
+

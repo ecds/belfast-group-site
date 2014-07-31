@@ -1,4 +1,5 @@
 {# snippet to display a single rdf groupsheet #}
+{% load groupsheet_tags %}
 <p>
   {% if not profile or doc.author_list|length != 1 %}
   {% for author in doc.author_list %}
@@ -11,7 +12,7 @@
 {% empty %} {# single title if we have one, or untitled + genre if available #}
   {% if doc.title %}"{{ doc.title }}"{% else %}Untitled{{ ' '|add:doc.genre|default:'' }}{% endif %},
 {% endfor %}
-{% if doc.date %}{{ doc.date }}{% else %}no date{% endif %}.  {# TODO: format date for readability #}
+{% if doc.date %}{{ doc.date|natural_date }}{% else %}no date{% endif %}.  {# TODO: format date for readability #}
 {# perhaps simply omit the no date since the majority are undated? #}
 {% if doc.num_pages %}({{ doc.num_pages }} page{{ doc.num_pages|pluralize }}){% endif %}
 </p>
