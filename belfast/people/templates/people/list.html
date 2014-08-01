@@ -16,7 +16,9 @@
     <div class="thumbnail text-center">
           {% if pic %}
           <a href="{{ person }}">
-            <img src="{{ pic.thumbnail.url }}" alt="{{ pic.title }}">
+            <figure>
+              <img src="{{ pic.thumbnail.url }}" alt="{{ pic.title }}">
+            </figure>
           </a>
           {% endif %}
           <div class="caption">

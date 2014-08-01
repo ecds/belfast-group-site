@@ -53,7 +53,7 @@ class ProfilePicture(models.Model):
             return self.rdfcollection.name
 
     image_size = (350, 350)
-    thumbnail_size = (128, 128)
+    thumbnail_size = (180, 350)
 
     def save(self, *args, **kwargs):
         # override save method to resize image and generate thumbnail

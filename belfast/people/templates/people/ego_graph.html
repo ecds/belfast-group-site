@@ -19,13 +19,15 @@
   <script src="{% static 'js/d3.min.js' %}" charset="utf-8"></script>
   <link type="text/css" href="{% static 'css/d3.force.css' %}" rel="stylesheet" media="screen"/>
    <script type="text/javascript" src="{% static 'js/d3.force.js' %}"></script>
+
    <script type="text/javascript">
+    $(document).ready(function(){
       ForceGraphControls({
         target: "#graph-controls",
         graph_options: {
             url: "{% url 'people:egograph-js' id=person.slug %}",
             target: "#network-graph",
-            width: 'auto',
+            width: 800,
             height: 500,
             highlight: ['{{ person.identifier }}'],
             labels: true,
@@ -35,4 +37,6 @@
             charge: -500
         }
       });
+    });
    </script>
+

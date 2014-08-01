@@ -583,6 +583,9 @@ footer {
     }
 }
 
+div#bios {
+	min-height: 500px;
+}
 
 #bios .panel{
 	margin-bottom: 10px;
@@ -675,12 +678,27 @@ a.to-top:active{
     position: relative;
 }
 
+#bios .thumbnail figure {
+    max-height: 200px;
+    overflow: hidden;
+    display: block;
+    width: 100%;
+}
+
 @media (min-width:768px){
 	a.to-top{
 		display:none;
 	}
 }
 
+figure.thumbnail.text-center {
+	box-shadow: 0 3px 7px 0px rgba(49, 49, 49, 0.14);
+	background: #F3F3F3;
+}
+
+.tab-content {
+	padding: 20px 0;
+}
 
 /** local/dev additions */
 
