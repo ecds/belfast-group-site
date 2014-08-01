@@ -1,7 +1,17 @@
+html, body{
+	height: 100%;
+}
+
 body {
 	padding-top: 50px; /* 50px is the height of the navbar - change this if the navbar height changes */
 	font-family: 'Droid Serif';
 }
+body >.container{
+	height:auto !important;
+    height:100%;
+    min-height:100%;
+}
+
 
 a{
 	color: #11A7E4;
@@ -583,10 +593,6 @@ footer {
     }
 }
 
-div#bios {
-	min-height: 500px;
-}
-
 #bios .panel{
 	margin-bottom: 10px;
 }
@@ -698,6 +704,20 @@ figure.thumbnail.text-center {
 
 .tab-content {
 	padding: 20px 0;
+}
+
+.well+.text-content {
+	padding-top: 1em;
+}
+
+#network-graph svg {
+    height: 500px;
+}
+
+@media (min-height:1000px){
+    #network-graph svg {
+        height: 800px;
+    }
 }
 
 /** local/dev additions */
