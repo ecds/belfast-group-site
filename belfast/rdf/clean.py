@@ -154,7 +154,8 @@ class SmushGroupSheets(object):
                 for t in title_collection:
                     normalized_title = normalize_whitespace(t)
                     if unicode(t) != normalized_title:
-                        print '** replacing "%s" with normalized version "%s"' % (t, normalized_title)
+                        logger.debug('Replacing title "%s" with normalized version "%s"' \
+                                 % (t, normalized_title))
                         index = title_collection.index(t)
                         title_collection[index] = rdflib.Literal(normalized_title)
                     titles.append(normalized_title)
@@ -183,9 +184,25 @@ class SmushGroupSheets(object):
             last = graph.value(author, rdfns.SCHEMA_ORG.familyName)
             first = graph.value(author, rdfns.SCHEMA_ORG.givenName)
             if last is not None and first is not None:
-                author = '%s, %s' % (last, first)
+                author = normalize_whitespace('%s, %s' % (last, first))
             else:
-                author = None
+                author_name = None
+                names = list(graph.objects(author, rdfns.SCHEMA_ORG.name))
+                for n in names:
+                    if ',' in n:
+                        author_name = normalize_whitespace(n)
+                        break
+
+                # if author is still not set, build lastname, first format from existing name
+                if author_name is None:
+                    name_parts = normalize_whitespace(names[0]).split(' ')
+                    # pop off last name (splitting on whitespace)
+                    last_name = name_parts.pop()
+                    # remaning name(s) = first name
+                    first_name = ' '.join(name_parts)
+                    author_name ='%s, %s' % (last_name, first_name)
+
+                author = author_name
 
         # if not at least one title or title and author, skip this ms
         if not titles and not author:
