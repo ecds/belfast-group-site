@@ -5,6 +5,7 @@ parser.out
 parsetab.py
 # rdf sleepycat berkeleydb
 *.bdb
+media
 
 # python default ignores from github
 *.py[cod]
@@ -52,5 +53,3 @@ gexf/belfastgroup.gexf
 
 gexf/bg1.gexf
 
-# Media images
-media

@@ -183,7 +183,8 @@ class RdfGroupSheet(RdfResource):
     # single author
     author = rdfmap.Resource(rdfns.DC.creator, RdfPerson)
     # author list - a very few groupsheets have multiple authors
-    author_list = rdfmap.ResourceList(rdfns.DC.creator, RdfPerson)
+    author_list = rdfmap.ResourceList(rdfns.DC.creator, RdfPerson,
+        sort=lambda author: author.lastname)
 
     # single title as literal value
     title = rdfmap.Value(rdfns.DC.title)
@@ -211,9 +212,15 @@ def get_rdf_groupsheets(author=None, has_url=None, source=None, coverage=None):
     # optionally filter by author (takes a URI)
     start = time.time()
     g = rdf_data()
+    # in most cases, sort by last name and then title
+    sort = '?sort_name ?sort_title'
+
     fltr = ''
     if author is not None:
         fltr = '. ?ms dc:creator <%s> ' % author
+        # when filtering by author, only sort on title
+        # (better handling for multi-author Group sheets)
+        sort = '?sort_title'
 
     if has_url is True:
         fltr += '. ?ms schema:URL ?url '
@@ -235,20 +242,48 @@ def get_rdf_groupsheets(author=None, has_url=None, source=None, coverage=None):
         SELECT DISTINCT ?ms
         WHERE {
             ?ms rdf:type <%(bg)s> .
-            ?ms dc:creator ?author .
-            ?author schema:familyName ?name
+            # one Group sheet is anonymous; make author optional to avoid omitting
+            OPTIONAL {
+               ?ms dc:creator ?author .
+               ?author schema:familyName ?name
+            } .
+            # some Group sheets are untitled; make title optional so we don't lose those
+            OPTIONAL {
+               ?ms dc:title ?title .
+               # some Group sheets have only one title while others have a list
+               OPTIONAL {
+                  ?title rdf:first ?first_title
+               }
+            } .
+            # sort anonymous Group sheet at the beginning of the list
+            BIND (COALESCE(?name, "AA") AS ?sort_name) .
+            # untitled should sort *after* other titles; set default string of ZZ
+            BIND (COALESCE(?title, "ZZ") AS ?title1) .
+            # first title default to empty string
+            BIND (COALESCE(?first_title, "") AS ?first_title1) .
+            # sort on first title (if list) or only title, together
+            BIND (concat(str(?first_title1), str(?title1)) as ?sort_title)
             %(filter)s
-        } ORDER BY ?name
+        } ORDER BY %(sort)s
         ''' % {'schema': rdfns.SCHEMA_ORG, 'dc': rdfns.DC,
                'rdf': rdflib.RDF, 'bg': rdfns.BG.GroupSheet,
-               'filter': fltr}
-    # TODO: use OPTIONAL {...} for author/name to include anonymous groupsheet?
+               'filter': fltr, 'sort': sort}
+
+        # } ORDER BY ?sort_name ?sort_title
+
+    # FIXME: some untitled Group sheets have *no* title; fix query so title is not required
+    # (sort untitled either beginning or end of list...  end probably?)
+
+    # NOTE: some group sheets have rdf:sequence for titles, others have literal titles
+    # combining first title in sequence (if present) with dc:title literal
+    # so literal and sequence titles can be sorted together
+
+    # TODO: use OPTIONAL {...} for author/name to include anonymous groupsheet
+    # but FIXME: making author optional results in *many* more group sheets, check
+    # rdf data/prep logic, cleanup...
 
     logger.debug(query)
     res = g.query(query)
-
-    # FIXME: restricting to ms with author loses one anonymous sheet;
-    # how to make optional?
 
     logger.debug('Found %d group sheets in %.02f sec' % (len(res),
                  time.time() - start))

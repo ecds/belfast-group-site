@@ -29,6 +29,7 @@ class QUB(object):
         'Simmons, James': 'http://viaf.org/viaf/92591927',
         'Parker, Stewart': 'http://viaf.org/viaf/7497547',
         'MacLaverty, Bernard': 'http://viaf.org/viaf/95151565',
+        'Watton, Joan': 'http://viaf.org/viaf/262730140',    # Joan Newmann; old BG site lists as Watton, Joan (Newmann)
         'Belfast Group': rdfns.BELFAST_GROUP_URI,
     }
 
@@ -48,7 +49,6 @@ class QUB(object):
     #   Sullivan, Ronald
     #   Brophy, Michael (possibly the one born in 1945, http://viaf.org/viaf/70921974 - http://trove.nla.gov.au/work/33952887?versionId=41792823)
     #   Mitchell, Michael
-    #   Watton, Joan
     #   Bond, John
     #   Gallagher, Maurice
     #   Harvey, W.J.
@@ -114,6 +114,7 @@ class QUB(object):
 
             content = list(div.stripped_strings)
             first_line = content[0]
+            second_line = content[1]
             # first line should start with the author's name (if known)
             # second line *may* include a secondary author, but
             # because we don't know exactly where the second line starts, check all content
@@ -168,7 +169,7 @@ class QUB(object):
 
             # collection desription includes notes about poetry, short story, etc.
             # including as genre to avoid losing information
-            if 'poem' in first_line.lower():
+            if 'poem' in first_line.lower() or 'poem' in second_line.lower():
                 g.add((msnode, rdfns.SCHEMA_ORG.genre, rdflib.Literal('poetry')))
             elif 'short story' in div.text.lower() or 'short stories' in div.text.lower():
                 g.add((msnode, rdfns.SCHEMA_ORG.genre, rdflib.Literal('short story')))

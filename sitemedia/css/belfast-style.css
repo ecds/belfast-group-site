@@ -321,7 +321,7 @@ font-family: 'PT Mono', courier, sans-serif;
 
 
 footer {
-	margin: 50px 0;
+	margin: 50px 0 0;
 }
 
 .footer{
@@ -709,4 +709,27 @@ figure.thumbnail.text-center {
 
 .node-info-detail h4 {
 	display: inline-block;
+}
+
+/* emory branding, borrowed from eultheme */
+#sw_version {
+  opacity: 0.6;
+  font-size: 12px;
+  margin-top: 2em;
+}
+
+.lits{
+    float: right;
+    width: 100%;
+    padding-right: 1em;
+    color: #FFF;
+    opacity: 0.6;
+    max-width:200px;
+    /*padding-bottom:24px*/
+}
+.lits img{
+    width: 100%;
+}
+.lits p {
+    font-size: 12px;
 }

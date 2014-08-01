@@ -107,7 +107,6 @@
   </div><!-- /.row -->
 
   <div class="row">
-
     <ul class="nav nav-tabs" id="vizTab">
       {% if groupsheets %}
       <li class="active"><a href="#groupsheets">Group Sheets</a></li>
@@ -125,7 +124,7 @@
       <div class="tab-pane active" id="groupsheets">
         <ul class="groupsheet-list">
           {% for doc in groupsheets %}
-          <li>{% include 'groupsheets/snippets/list_groupsheet.html' with profile=True %}</li>
+            <li>{% include 'groupsheets/snippets/list_groupsheet.html' with profile=True %}</li>
           {% endfor %}
         </ul>
       </div>

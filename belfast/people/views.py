@@ -37,8 +37,7 @@ def list(request):
     pics = dict([(p.person_uri, p) for p in pictures])
     # make a list of tuples: rdf person, corresponding profile pic if any
     people_pics = [(p, pics.get(str(p.identifier), None)) for p in people]
-    # people = BelfastGroup().connected_people
-    # people = Person.objects.order_by('last_name').all()
+
     return render(request, 'people/list.html',
                   {'people_pics': people_pics})
 

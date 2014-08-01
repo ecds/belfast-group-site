@@ -11,7 +11,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.contrib.sites.models import Site
 
-from belfast.rdf.harvest import HarvestRdf, Annotate # HarvestRelated
+from belfast.rdf.harvest import HarvestRdf, Annotate, GroupBios # HarvestRelated
 from belfast.rdf.qub import QUB
 from belfast.rdf.clean import SmushGroupSheets, IdentifyGroupSheets, \
     InferConnections, ProfileUris
@@ -67,9 +67,13 @@ class Command(BaseCommand):
     harvest_urls = ['http://findingaids.library.emory.edu/documents/%s/' % e
                     for e in eadids]
 
-    # TEMP: harvest from QA for RDFa bugs found during development
-    harvest_urls.append('http://testfindingaids.library.emory.edu/documents/hobsbaum1013/')
+    rdf_fixture_dir = os.path.join(settings.BASE_DIR, 'rdf', 'fixtures')
 
+    # convert to graph via rdfa, and add with graph identifier of webpage about
+    BG_bios = [
+       os.path.join(rdf_fixture_dir, 'BelfastGroup_biographies.html'),
+       os.path.join(rdf_fixture_dir, 'ednalongley_bio.html'),
+    ]
 
     QUB_input = os.path.join(settings.BASE_DIR, 'rdf', 'fixtures', 'QUB_ms1204.html')
     # FIXME: can we find a better url for the Queen's Belfast Group collection ?
@@ -112,6 +116,9 @@ class Command(BaseCommand):
             HarvestRdf(self.harvest_urls,
                        find_related=True, verbosity=self.verbosity,
                        graph=graph, no_cache=options['no_cache'])
+            # also add BG bios from old site to our RDF data
+            self.stdout.write('-- Adding RDF bios from old Belfast Group site')
+            GroupBios(graph, self.BG_bios)
 
         if all_steps or options['queens']:
             self.stdout.write('-- Converting Queens University Belfast Group collection description to RDF')
