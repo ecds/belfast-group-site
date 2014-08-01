@@ -64,6 +64,9 @@ by default; use page_rdf_type to override with a webpage subclass.
           <li><a {% if request.path = network_url %} class="current"{% endif %} href="{{ network_url }}">Networks &amp; Maps</a></li>
           {% url 'credits' as credits_url %}
           <li><a {% if request.path = credits_url %} class="current"{% endif %} href="{{ credits_url }}">Credits</a></li>
+          {% if user.is_authenticated and user.is_staff %}
+          <li><a href="{% url 'admin:index' %}"><span class="glyphicon glyphicon-cog"></span></a></li>
+          {% endif %}
           <li class="search">
             <form class="form-search navbar-search pull-right" action="{% url 'groupsheets:search' %}">
               {{ kwsearch_form.keywords }}
