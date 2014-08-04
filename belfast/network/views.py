@@ -178,7 +178,8 @@ def group_people_js(request, mode='egograph', output='full'):
         graph = gexf.read_gexf(settings.GEXF_DATA['bg1'])
         graph = annotate_graph(graph,
             fields=['degree', #'in_degree', 'out_degree',
-                   'betweenness_centrality'])
+                   'betweenness_centrality',
+                   'eigenvector_centrality'])
 
     if output == 'full':
         data = json_graph.node_link_data(graph)
