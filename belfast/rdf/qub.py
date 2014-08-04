@@ -173,6 +173,8 @@ class QUB(object):
                 g.add((msnode, rdfns.SCHEMA_ORG.genre, rdflib.Literal('poetry')))
             elif 'short story' in div.text.lower() or 'short stories' in div.text.lower():
                 g.add((msnode, rdfns.SCHEMA_ORG.genre, rdflib.Literal('short story')))
+            elif 'prose' in div.text.lower():
+                g.add((msnode, rdfns.SCHEMA_ORG.genre, rdflib.Literal('prose')))
             # one case is a book chapter...
             # some marked as possible translations?
 
