@@ -12,7 +12,8 @@ function ChordDiagram(config) {
   var options = {
     target: '#chart',
     'max_size': 720,
-    'fill': d3.scale.category20c(),  // was using category20 before...
+    //'fill': d3.scale.category20c(),  // was using category20 before...
+    'fill': d3.scale.ordinal().range(["#FFE4BA","#FFD38F","#FFC46B","#FFB84C","#E99C25","#B6C4F0","#B3CFEF","#AFE0EE","#879BDD","#82ACDB","#7CC3D8","#6179C7","#5B8CC3","#53A6BE","#425CAF","#3C6FA9","#3489A1","#28449E","#225A98","#1B7791"]),
     // NOTE: assigning separate color by id for now,
     // but if dataset is large enough should probably be by category
     'highlight': [],

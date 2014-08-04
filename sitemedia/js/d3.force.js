@@ -355,7 +355,8 @@ function ForceGraph(config) {
     target: '#chart', // selector for element where svg should be added
     width: 400,
     height: 400,
-    fill: d3.scale.category20c(),
+    // fill: d3.scale.category20c(),
+    'fill': d3.scale.ordinal().range(["#66a0b7","#FFCE6B","#264A9C"]),
     highlight: [],
     labels: false,
     nodesize: 5,
