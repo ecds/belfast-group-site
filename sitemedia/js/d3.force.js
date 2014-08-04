@@ -358,7 +358,7 @@ function ForceGraph(config) {
     width: 400,
     height: 400,
     // fill: d3.scale.category20c(),
-    'fill': d3.scale.ordinal().range(["#66a0b7","#FFCE6B","#264A9C"]),
+    // 'fill': d3.scale.ordinal().range(["#66a0b7","#FFCE6B","#264A9C"]),
     highlight: [],
     labels: false,
     nodesize: 5,
@@ -463,7 +463,7 @@ function init_graph(json) {
       .data(json.nodes)
     .enter().append("svg:g")
       .attr("class", function(d) { return "node " + d.type; })
-      .style("fill", function(d) { return options.fill(d.type); })
+      // .style("fill", function(d) { return options.fill(d.type); })
       .on("dblclick", dblclick)
       .call(drag);
 
@@ -472,8 +472,8 @@ function init_graph(json) {
     }
 
     node.append("svg:circle")
-        .attr("r", options.nodesize)
-        .style("fill", function(d) { return options.fill(d.type); });
+        .attr("r", options.nodesize);
+        // .style("fill", function(d) { return options.fill(d.type); });
 
     // click for node info IF defined
     if (options.node_info_url) {
@@ -524,7 +524,7 @@ function init_graph(json) {
           })
         .attr("id", function(d) { return d.node.id; });
 
-    anchorNode.append("svg:circle").attr("r", 0).style("fill", "#FFF");
+    anchorNode.append("svg:circle").attr("r", 0); // .style("fill", "#FFF");
       anchorNode.append("svg:text").text(function(d, i) {
         return i % 2 === 0 ? "" : d.node.label;
       })

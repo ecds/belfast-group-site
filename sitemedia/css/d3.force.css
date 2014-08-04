@@ -38,6 +38,19 @@
     font-size: 11pt;
 }
 
+/* fill colors for network graphs by type */
+.node.Person {
+    fill: #66a0b7;
+}
+
+.node.Organization {
+    fill: #FFCE6B;
+}
+
+.node.Place {
+    fill: #264A9C;
+}
+
 /* styles for graph controls */
 #graph-controls {
     border: 2px solid #efefef;
