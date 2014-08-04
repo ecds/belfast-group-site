@@ -301,13 +301,15 @@ function ForceGraphControls(config) {
   // (force node size to be recalculated using existing function)
   for (key in sizeopts) {
     // bind change method for all resize-attribute inputs
-    sizeopts[key].input.change(resume_update());
+    sizeopts[key].input.on('change', function(event, ui) {
+      resume_update();
+    });
   }
-  $("#nodesize-range").slider().on('slidechange', function(event, ui) {
+  $("#nodesize-range").slider().on('change', function(event, ui) {
     resume_update();
   });
 
-  $("#visnodesize-range").slider().on('slidechange', function(event, ui) {
+  $("#visnodesize-range").slider().on('change', function(event, ui) {
     update_visible_nodes();
   });
 
