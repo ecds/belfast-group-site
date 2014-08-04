@@ -152,8 +152,11 @@ class RdfArchivalCollection(RdfResource):
             return d.part_of or d
 
         # fallback access (should only apply to QUB collection)
-        return self.identifier
+        # - but only use identifier if it looks like a url
+        if self.identifier.startswith('http'):
+            return self.identifier
 
+        # no url for Pakenham Group sheet in private collection
 
 
 class RdfGroupSheet(RdfResource):
