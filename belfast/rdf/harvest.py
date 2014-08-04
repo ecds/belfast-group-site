@@ -652,7 +652,10 @@ class HarvestRelated(object):
 
 
 
-class GroupBios(object):
+class LocalRDF(object):
+    '''Harvest RDF from local HTML/RDFa fixtures and add information to the larger
+    RDF graph. Uses the webpage identifier as context id, if available.
+    '''
 
     def __init__(self, graph, files):
         triple_count = 0
@@ -663,10 +666,14 @@ class GroupBios(object):
                 tmp_graph.parse(file=bio, format='rdfa')
 
             # find the identifier we want to use for graph context
-            graph_id = list(tmp_graph.subjects(rdflib.RDF.type, rdfns.SCHEMA_ORG.WebPage))[0]
+            try:
+                graph_id = list(tmp_graph.subjects(rdflib.RDF.type, rdfns.SCHEMA_ORG.WebPage))[0]
+                # create a new context in our data store and copy all the data over
+                g = rdflib.Graph(graph.store, graph_id)
+            except IndexError:
+                # if no webpage/url, create a context with no graph id
+                g = rdflib.Graph(graph.store)
 
-            # create a new context in our data store and copy all the data over
-            g = rdflib.Graph(graph.store, graph_id)
             for triple in tmp_graph:
                 g.add(triple)
 

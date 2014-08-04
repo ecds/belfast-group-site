@@ -11,7 +11,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.contrib.sites.models import Site
 
-from belfast.rdf.harvest import HarvestRdf, Annotate, GroupBios # HarvestRelated
+from belfast.rdf.harvest import HarvestRdf, Annotate, LocalRDF # HarvestRelated
 from belfast.rdf.qub import QUB
 from belfast.rdf.clean import SmushGroupSheets, IdentifyGroupSheets, \
     InferConnections, ProfileUris
@@ -69,10 +69,12 @@ class Command(BaseCommand):
 
     rdf_fixture_dir = os.path.join(settings.BASE_DIR, 'rdf', 'fixtures')
 
-    # convert to graph via rdfa, and add with graph identifier of webpage about
-    BG_bios = [
+    # local html+rdfa fixtures; convert to graph via rdfa,
+    # and add with webpage url as graph identifier
+    local_rdf_fixtures = [
        os.path.join(rdf_fixture_dir, 'BelfastGroup_biographies.html'),
        os.path.join(rdf_fixture_dir, 'ednalongley_bio.html'),
+       os.path.join(rdf_fixture_dir, 'pakenham_privatecoll.html'),
     ]
 
     QUB_input = os.path.join(settings.BASE_DIR, 'rdf', 'fixtures', 'QUB_ms1204.html')
@@ -116,9 +118,9 @@ class Command(BaseCommand):
             HarvestRdf(self.harvest_urls,
                        find_related=True, verbosity=self.verbosity,
                        graph=graph, no_cache=options['no_cache'])
-            # also add BG bios from old site to our RDF data
-            self.stdout.write('-- Adding RDF bios from old Belfast Group site')
-            GroupBios(graph, self.BG_bios)
+            # local info from RDF data - additional bios, Group sheet in private collection
+            self.stdout.write('-- Adding RDF data from local fixtures')
+            LocalRDF(graph, self.local_rdf_fixtures)
 
         if all_steps or options['queens']:
             self.stdout.write('-- Converting Queens University Belfast Group collection description to RDF')
