@@ -1,9 +1,11 @@
+from collections import defaultdict
 import datetime
 import hashlib
 import logging
 import rdflib
 from rdflib import collection as rdfcollection
 import re
+import string
 import time
 
 from django.conf import settings
@@ -119,6 +121,11 @@ class SmushGroupSheets(object):
     BELFASTGROUPSHEET = rdflib.Namespace("http://%s/groupsheets/md5/" % \
         Site.objects.get(id=settings.SITE_ID).domain)
 
+    # dictionary of smushed ids by graph identifier, in order to guarantee
+    # unique ids within a single graph and avoid smushing multiple, different
+    # untitled works into a single work
+    groupsheet_ids = defaultdict(list)
+
     def __init__(self, graph, verbosity=1):
         self.verbosity = verbosity
         self.full_graph = graph
@@ -126,6 +133,9 @@ class SmushGroupSheets(object):
         # iterate over all contexts in a conjunctive graph and process each one
         for ctx in graph.contexts():
             self.process_graph(ctx)
+
+        # dictionary to keep track of unique group sheet ids within a particular graph,
+        # so that we don't collapse multiple untitled documents into a single doc
 
     def calculate_uri(self, uri, graph):
         # calculate a 'smushed' uri for a single groupsheet
@@ -217,7 +227,30 @@ class SmushGroupSheets(object):
         text = '%s %s' % (author, ' '.join(titles))
         m.update(text.encode('utf-8'))
 
-        return self.BELFASTGROUPSHEET[m.hexdigest()]
+        identifier = m.hexdigest()
+        # In two cases (Paul Smyth and Stewart Parker), there are multiple different
+        # untitled Group sheets in the same collection (QUB).
+        # Since identifiers are based on author and title list, these were being
+        # collapsed into a single document.
+        # To avoid that, check if the generated identifier is unique for this graph,
+        # and if not, add a suffix until it *is* unique.
+        if identifier in self.groupsheet_ids[graph.identifier]:
+
+            # add suffix to the base id to differentiate
+            for suffix in string.ascii_lowercase:
+                new_id = '%s-%s' % (identifier, suffix)
+                # if the new id is not already in the list for this graph, it is unique
+                # and can be used
+                if new_id not in self.groupsheet_ids[graph.identifier]:
+                    identifier = new_id
+                    # add to the list so we don't repeat this one either
+                    self.groupsheet_ids[graph.identifier].append(identifier)
+                    break
+
+        else:
+            self.groupsheet_ids[graph.identifier].append(identifier)
+
+        return self.BELFASTGROUPSHEET[identifier]
 
     def process_graph(self, graph):
         # build a dictionary of "smushed" URIs for belfast group sheets
