@@ -623,17 +623,29 @@ class InferConnections(object):
         # determine whether a groupsheet is first or second period
         # and store the corresponding dates for that period in the rdf
 
-        # if coverage is already present (e.g., from TEI groupsheet or previous calculation),
+        # if coverage is already present anywhere in the full graph
+        # (e.g., from TEI groupsheet or previous calculation),
         # nothing needs to be done
-        coverage = graph.value(ms, rdfns.DC.coverage)
+        coverage = self.full_graph.value(ms, rdfns.DC.coverage)
         if coverage is not None:
             # a couple of TEI groupsheet dates need to be cleaned up
             if str(coverage) in self.coverage_convert:
                 graph.set((ms, rdfns.DC.coverage,
                            rdflib.Literal(self.coverage_convert[str(coverage)])))
+
+            # no conversion necessary; coverage date is valid
             return
 
+        # look for exact date of ms, if known
         date = graph.value(ms, rdfns.DC.date)
+
+        # In case there is no date, get all contexts where this ms occurs
+        # so we can correctly infer the correct time period.
+        # (Inferring based on presence/absence in Hobsbaum collection, but may
+        # not encounter the Hobsbaum version of a ms first.)
+        context_ids = [str(ctx.identifier) for ctx in
+                       self.full_graph.contexts((ms, rdflib.RDF.type, rdfns.BG.GroupSheet))]
+
         # if date is known, check which period it falls into and assign dc:coverage accordingly
         if date:
             match = self.date_re.match(date)
@@ -650,7 +662,7 @@ class InferConnections(object):
 
         # If date is not known but part of Hobsbaum collection, infer first period
         # (Hobsbaum collection at Queen's is labeled 1963-6; first period materials only)
-        elif str(graph.identifier) == QUB.QUB_BELFAST_COLLECTION:
+        elif QUB.QUB_BELFAST_COLLECTION in context_ids:
             graph.set((ms, rdfns.DC.coverage,
                       rdflib.Literal(self.first_period['coverage'])))
 
