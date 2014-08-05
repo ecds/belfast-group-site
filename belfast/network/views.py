@@ -268,16 +268,13 @@ def map_js(request):
         if not people and not texts:
             continue
 
+        # flag to indicate the type of icon that should be used on the map
         if people and texts:
             icon = 'bio-text'
-            icon_color = 'purple'
         elif people:
             icon = 'bio'
-            icon_color = 'red'
         else:
             icon = 'text'
-            icon_color = 'blue'
-
 
         info = {
             'latitude': pl.latitude,
@@ -287,8 +284,6 @@ def map_js(request):
             'content': '''<b>%s</b> %s %s''' % (pl.name, people, texts),
             # properties to affect display
             'tags': tags,
-            # icon color so we can use different icons on the map by type (?)
-            'icon_color': icon_color,
             'icon': icon
 
         }

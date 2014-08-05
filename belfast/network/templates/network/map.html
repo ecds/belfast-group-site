@@ -51,7 +51,7 @@
         'position': new google.maps.LatLng(marker.latitude, marker.longitude),
         'bounds': true,
         'tags': marker.tags,
-        'icon': "{% static 'img/' %}map_marker_" + marker.icon_color  + ".png"
+        'icon': "{% static 'img/' %}map_marker_" + marker.icon  + ".png"
       }).click(function() {
         $('#map_canvas').gmap('openInfoWindow', {
            'content': marker.content,
