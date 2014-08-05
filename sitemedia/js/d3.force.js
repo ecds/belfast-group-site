@@ -305,12 +305,12 @@ function ForceGraphControls(config) {
       resume_update();
     });
   }
-  $("#nodesize-range").slider().on('change', function(event, ui) {
+  $("#nodesize-range").slider().on('slidechange', function(event, ui) {
     resume_update();
   });
 
-  $("#visnodesize-range").slider().on('change', function(event, ui) {
-    update_visible_nodes();
+  $("#visnodesize-range").slider().on('slidechange', function(event, ui) {
+    resume_update();
   });
 
   // method to resize svg & force graph based on parent container
