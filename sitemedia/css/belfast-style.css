@@ -714,6 +714,13 @@ figure.thumbnail.text-center {
     height: 500px;
 }
 
+@media(min-width:450px){
+    #network-images .panel {
+        max-width: 50%;
+        float: left;
+    }
+}
+
 @media (min-height:1000px){
     #network-graph svg {
         height: 800px;
