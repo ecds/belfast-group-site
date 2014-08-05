@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 def normalize_whitespace(s):
     # FIXME: if we want to use flags in python 2.6 needs to be compiled first
-    return unicode(re.sub(r'\s+', u' ', s.strip()))
+    return unicode(re.sub(r'\s+', u' ', s.strip(), flags=re.UNICODE | re.MULTILINE))
     # return unicode(re.sub(r'\s+', u' ', s.strip(), flags=re.UNICODE))
 
 
@@ -166,8 +166,19 @@ class SmushGroupSheets(object):
                     if unicode(t) != normalized_title:
                         logger.debug('Replacing title "%s" with normalized version "%s"' \
                                  % (t, normalized_title))
-                        index = title_collection.index(t)
-                        title_collection[index] = rdflib.Literal(normalized_title)
+
+                        # NOTE: AFAICT, it should be possible to update the value
+                        # via collection, something like this:
+                        # index = title_collection.index(t)
+                        # title_collection[index] = rdflib.Literal(normalized_title)
+
+                        # but since that isn't working, find the exact triple
+                        # and update the value for it directly
+
+                        triples = list(graph.triples((None, rdflib.RDF.first, t)))
+                        s, p, o = triples[0]
+                        graph.set((s, p, rdflib.Literal(normalized_title)))
+
                     titles.append(normalized_title)
 
         # ignore title order for the purposes of de-duping
