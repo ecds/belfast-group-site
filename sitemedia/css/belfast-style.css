@@ -9,7 +9,7 @@ body {
 body >.container{
 	height:auto !important;
     height:100%;
-    min-height:100%;
+    min-height:90%;
 }
 
 
@@ -743,6 +743,16 @@ figure.thumbnail.text-center {
 
 .node-info-detail h4 {
 	display: inline-block;
+}
+
+@media (min-height:1200px){
+	#index{
+		height: 90%;
+	}
+    #index footer{
+        position: fixed;
+        bottom: 0;
+    }
 }
 
 /* emory branding, borrowed from eultheme */
