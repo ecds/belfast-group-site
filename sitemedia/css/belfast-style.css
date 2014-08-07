@@ -714,11 +714,18 @@ figure.thumbnail.text-center {
     height: 500px;
 }
 
+.btn-primary{
+	white-space:normal;
+}
+
 @media(min-width:450px){
     #network-images .panel {
         max-width: 50%;
         float: left;
     }
+	.btn-primary{
+		white-space:nowrap;
+	}
 }
 
 @media (min-height:1000px){
