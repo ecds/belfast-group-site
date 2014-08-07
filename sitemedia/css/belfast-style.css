@@ -612,11 +612,11 @@ footer {
 		transition:background-color 0.2s;
 		text-decoration:none;
 	}
-	.sidebar ul li a:hover,
-	.sidebar ul li a:focus{
+	.sidebar ul.active-filters li a:hover,
+	.sidebar ul.active-filters li a:focus{
 		background-color: #E2CACA;
 	}
-	.sidebar ul li a:focus{
+	.sidebar ul.active-filters li a:focus{
 		text-decoration:underline;
 	}
     .sidebar p {
