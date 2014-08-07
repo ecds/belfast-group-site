@@ -109,7 +109,7 @@
   </div><!-- /.row -->
 
   <div class="row">
-    <ul class="nav nav-tabs" id="vizTab">
+    <ul class="nav nav-tabs nav-justified" id="vizTab">
       {% if groupsheets %}
       <li class="active"><a href="#groupsheets">Group Sheets</a></li>
       {% endif %}
@@ -124,9 +124,9 @@
     <div class="tab-content">
       {% if groupsheets %}
       <div class="tab-pane active" id="groupsheets">
-        <ul class="groupsheet-list">
+        <ul class="groupsheet-list list-group">
           {% for doc in groupsheets %}
-            <li>{% include 'groupsheets/snippets/list_groupsheet.html' with profile=True %}</li>
+            <li class="list-group-item">{% include 'groupsheets/snippets/list_groupsheet.html' with profile=True %}</li>
           {% endfor %}
         </ul>
       </div>
@@ -198,7 +198,7 @@
 </div>
 <script>
 $(function () {
-  $('#vizTab a').click(function (e) {
+  $('#vizTab a').on('click',function (e) {
     e.preventDefault();
     $(this).tab('show');
   });

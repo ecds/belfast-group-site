@@ -22,21 +22,53 @@
 
    <script type="text/javascript">
     $(document).ready(function(){
-      ForceGraphControls({
-        target: "#graph-controls",
-        graph_options: {
-            url: "{% url 'people:egograph-js' id=person.slug %}",
-            target: "#network-graph",
-            width: 800,
-            height: 500,
-            highlight: ['{{ person.identifier }}'],
-            labels: true,
-            node_info_url: "{% url 'people:egograph-node'  id=person.slug %}",
-            gravity: 1.0,
-            link_distance: 75,
-            charge: -500
+
+      //This function lets us delay the window resize event before running the drawCharts function.
+      jQuery.fn.resize_delayed = function ( func, duration ){
+          this.resize(function() {
+              clearTimeout( window.____resize_delayed );
+              window.____resize_delayed = setTimeout( func, duration);
+          });
+      };
+
+      //This is were we define the network graph
+      function drawGraph(options){
+        var setWidth = $("#network-graph").width();
+
+        //if the graph's parent container is hidden (not the active tab), we can't get the width
+        //take the tab-content width instead.
+
+        if(setWidth==null || setWidth<100){
+          setWidth = $(".tab-content").width();
         }
-      });
+
+        ForceGraphControls({
+          target: "#graph-controls",
+          graph_options: {
+              url: "{% url 'people:egograph-js' id=person.slug %}",
+              target: "#network-graph",
+              width: setWidth,
+              height: 500,
+              highlight: ['{{ person.identifier }}'],
+              labels: true,
+              node_info_url: "{% url 'people:egograph-node'  id=person.slug %}",
+              gravity: 1.0,
+              link_distance: 75,
+              charge: -500
+          }
+        });
+      }
+
+      //Call drawChart on load
+      drawGraph();
+      
+      //When the window is resized, call the drawGraph function to redraw chart
+      $(window).resize_delayed(function(){
+        
+        drawGraph({setWidth:$("#network-graph").width()});
+        
+      },500);
+
     });
    </script>
 

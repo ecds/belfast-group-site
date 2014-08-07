@@ -15,22 +15,26 @@
 {% endif %}
 
 <div class="panel panel-default">
-  <div class="panel-heading">A map of all places referenced in our data specific to
-  the Belfast Group and the people associated with it.
+  <div class="panel-heading col-xs-12">
 
-  <!-- Single button -->
-  <div class="btn-group" style="margin-left:50px">
-    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-      Filter by person <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu map-filter" role="menu">
-      {% for id, name in people.iteritems %}
-        <li><a id="{{ id }}">{{ name }}</a></li>
-      {% endfor %}
-        <li class="divider"></li>
-        <li class="active"><a id="view_all">View All</a></li>
-    </ul>
-  </div>
+    <div class="col-xs-12 col-sm-9">
+      <p>A map of all places referenced in our data specific to the Belfast Group and the people associated with it.</p>
+    </div>
+    <div class="col-xs-12 col-sm-3">
+      <!-- Single button -->
+      <div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+          Filter by person <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu map-filter" role="menu">
+          {% for id, name in people.iteritems %}
+            <li><a id="{{ id }}">{{ name }}</a></li>
+          {% endfor %}
+            <li class="divider"></li>
+            <li class="active"><a id="view_all">View All</a></li>
+        </ul>
+      </div>
+    </div>
 </div>
 
 {# FIXME: height % seems to be ignored entirely... #}
@@ -41,42 +45,42 @@
 </div>
 
 <script type="text/javascript">
-
+$(document).ready(function(){
  $('#map_canvas').gmap().bind('init', function() {
-  // This URL won't work on your localhost, so you need to change it
-  // see http://en.wikipedia.org/wiki/Same_origin_policy
-  $.getJSON("{% url 'network:map-js' %}", function(data) {
-    $.each( data.markers, function(i, marker) {
-      $('#map_canvas').gmap('addMarker', {
-        'position': new google.maps.LatLng(marker.latitude, marker.longitude),
-        'bounds': true,
-        'tags': marker.tags,
-        'icon': "{% static 'img/' %}map_marker_" + marker.icon  + ".png"
-      }).click(function() {
-        $('#map_canvas').gmap('openInfoWindow', {
+    // This URL won't work on your localhost, so you need to change it
+    // see http://en.wikipedia.org/wiki/Same_origin_policy
+    $.getJSON("{% url 'network:map-js' %}", function(data) {
+      $.each( data.markers, function(i, marker) {
+        $('#map_canvas').gmap('addMarker', {
+          'position': new google.maps.LatLng(marker.latitude, marker.longitude),
+          'bounds': true,
+          'tags': marker.tags,
+          'icon': "{% static 'img/' %}map_marker_" + marker.icon  + ".png"
+        }).click(function() {
+          $('#map_canvas').gmap('openInfoWindow', {
            'content': marker.content,
            'maxWidth': 250,
          }, this);
+        });
       });
     });
   });
-});
-$('.map-filter a').click(function() {
+ $('.map-filter a').click(function() {
   var id = $(this).attr('id');
-  // show or hide map markers based on the selected filter
-  if (id == 'view_all') {
-    $.each($('#map_canvas').gmap('get', 'markers'), function(i, m) {
-      m.setVisible(true);
-    });
-  } else {
-    $('#map_canvas').gmap('find', 'markers', { 'property': 'tags', 'value': id }, function(marker, found) {
-      marker.setVisible(found);
+    // show or hide map markers based on the selected filter
+    if (id == 'view_all') {
+      $.each($('#map_canvas').gmap('get', 'markers'), function(i, m) {
+        m.setVisible(true);
+      });
+    } else {
+      $('#map_canvas').gmap('find', 'markers', { 'property': 'tags', 'value': id }, function(marker, found) {
+        marker.setVisible(found);
 
-    });
-  }
-  $('.map-filter li').removeClass('active');
-  $(this).parent().addClass('active');
-
+      });
+    }
+    $('.map-filter li').removeClass('active');
+    $(this).parent().addClass('active');
+  });
 });
 </script>
 {% endblock %}

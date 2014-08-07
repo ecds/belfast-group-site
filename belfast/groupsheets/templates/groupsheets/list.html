@@ -17,9 +17,9 @@
     <h4>Filter Group sheets <a href="#" class="toggle-section btn btn-primary"><span class="glyphicon glyphicon-chevron-down dwn"></span><span class="glyphicon glyphicon-chevron-up up"></span></a></h4>
     <div class="collaspe-section collasped" style="display:none;">
         {% if filters %}{# display filters currently in effect, with link to remove #}
-          <ul>
+          <ul class="active-filters">
             {% for label, link in filters.iteritems %}
-            <li>{{ label }} <a class="small" href="{{ link }}"><span class="glyphicon glyphicon-remove-sign"></span></a></li>
+            <li><a href="{{ link }}">{{ label }} <span class="small text-danger"><span class="glyphicon glyphicon-remove-sign"></span></span></a></li>
             {% endfor %}
         </ul>
         {% endif %}
@@ -65,9 +65,9 @@
 
     <h2>Displaying {{ documents|length }} Group sheet{{ documents|pluralize }}.</h2>
 
-    <ul class="groupsheet-list">
+    <ul class="groupsheet-list list-group">
         {% for doc in documents %}
-        <li>
+        <li class="list-group-item">
             {% include 'groupsheets/snippets/list_groupsheet.html' %}
         </li>
         {% endfor %}

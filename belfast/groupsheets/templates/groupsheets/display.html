@@ -69,7 +69,8 @@
         <hr/>
         <a name="{{ poem.id }}">
           {% if poem.title %}
-            <h3><span property="schema:name">{{ poem.title_node|format_tei }}</span> <a href="#top" class="to-top"><span class="glyphicon glyphicon-chevron-up"></span>Back to top</a></h3>
+            <a href="#top" class="to-top"><span class="glyphicon glyphicon-chevron-up"></span>Back to top</a>
+            <h3><span property="schema:name">{{ poem.title_node|format_tei }}</span></h3>
           {% endif %}
         </a>
         {{ poem.body|format_tei }}
@@ -78,7 +79,7 @@
         {% endif %}
       </div>
     {% endfor %}
-
+    <a href="#top" class="to-top"><span class="glyphicon glyphicon-chevron-up"></span>Back to top</a>
     <p class="pull-right"><a href="{% url 'groupsheets:xml' document.document_name %}" rel="alternate">TEI XML</a></p>
   </div> {# end right column #}
 
