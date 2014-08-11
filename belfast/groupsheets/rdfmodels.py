@@ -174,6 +174,8 @@ class RdfGroupSheet(RdfResource):
     'genre of the groupsheet content if known; schema.org/genre'
     url = rdfmap.Value(rdfns.SCHEMA_ORG.URL)
     'url for the groupsheet if digital edition is available; schema.org/URL'
+    description = rdfmap.Value(rdfns.DC.description)
+    'dc:description, used for additional notes about some groupsheets'
 
     # TODO: store this somewhere...
     @property
