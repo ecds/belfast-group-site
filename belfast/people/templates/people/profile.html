@@ -21,17 +21,21 @@
       {% endif %}
     </h1>
     <div class="row">
-      {% if pic %}
+      {% if person.picture %}
+      {% with pic=person.picture %}
         <div class="col-xs-6 col-md-4 pull-right" rel="schema:image">
           <figure typeof="schema:ImageObject" class="thumbnail text-center">
               <h4 property="schema:caption">{{ pic.title }}</h4>
-              <img src="{{ MEDIA_ROOT}}{{ pic.img.url }}"
-              width="{{ pic.img.width }}" height="{{ pic.img.height }}"
+              <img src="{{ pic.img.get__profile }}"
               property="schema:contentUrl"/>
               <figcaption class="caption">
                 <ul class="list-inline small">
                   {% if pic.date %}<li property="schema:dateCreated">{{ pic.date }}</li>{% endif %}
-                  {% if pic.creator %}<li property="schema:author">{{ pic.creator }}</li>{% endif %}
+                  {% if pic.creator %}<li property="schema:author">
+                      {% if pic.creator_url %}
+                      <a href="{[ pic.creator_url ]}">{{ pic.creator }}</a>
+                      {% else %}{{ pic.creator }}{% endif %}
+                      </li>{% endif %}
                   {% if pic.publisher %}
                   <li rel="schema:publisher">
                     <span typeof="schema:Organization">
@@ -45,10 +49,15 @@
                 {% if pic.collection %}
                 <p><small><a href="{{ pic.rdfcollection }}">{{ pic.collection }}</a></small></p>
                 {% endif %}
+                {% if pic.permissions %}
                 <p><i class="small">{{ pic.permissions }}</i></p>
+                {# NOTE: if url, could use schema:license #}
+                {% endif %}
+
               </figcaption><!--/.caption-->
           </figure>
         </div>
+        {% endwith %}
       {% endif %}
 
     <div class="col-md-8">

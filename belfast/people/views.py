@@ -33,13 +33,13 @@ def list(request):
     # filter to only people with a description
     people = [p for p in people if p.has_profile]
     # find profile pictures
-    pictures = ProfilePicture.objects.filter(person_uri__in=[p.identifier for p in people])
-    pics = dict([(p.person_uri, p) for p in pictures])
-    # make a list of tuples: rdf person, corresponding profile pic if any
-    people_pics = [(p, pics.get(str(p.identifier), None)) for p in people]
+    # pictures = ProfilePicture.objects.filter(person_uri__in=[p.identifier for p in people])
+    # pics = dict([(p.person_uri, p) for p in pictures])
+    # # make a list of tuples: rdf person, corresponding profile pic if any
+    # people_pics = [(p, pics.get(str(p.identifier), None)) for p in people]
 
     return render(request, 'people/list.html',
-                  {'people_pics': people_pics})
+                  {'people': people})
 
 
 # @last_modified(rdf_nx_lastmod)  # uses both rdf and gexf
@@ -54,14 +54,9 @@ def profile(request, id):
     person = RdfPerson(g, uriref)
     groupsheets = get_rdf_groupsheets(author=uri) # TODO: move to rdfperson class
 
-    # find profile picture if there is one (not present for all)
-    # TODO: make this a class method on rdfperson
-    pics = ProfilePicture.objects.filter(person_uri=uri)
-    pic = pics[0] if pics.count() else None
-
     return render(request, 'people/profile.html',
                   {'person': person, 'groupsheets': groupsheets,
-                  'pic': pic, 'page_rdf_type': 'schema:ProfilePage'})
+                  'page_rdf_type': 'schema:ProfilePage'})
 
 
 # @last_modified(rdf_nx_lastmod)  # uses both rdf and gexf
@@ -126,4 +121,3 @@ def egograph_node_info(request, id):
             context['poems'] = [p for p in poems if rdfns.FREEBASE["book/poem"] in p.rdf_types]
 
     return render(request, 'network/node_info.html', context)
-
