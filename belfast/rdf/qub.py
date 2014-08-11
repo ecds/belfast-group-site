@@ -10,11 +10,12 @@ from belfast import rdfns
 class QUB(object):
 
     # regex to grab names from description
-    NAME_REGEX = re.compile('(?P<last>[A-Z][a-zA-Z]+), (?P<first>[A-Za-z. ]+)')  # include . for initials
-    DATE_REGEX = re.compile('Dated (?P<day>\d{2})/(?P<month>\d{2})/(?P<year>\d{4})')
-    YEAR_REGEX = re.compile('Dates [^\d]*(?P<year>\d{4})')
-    PAGES_REGEX = re.compile('Typescripts?,? (?P<num>\d)(p|pp.)')
-    PAREN_REGEX = re.compile(' ?\([^())]+\)')
+    NAME_REGEX = re.compile(r'(?P<last>[A-Z][a-zA-Z]+), (?P<first>[A-Za-z. ]+)')  # include . for initials
+    DATE_REGEX = re.compile(r'Dated (?P<day>\d{2})/(?P<month>\d{2})/(?P<year>\d{4})')
+    YEAR_REGEX = re.compile(r'Dates [^\d]*(?P<year>\d{4})')
+    PAGES_REGEX = re.compile(r'Typescripts?,? (?P<num>\d)(p|pp.)')
+    PAREN_REGEX = re.compile(r' ?\([^())]+\)')
+    MULTIPLE_UNTITLED_REGEX = re.compile(r'\[(?P<note>\d untitled (poems|prose pieces))')
 
     NAME_URIS = {
         'Terry, Arthur': 'http://viaf.org/viaf/2490119',
@@ -210,9 +211,15 @@ class QUB(object):
                 g.add((msnode, rdfns.DC.title, title_node))
             # if untitled, no dc:title should be added
 
+            # two special cases: multiple untitled pieces, translations
+            if self.MULTIPLE_UNTITLED_REGEX.search(first_line):
+                match = self.MULTIPLE_UNTITLED_REGEX.search(first_line)
+                g.add((msnode, rdfns.DC.description, rdflib.Literal(match.groupdict()['note'])))
+
+            if 'translations' in first_line:
+                g.add((msnode, rdfns.DC.description, rdflib.Literal('translations')))
+
         # report on what was done
         if verbosity >= 1:
             print 'Identified %d manuscripts by %d authors' % (ms_total,
                 len(authors.keys()))
-
-
