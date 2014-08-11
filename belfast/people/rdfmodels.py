@@ -5,6 +5,7 @@ import time
 
 from django.conf import settings
 from django.contrib.sites.models import Site
+from django.db.models import get_model
 
 from belfast import rdfns
 from belfast.rdf import rdfmap
@@ -13,7 +14,6 @@ from belfast.util import rdf_data, network_data, cached_property
 from belfast.network.util import filter_graph
 
 logger = logging.getLogger(__name__)
-
 
 
 class RdfEntity(RdfResource):
@@ -317,6 +317,16 @@ class RdfPerson(RdfEntity):
     def groupsheets(self):
         return [d for d in self.documents if rdfns.BG.GroupSheet in d.rdf_types]
 
+    @cached_property
+    def picture(self):
+        ''':class:`~belfast.people.models.ProfilePicture` of this person,
+        if there is one.'''
+        # NOTE: using get_model because importing ProfilePicture is a circular dep
+        profile_pic_model = get_model('people', 'ProfilePicture')
+        pics = profile_pic_model.objects.filter(person_uri=self.identifier)
+        if pics.count():
+            return pics[0]
+
 
 class RdfPoem(RdfEntity):
     author = rdfmap.Resource(rdfns.SCHEMA_ORG.author, RdfPerson)
@@ -366,4 +376,3 @@ def find_places():
     g = rdf_data()
     return [RdfLocation(g, subj) for subj in g.subjects(predicate=rdflib.RDF.type,
                                                        object=rdfns.SCHEMA_ORG.Place)]
-
