@@ -149,7 +149,7 @@ class RdfArchivalCollection(RdfResource):
         # subseries are part of primary findingaid docuent, so if there
         # is a partOf rel use that uri, otherwise use document uri
         for d in self.documents:
-            return d.part_of or d
+            return unicode(d.part_of or d)
 
         # fallback access (should only apply to QUB collection)
         # - but only use identifier if it looks like a url

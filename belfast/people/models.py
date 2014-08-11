@@ -91,7 +91,3 @@ class ProfilePicture(models.Model):
         image.save(tmp.name, 'png')
         content = File(tmp)
         field.save('%s.png' % self.rdfperson.slug, content, save=False)
-
-
-
-

@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib import admin
-from eulcommon.djangoextras.formfields import DynamicSelect, DynamicChoiceField
+from eulcommon.djangoextras.formfields import DynamicSelect
 
 from belfast.people.models import ProfilePicture
 from belfast.people.rdfmodels import profile_people
@@ -20,7 +20,7 @@ def collections():
     # generate a list of (uri, name) choices for collections
     # (empty choice at the beginning because this field is optional)
     choices = [('', '')] + \
-        [(str(c.identifier), c.name) for c in archival_collections()]
+        [(str(c.access_url), c.name) for c in sorted(archival_collections(), key=lambda c: c.name)]
     return choices
 
 
