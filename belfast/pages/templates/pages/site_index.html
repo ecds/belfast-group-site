@@ -39,34 +39,20 @@
       </div>
     </div><!-- /container -->
   </div><!-- /#networks -->
-{% comment %}
-<!-- photos removed until we can find photos we have permission to use
+
+ {# display profile pictures in random order, tiled with masonry #}
+  {% if pictures %}
   <div class="section" id="poets">
+    {% for pic in pictures %}
     <figure>
-      <img src="{% static 'img/sh.png' %}"/>
+      <img src="{{ pic.img.get__bw__profile }}" title="{{ pic.img.title }}" alt="{{ pic.img.alt_text }}"/>
       <figcaption class="description">
-        <p><a href="#">Seamus Heaney</a></p>
+        <p><a href="{{ pic.person_uri }}">{{ pic.rdfperson.fullname }}</a></p>
       </figcaption>
     </figure>
-    <figure>
-      <img src="{% static 'img/pm.png' %}"/>
-      <figcaption class="description">
-        <p><a href="#">Paul Muldoon</a></p>
-      </figcaption>
-    </figure>
-    <figure>
-      <img src="{% static 'img/js.png' %}"/>
-      <figcaption class="description">
-        <p><a href="#">James Simmons</a></p>
-      </figcaption>
-    </figure>
-    <figure>
-      <img src="{% static 'img/ml.png' %}"/>
-      <figcaption class="description">
-        <p><a href="#">Michael Longley</a></p>
-      </figcaption>
-    </figure>
-  </div> -->
+    {% endfor %}
+  </div>
+  {% endif %}
   <!-- /END THE SECTIONS -->
 {% endcomment %}
 </div>
