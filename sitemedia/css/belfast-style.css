@@ -678,6 +678,8 @@ div#top {
 	top: -50px;
 	position: relative;
 	display: block;
+	z-index: -2;
+	height: 1px;
 }
 
 a.to-top {
@@ -871,7 +873,7 @@ figure.thumbnail.text-center {
 	}
     .lits{
         float: none;
-    
+
         margin: auto;
 	}
 }
