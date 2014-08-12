@@ -448,7 +448,7 @@ footer {
 		padding-left:5px;
 		border-bottom: 1px solid #D7EFF8;
 	}
-    .sidenav.affix {
+    .sidenav.affix, h1.affix {
         position:relative!important;
     }
     .sidenav.affix li,
@@ -679,7 +679,7 @@ div#top {
 	position: relative;
 	display: block;
 	z-index: -2;
-	height: 1px;
+	height: 50px;
 }
 
 a.to-top {

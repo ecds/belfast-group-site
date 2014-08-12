@@ -9,9 +9,12 @@
   <link href="{% static 'css/poetry.css' %}" rel="stylesheet"/>
 {% endblock %}
 
-{% block body-attrs %}data-spy="scroll" data-target=".local-sidenav" data-offset-top="100"{% endblock %}
+{% block body-attrs %}data-spy="scroll" data-target=".local-sidenav" data-offset-top="200"{% endblock %}
 
 {% block page-content %}
-  <h1 property="schema:name">{{ flatpage.title }}</h1>
-  {% include "flatpages/snippets/flatpage_content.html" %}
+    {% include 'flatpages/snippets/flatpage_addedit.html' %}
+    <h1 class="affix" property="schema:name">{{ flatpage.title }}</h1>
+    <div class="text-content">
+        {{ flatpage.content|safe }}
+    </div>
 {% endblock %}

@@ -1,0 +1,13 @@
+{# add/edit buttons for flatpages #}
+{% if perms.flatpages.change_flatpage or perms.flatpages.add_flatpage %}
+    <div class="pull-right well well-sm">
+      {% if perms.flatpages.change_flatpage %}
+      <p><a class="btn btn-default btn-sm" href="{% url 'admin:flatpages_flatpage_change' flatpage.id %}">
+        <span class="glyphicon glyphicon-edit"></span> edit this page</a></p>
+      {% endif %}
+      {% if perms.flatpages.add_flatpage %}
+      <p><a class="btn btn-default btn-sm" href="{% url 'admin:flatpages_flatpage_add' %}">
+        <span class="glyphicon glyphicon-plus"></span> add a page</a></p>
+      {% endif %}
+    </div>
+{% endif %}
