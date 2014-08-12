@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
+import os
 from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
+
+from django_image_tools.models import md5Checksum
 
 class Migration(DataMigration):
 
@@ -20,7 +23,15 @@ class Migration(DataMigration):
                 caption=profile_pic.title,
                 alt_text=profile_pic.title,
                 credit=profile_pic.permissions,
-                image=profile_pic.img)
+                image=profile_pic.img.path,
+                checksum=md5Checksum(profile_pic.img.path))
+
+            # Image seems to require filename, but not set it
+            # NOTE: image migration is not fully working, but may at least save
+            # some manual effort in converting from old db setup to new
+            basename, ext = os.path.splitext(os.path.basename(profile_pic.img.path))
+            new_image.filename = basename
+
             # save the image and associated it with the profile pic record
             new_image.save()
             # explicitly set the id, since the schema migration sets it to 01
