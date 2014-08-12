@@ -149,7 +149,7 @@ class RdfArchivalCollection(RdfResource):
         # subseries are part of primary findingaid docuent, so if there
         # is a partOf rel use that uri, otherwise use document uri
         for d in self.documents:
-            return d.part_of or d
+            return unicode(d.part_of or d)
 
         # fallback access (should only apply to QUB collection)
         # - but only use identifier if it looks like a url
@@ -174,6 +174,8 @@ class RdfGroupSheet(RdfResource):
     'genre of the groupsheet content if known; schema.org/genre'
     url = rdfmap.Value(rdfns.SCHEMA_ORG.URL)
     'url for the groupsheet if digital edition is available; schema.org/URL'
+    description = rdfmap.Value(rdfns.DC.description)
+    'dc:description, used for additional notes about some groupsheets'
 
     # TODO: store this somewhere...
     @property

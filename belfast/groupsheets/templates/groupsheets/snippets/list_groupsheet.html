@@ -17,6 +17,7 @@
 {% if doc.date %}{{ doc.date|natural_date }}{% else %}no date{% endif %}{% if doc.num_pages %}, {% else %}.{% endif %}
 {# perhaps simply omit the no date since the majority are undated? #}
 {% if doc.num_pages %}{{ doc.num_pages }} page{{ doc.num_pages|pluralize }}.{% endif %}
+{% if doc.description %}({{ doc.description }}){% endif %}
 </p>
 {% if doc.tei_id %}
    <p><a class="btn btn-primary btn-sm" href="{% url 'groupsheets:view' doc.tei_id %}">view digital edition</a></p>

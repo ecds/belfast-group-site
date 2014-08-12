@@ -24,6 +24,10 @@
       {% if person.picture %}
       {% with pic=person.picture %}
         <div class="col-xs-6 col-md-4 pull-right" rel="schema:image">
+            {# admin edit link, if user has permission to edit profile pictures #}
+            {% if perms.people.change_profilepicture %}
+                <a class="pull-right btn" href="{% url 'admin:people_profilepicture_change' pic.id %}"><span class="glyphicon glyphicon-edit"></span></a>
+            {% endif %}
           <figure typeof="schema:ImageObject" class="thumbnail text-center">
               <h4 property="schema:caption">{{ pic.title }}</h4>
               <img src="{{ pic.img.get__profile }}"

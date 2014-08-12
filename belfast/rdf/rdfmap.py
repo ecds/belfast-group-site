@@ -66,7 +66,13 @@ class Resource(object):
         rels = list(meth(self.predicate))
         # NOTE: could probably use as generator without forcing to list instead?
         if rels:
-            return self.resource_type(obj.graph, rels[0].identifier)
+            # in some cases, rel is a literal uri rather than a resource
+            if hasattr(rels[0], 'identifier'):
+                rel_uri = rels[0].identifier
+            else:
+                rel_uri = rels[0]
+
+            return self.resource_type(obj.graph, rel_uri)
 
 
 class ResourceList(object):

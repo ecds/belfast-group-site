@@ -1,8 +1,6 @@
 from django.db import models
-from django.core.files import File
 from PIL import Image
 import rdflib
-import tempfile
 
 from django_image_tools.models import Image
 
