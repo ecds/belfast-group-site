@@ -19,10 +19,13 @@ class Migration(DataMigration):
             new_image = Image(title=profile_pic.title,
                 caption=profile_pic.title,
                 alt_text=profile_pic.title,
-                credit=profile_pic.permissions)
+                credit=profile_pic.permissions,
+                image=profile_pic.img)
             # save the image and associated it with the profile pic record
             new_image.save()
-            profile_pic.image = new_image
+            # explicitly set the id, since the schema migration sets it to 01
+            profile_pic.image_id = new_image.id
+            profile_pic.save()
 
     def backwards(self, orm):
         "Map django-image-tools Image model fields to profile picture Image."
@@ -32,9 +35,9 @@ class Migration(DataMigration):
             profile_pic.title = profile_pic.image.title
             # set local profile pic image from image
             profile_pic.img = profile_pic.image.image
-
             # delete the Image object created on the forward migration
             profile_pic.image.delete()
+            profile_pic.save()
 
     models = {
         u'django_image_tools.image': {
