@@ -23,13 +23,10 @@ Initial setup
 * Copy ``belfast/localsettings.py.dist`` to ``belfast/localsettings.py``
   and customize as needed.
 
-* Initialize the database::
+* Initialize the database and load initial html site content::
 
   python manage.py syncdb
-
-* Load fixtures for initial required flat pages::
-
-  python manage.py loaddata belfast/pages/fixtures/initial_flatpages.json
+  python manage.py migrate
 
 * Manually create an eXist collection and load the TEI Belfast Group Sheet
   content. Load the index configuration and index the content::
@@ -51,6 +48,3 @@ Initial setup
   run manage command to harvest and prepare the RDF data for the site::
 
   python manage.py prep_dataset
-
-
-
