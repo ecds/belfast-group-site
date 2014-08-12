@@ -45,7 +45,7 @@
   <div class="section" id="poets">
     {% for pic in pictures %}
     <figure>
-      <img src="{{ pic.img.get__bw__profile }}" title="{{ pic.img.title }}" alt="{{ pic.img.alt_text }}"/>
+      <img src="{{ pic.image.get__bw__profile }}" title="{{ pic.image.title }}" alt="{{ pic.image.alt_text }}"/>
       <figcaption class="description">
         <p><a href="{{ pic.person_uri }}">{{ pic.rdfperson.fullname }}</a></p>
       </figcaption>
