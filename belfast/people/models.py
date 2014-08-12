@@ -1,5 +1,4 @@
 from django.db import models
-from PIL import Image
 import rdflib
 
 from django_image_tools.models import Image
@@ -12,7 +11,7 @@ from belfast.people.rdfmodels import RdfPerson
 class ProfilePicture(models.Model):
     # Fields: creator, title, date, publisher, publisher URL, collection, statement of permissions
     person_uri = models.URLField(verbose_name='Person', unique=True)
-    img = models.ForeignKey(Image, related_name='profilepicture_set')
+    image = models.ForeignKey(Image, related_name='profilepicture_set')
     date = models.CharField(max_length=255,
         help_text='Date of the photo, if known', blank=True)
     collection_uri = models.URLField(blank=True, null=True,
@@ -31,7 +30,7 @@ class ProfilePicture(models.Model):
     permissions = models.TextField(help_text='Statement of Permissions')
 
     def __unicode__(self):
-        return self.img.title
+        return self.image.title
 
     @property
     def rdfperson(self):
@@ -53,11 +52,11 @@ class ProfilePicture(models.Model):
 
     @property
     def title(self):
-        if self.img:
-            return self.img.title
+        if self.image:
+            return self.image.title
 
     @property
     def thumbnail(self):
         'thumbnail of django-image-tools Image, for use in admin'
-        if self.img:
-            return self.img.thumbnail
+        if self.image:
+            return self.image.thumbnail
