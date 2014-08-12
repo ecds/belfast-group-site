@@ -9,7 +9,7 @@ networkx>=1.9
 eulcommon
 html5lib
 progressbar
-django-image-tools
+django-image-tools>=0.8.b3
 
 # additional rdf script reqs
 requests>=1.1
