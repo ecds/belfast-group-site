@@ -127,6 +127,7 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'tinymce',
     'eulexistdb',
+    'south',
     'belfast.pages',
     'belfast.groupsheets',
     'belfast.people',

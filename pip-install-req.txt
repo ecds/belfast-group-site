@@ -14,6 +14,7 @@ progressbar
 requests>=1.1
 BeautifulSoup4
 SPARQLWrapper
+south
 
 # for graph matrices
 numpy
