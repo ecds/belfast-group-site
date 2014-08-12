@@ -906,3 +906,31 @@ figure.thumbnail.text-center {
 #graph-controls .ui-widget-header {
     background: #C5DFF3;
 }
+
+/* footnotes in overview essay */
+
+/* adjust footnote anchor targets so they display after fixed site header */
+sup.note:before {
+  display: inline-block;
+  content: " ";
+  margin-top: -200px;
+  height: 200px;
+  visibility: hidden;
+}
+
+ol.notes li {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+
+sup.note a {
+	white-space: nowrap;
+}
+
+/* highlight target reference or in-text note so it's easier to find */
+sup.note:target, ol.notes li:target a {
+	background-color: #FFF3DA;
+}
+sup.note:target a, .notes li:target a {
+	color: gray;
+}
