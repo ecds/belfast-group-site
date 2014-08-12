@@ -35,7 +35,7 @@ class ProfilePictureAdminForm(forms.ModelForm):
 
 class ProfilePictureAdmin(admin.ModelAdmin):
     form = ProfilePictureAdminForm
-    list_display = ('title', 'person', 'creator', 'date', 'publisher', 'collection')
+    list_display = ('person', 'title', 'creator', 'date', 'publisher', 'collection', 'thumbnail')
 
 
 admin.site.register(ProfilePicture, ProfilePictureAdmin)

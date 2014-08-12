@@ -11,13 +11,13 @@
 <h1 property="schema:name">People associated with the Belfast Group</h1>
 
 <div id="bios">
-  {% for person, pic in people_pics %}
+  {% for person in people %}
   <div class="panel">
     <div class="thumbnail text-center">
-          {% if pic %}
+          {% if person.picture %}
           <a href="{{ person }}">
             <figure>
-              <img src="{{ pic.thumbnail.url }}" alt="{{ pic.title }}">
+              <img src="{{ person.picture.image.get__thumbnail }}" alt="{{ person.picture.image.alt_text }}">
             </figure>
           </a>
           {% endif %}

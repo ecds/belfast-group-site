@@ -127,6 +127,7 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'tinymce',
     'eulexistdb',
+    'django_image_tools',
     'south',
     'belfast.pages',
     'belfast.groupsheets',
@@ -152,7 +153,6 @@ except ImportError:
     print >> sys.stderr, 'No local settings. Trying to start, but if ' + \
         'stuff blows up, try copying localsettings.py.dist to ' + \
         'localsettings.py and setting appropriately for your environment.'
-    pass
 
 
 # django_nose configurations  (optional - dev only)
