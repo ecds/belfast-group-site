@@ -10,6 +10,8 @@ eulcommon
 html5lib
 progressbar
 django-image-tools
+# if django-image-tools doesn't work, you can use the below to get the package directly 
+#https://pypi.python.org/packages/source/d/django-image-tools/django-image-tools-0.8.b3.tar.gz
 
 # additional rdf script reqs
 requests>=1.1
