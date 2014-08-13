@@ -27,7 +27,8 @@
         <hr/>
         {% if facets.digital %}
         <ul>
-            <li><a href="?edition=digital{{ url_suffix }}">digital editions ({{ facets.digital }})</a> </li>
+            <li><a href="?edition=digital{{ url_suffix }}">digital editions
+                <span class="text-muted">({{ facets.digital }})</span>  </a> </li>
         </ul>
         {% endif %}
 
@@ -35,7 +36,8 @@
         <p><b>Time Period</b></p>
         <ul>
             {% for f in facets.time_periods|dictsort:"time_period" %}
-            <li><a href="?dates={{ f.time_period|default:"undetermined" }}{{ url_suffix }}">{{ f.time_period|default:"Undetermined" }} ({{ f.total }})</a> </li>
+            <li><a href="?dates={{ f.time_period|default:"undetermined" }}{{ url_suffix }}">{{ f.time_period|default:"Undetermined" }}
+                <span class="text-muted">({{ f.total }})</span></a> </li>
             {% endfor %}
         </ul>
         {% endif %}
@@ -44,7 +46,8 @@
         <p><b>Author</b></p>
         <ul>
             {% for f in facets.authors|dictsortreversed:"total" %}
-            <li><a href="?author={{ f.author.slug }}{{ url_suffix }}">{{ f.author.lastname }}, {{ f.author.firstname }} ({{ f.total }})</a></li>
+            <li><a href="?author={{ f.author.slug }}{{ url_suffix }}">{{ f.author.lastname }}, {{ f.author.firstname }}
+                <span class="text-muted">({{ f.total }})</span></a></li>
             {% endfor %}
         </ul>
         {% endif %}
@@ -53,7 +56,8 @@
         <p><b>Source</b></p>
         <ul>
             {% for s in facets.sources|dictsortreversed:"total" %}  {# TODO: need to use short names here! #}
-            <li><a href="?source={{ s.source.identifier|urlencode }}{{ url_suffix }}">{{ s.source.name }} ({{ s.total }})</a> </li>
+            <li><a href="?source={{ s.source.identifier|urlencode }}{{ url_suffix }}">{{ s.source.name }}
+                <span class="text-muted">({{ s.total }})</span></a> </li>
             {# NOTE: urlencode required since collection URIs include #anchors which otherwise get lost #}
             {% endfor %}
         </ul>
@@ -76,4 +80,3 @@
 
 </div> {# end rows #}
 {% endblock %}
-
