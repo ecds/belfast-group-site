@@ -22,10 +22,10 @@
   "pk": 2,
   "model": "django_image_tools.size",
   "fields": {
-    "width": 180,
+    "width": 220,
     "name": "thumbnail",
     "auto": 0,
-    "height": 180
+    "height": 220
   }
 }
 ]
