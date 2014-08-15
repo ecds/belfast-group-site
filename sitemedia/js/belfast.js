@@ -17,7 +17,14 @@ $("document").ready(function(){
           "columnWidth": 1
         });
     });
-  
+    $("#poets figure").on('mouseover',function(){
+        var $this = $(this);
+        $this.siblings().addClass('faded');
+    })
+    .on('mouseout',function(){
+        var $this = $(this);
+        $this.siblings().removeClass('faded');
+    })
   }
 
   var $bios = $("#bios");

@@ -279,6 +279,12 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 
 #poets figure{
 	cursor: pointer;
+	opacity: 1;
+	transition:opacity 0.5s;
+}
+
+#poets figure.faded{
+	opacity: 0.5;
 }
 
 .text-content {
