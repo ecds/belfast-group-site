@@ -836,6 +836,12 @@ figure.thumbnail.text-center {
     }
 }
 
+@media (min-height: 1200px) and (min-width: 2000px){
+	#index {
+		height: 125%;
+	}
+}
+
 /* emory branding, borrowed from eultheme */
 #sw_version {
   opacity: 0.6;
