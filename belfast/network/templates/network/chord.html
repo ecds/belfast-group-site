@@ -9,10 +9,13 @@
 {% endif %}
 
 {% with min_degree=3 %}
-
- <div id="chart">
+<div class="row">
+ <div id="chart" class="col-xs-12 col-sm-8">
   <div class="graph-loading text-center">Loading...</div>
  </div>
+ <div id="key" class="col-xs-6 col-xs-offset-3 col-sm-4 col-sm-offset-0">
+ </div>
+</div>
 
   <script src="{% static 'js/d3.min.js' %}" charset="utf-8"></script>
   <link type="text/css" href="{% static 'css/d3.chord.css' %}" rel="stylesheet" media="screen"/>
@@ -23,6 +26,7 @@
         matrix: "{% url 'network:bg-js-matrix' %}",
         nodes: "{% url 'network:bg-js' %}",
         max_size: 720,
+        node_info_url: "{% url 'network:node-info' %}",
       };
       ChordDiagram(options);
 
