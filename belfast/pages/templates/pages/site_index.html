@@ -43,16 +43,21 @@
  {# display profile pictures in random order, tiled with masonry #}
   {% if pictures %}
   <div class="section" id="poets">
-    {% for pic in pictures %}
-    <figure>
-      <img src="{{ pic.image.get__bw__profile }}" title="{{ pic.image.title }}" alt="{{ pic.image.alt_text }}"/>
-      <figcaption class="description">
-        <p><a href="{{ pic.person_uri }}">{{ pic.rdfperson.fullname }}</a></p>
-      </figcaption>
-    </figure>
-    {% endfor %}
+    <div class="wrapper">
+      {% for pic in pictures %}
+      <figure>
+        <a href="{{ pic.person_uri }}">
+          <img src="{{ pic.image.get__bw__profile }}" title="{{ pic.image.title }}" alt="{{ pic.image.alt_text }}"/>
+          <figcaption class="description">
+            <p>{{ pic.rdfperson.fullname }}</p>
+          </figcaption>
+        </a>
+      </figure>
+      {% endfor %}
+    </div>
   </div>
   {% endif %}
+
   {# /END THE SECTIONS #}
 </div>
 {% endblock %}

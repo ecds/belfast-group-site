@@ -9,12 +9,13 @@
 $("document").ready(function(){
 
 
-  var $poets = $("#poets");
+  var $poets = $("#poets .wrapper");
   if($poets.length>0){
     $poets.imagesLoaded( function() {
        $poets.masonry({
           "itemSelector": 'figure',
-          "columnWidth": 1
+          "columnWidth": 1,
+          "isFitWidth": true
         });
     });
     $("#poets figure").on('mouseover',function(){
