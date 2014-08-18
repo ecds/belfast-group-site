@@ -56,6 +56,34 @@ $("document").ready(function(){
 
   });
 
+/* Rotate controls
+
+  var $chord_chart = $("#chart>svg");
+  if($chord_chart.length>0){
+    var $rotateUp = $('.controls .rotate-up a'),
+        $rotateDown = $('.controls .rotate-down a');
+
+    var angle = 0,
+        inc = 30;
+
+    function rotateChord(deg,step,direction){
+      var dir =  direction || 1; //-1 for reverse
+      deg+=step*dir; //calc angle
+      $chord_chart.css({'transform':'rotateZ('+deg+'deg)'}) //move element
+      return deg; //return deg for future calculations
+    }
+    $rotateUp.bind('click',function(evt){
+      evt.preventDefault();
+      angle = rotateChord(angle,inc,-1);
+    })
+    $rotateDown.bind('click',function(evt){
+      evt.preventDefault();
+      angle = rotateChord(angle,inc);
+    })
+
+  }
+
+*/
   var $sidenav = $(".nav-list.sidenav");
 
   if($sidenav.length>0){
