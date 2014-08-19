@@ -12,6 +12,10 @@ body >.container{
     min-height:90%;
 }
 
+.container .container{
+	margin: 0px;
+	padding: 0;
+}
 
 a{
 	color: #11A7E4;
@@ -170,7 +174,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 	}
 
 	.navbar-nav .search{
-		margin-right: -50px;
+		margin-right: -35px;
 	}
 	.form-search .searchform{
 		opacity:0;
@@ -181,6 +185,12 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 	.form-search .searchform:focus{
 		opacity:1;
 		width:175px;
+	}
+}
+
+@media (min-width:1200px){
+	.navbar-nav .search{
+		margin-right: -50px;
 	}
 }
 .navbar-brand{
@@ -469,6 +479,9 @@ footer {
     .sidenav.affix, h1.affix {
         position:relative!important;
     }
+	h1.affix{
+		padding:0 15px;
+	}
     .sidenav.affix li,
 	.sidenav.affix-top li{
         display:inline-block;
@@ -705,7 +718,22 @@ div#top {
 	position: relative;
 	display: block;
 	z-index: -2;
-	height: 50px;
+	height: 0px;
+}
+
+@media(min-width: 993px){
+	div#top {
+		height: 50px;
+	}
+}
+@media(min-width: 767px){
+	.anchor{
+		margin-top: -50px;
+		padding-top: 50px;
+		height: 2px;
+		float: left;
+		width: 100%;
+	}
 }
 
 a.to-top {
@@ -938,6 +966,17 @@ figure.thumbnail.text-center {
 #graph-controls .ui-widget-header {
     background: #C5DFF3;
 }
+
+p.iframe{
+	width: 100%;
+	display: block;
+}
+
+p.iframe iframe{
+	max-width: 100%;
+	width: 100%;
+}
+
 
 /* footnotes in overview essay */
 

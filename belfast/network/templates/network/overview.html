@@ -10,58 +10,57 @@
 
 <div class="clearfix"></div>
 
-{# <div class="container-fluid"> #}
-<div id="network-images">
-  <div class="panel col-sm-6 col-md-3 text-center">
-    <div class="thumbnail">
-        <a href="{% url 'network:bg' %}">
-            <img src="{% static 'img/bg-thumb.png' %}" alt="Belfast Group network graph thumbnail"/>
-        </a>
-        <div class="caption text-left">
-            A network graph visualization showing the people directly connected
-            to the Belfast Group, and the connections between them.
-        </div>
+  {# <div class="container-fluid"> #}
+  <div id="network-images" class="row">
+    <div class="panel col-sm-6 col-md-3 text-center">
+      <div class="thumbnail">
+          <a href="{% url 'network:bg' %}">
+              <img src="{% static 'img/bg-thumb.png' %}" alt="Belfast Group network graph thumbnail"/>
+          </a>
+          <div class="caption text-left">
+              A network graph visualization showing the people directly connected
+              to the Belfast Group, and the connections between them.
+          </div>
+      </div>
     </div>
-  </div>
 
-  <div class="panel col-sm-6 col-md-3 text-center">
-    <div class="thumbnail">
-        <a href="{% url 'network:chord' %}">
-            <img src="{% static 'img/chord-thumb.png' %}" alt="Belfast Group chord diagrapm thumbnail"/>
-        </a>
-        <div class="caption text-left">
-            A chord diagram of the connections in the Belfast Group network,
-            as a different way of visualizing and exploring the connections.
-        </div>
+    <div class="panel col-sm-6 col-md-3 text-center">
+      <div class="thumbnail">
+          <a href="{% url 'network:chord' %}">
+              <img src="{% static 'img/chord-thumb.png' %}" alt="Belfast Group chord diagrapm thumbnail"/>
+          </a>
+          <div class="caption text-left">
+              A chord diagram of the connections in the Belfast Group network,
+              as a different way of visualizing and exploring the connections.
+          </div>
+      </div>
     </div>
-  </div>
 
-  <div class="panel col-sm-6 col-md-3 text-center">
-    <div class="thumbnail">
-        <a href="{% url 'network:bg-gs' %}">
-            <img src="{% static 'img/bgalt-thumb.png' %}" alt="Belfast Group alternate network graph thumbnail"/>
-        </a>
-        <div class="caption text-left">
-            Another network graph visualization of the Belfast Group and connected people,
-            based on an alternate model of the network derived entirely from
-            the group sheets.
-        </div>
+    <div class="panel col-sm-6 col-md-3 text-center">
+      <div class="thumbnail">
+          <a href="{% url 'network:bg-gs' %}">
+              <img src="{% static 'img/bgalt-thumb.png' %}" alt="Belfast Group alternate network graph thumbnail"/>
+          </a>
+          <div class="caption text-left">
+              Another network graph visualization of the Belfast Group and connected people,
+              based on an alternate model of the network derived entirely from
+              the group sheets.
+          </div>
+      </div>
     </div>
-  </div>
 
-  <div class="panel col-sm-6 col-md-3 text-center">
-    <div class="thumbnail">
-        <a href="{% url 'network:map' %}">
-            <img src="{% static 'img/map-thumb.png' %}" alt="Belfast Group map thumbnail"/>
-        </a>
-        <div class="caption text-left">
-            A map of places connected to people associated the Belfast Group - where
-            they lived and worked, and places mentioned in the digital group sheets.
-        </div>
+    <div class="panel col-sm-6 col-md-3 text-center">
+      <div class="thumbnail">
+          <a href="{% url 'network:map' %}">
+              <img src="{% static 'img/map-thumb.png' %}" alt="Belfast Group map thumbnail"/>
+          </a>
+          <div class="caption text-left">
+              A map of places connected to people associated the Belfast Group - where
+              they lived and worked, and places mentioned in the digital group sheets.
+          </div>
+      </div>
     </div>
   </div>
-</div>
-</div>
 {% endblock %}
 
 

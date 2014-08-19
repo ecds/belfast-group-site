@@ -56,6 +56,11 @@ $("document").ready(function(){
 
   });
 
+  var $iframe = $("p>iframe");
+  if($iframe.length>0){
+    $iframe.parent('p').addClass('iframe');
+  }
+
 /* Rotate controls
 
   var $chord_chart = $("#chart>svg");

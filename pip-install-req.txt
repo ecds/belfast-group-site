@@ -9,7 +9,12 @@ networkx>=1.9
 eulcommon
 html5lib
 progressbar
+
+# Django Image Tools
+# if normal import doesn't work, get the package directly:
+# https://pypi.python.org/packages/source/d/django-image-tools/django-image-tools-0.8.b3.tar.gz
 django-image-tools>=0.8.b3
+
 
 # additional rdf script reqs
 requests>=1.1

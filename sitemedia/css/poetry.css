@@ -11,8 +11,10 @@ a[name] {
   color: black;
 }
 
-.local-sidenav {
-    padding: 20px 0;
+@media (min-width:993px){
+  .local-sidenav {
+      padding: 20px 0;
+  }
 }
 
 /* style active title in poetry table of contents (preliminary) */
