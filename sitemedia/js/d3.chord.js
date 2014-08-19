@@ -30,9 +30,8 @@ function ChordDiagram(config) {
 
   // special config for auto width/height: base on parent container size
   var width = d3.min([options.max_size, parseInt(d3.select(options.target).style('width'), 10)]);
-  console.log('width = ' + width);
   options.width = options.height = width;
-  var rd = 200
+  var rd = ($(window).width()>600) ? 200 : 50
 
 var outerRadius = Math.min(options.width-rd, options.height-rd) / 2 - 10,
     innerRadius = outerRadius - 24;
@@ -54,7 +53,7 @@ var path = d3.svg.chord()
 var svg = d3.select(options.target).append("svg")
     .attr("width", options.width)
     .attr("height", options.height)
-  .append("g")
+    .append("g")
     .attr("id", "circle")
     .attr("transform", "translate(" + options.width / 2 + "," + options.height / 2 + ")");
 
@@ -138,7 +137,6 @@ return d3.json(config.nodes, function(data) {
         });
 
     // Remove the labels that don't fit. :(
-      console.log($(window).width())
       if($(window).width()<768){
         groupText.remove();
       }

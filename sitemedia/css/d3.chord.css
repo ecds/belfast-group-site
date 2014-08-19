@@ -5,8 +5,15 @@
 }
 
 #chart{
-	margin-top: -5em;
+	margin-top: -2em;
 }
+
+@media(min-width: 600px){
+	#chart{
+		margin-top: -5em;
+	}
+}
+
 #chart svg{
 	overflow: inherit;
 }
