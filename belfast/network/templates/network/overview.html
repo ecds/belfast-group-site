@@ -6,7 +6,7 @@
 {% block page-content %}
   <h1 property="schema:name">{{ flatpage.title }}</h1>
 
-  {% include "flatpages/snippets/flatpage_content.html" %}
+
 
 <div class="clearfix"></div>
 
@@ -18,8 +18,8 @@
               <img src="{% static 'img/bg-thumb.png' %}" alt="Belfast Group network graph thumbnail"/>
           </a>
           <div class="caption text-left">
-              A network graph visualization showing the people directly connected
-              to the Belfast Group, and the connections between them.
+              A network graph showing the people directly connected
+              to the Belfast Group, as well as the connections between them.
           </div>
       </div>
     </div>
@@ -30,8 +30,8 @@
               <img src="{% static 'img/chord-thumb.png' %}" alt="Belfast Group chord diagrapm thumbnail"/>
           </a>
           <div class="caption text-left">
-              A chord diagram of the connections in the Belfast Group network,
-              as a different way of visualizing and exploring the connections.
+              This chord diagram makes connections between an individual associated with
+               the Belfast Group easily visible. It uses the same data as the first network graph.
           </div>
       </div>
     </div>
@@ -42,9 +42,8 @@
               <img src="{% static 'img/bgalt-thumb.png' %}" alt="Belfast Group alternate network graph thumbnail"/>
           </a>
           <div class="caption text-left">
-              Another network graph visualization of the Belfast Group and connected people,
-              based on an alternate model of the network derived entirely from
-              the group sheets.
+              A network graph of the two time periods of the Belfast Group, which helps
+              visualize who was connected to the Group at certain moments.
           </div>
       </div>
     </div>
@@ -55,12 +54,15 @@
               <img src="{% static 'img/map-thumb.png' %}" alt="Belfast Group map thumbnail"/>
           </a>
           <div class="caption text-left">
-              A map of places connected to people associated the Belfast Group - where
-              they lived and worked, and places mentioned in the digital group sheets.
+              A map of places connected to people associated the Belfast Group: where
+              they lived and worked, as well as places mentioned in their poetry.
           </div>
       </div>
     </div>
   </div>
+  
+  {% include "flatpages/snippets/flatpage_content.html" %}
+  
 {% endblock %}
 
 
