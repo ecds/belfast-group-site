@@ -291,11 +291,19 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
   margin: 0 auto;
 }
 
+
 #poets figure{
 	cursor: pointer;
 	opacity: 1;
 	transition:opacity 0.5s;
-	max-width: 50%;
+	overflow:hidden;
+	z-index: 2;
+}
+
+@media (min-width: 550px){
+	#poets figure{
+		max-width: 50%;
+	}
 }
 
 @media (max-width: 480px){
@@ -307,6 +315,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 
 #poets figure.faded{
 	opacity: 0.5;
+	z-index: 1;
 }
 
 .text-content {
@@ -676,10 +685,19 @@ footer {
 	/* overflow: hidden; */
 	box-shadow: 0 3px 7px 0px rgba(49, 49, 49, 0.14);
 	background: #F3F3F3;
-	min-height: 180px;
+	min-height: 220px;
 	width: 120px;
 	position: relative;
 	float: left;
+	background: rgb(155,163,175); /* Old browsers */
+	background: -moz-linear-gradient(-45deg,  rgba(155,163,175,1) 0%, rgba(96,113,129,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,rgba(155,163,175,1)), color-stop(100%,rgba(96,113,129,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(-45deg,  rgba(155,163,175,1) 0%,rgba(96,113,129,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(-45deg,  rgba(155,163,175,1) 0%,rgba(96,113,129,1) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(-45deg,  rgba(155,163,175,1) 0%,rgba(96,113,129,1) 100%); /* IE10+ */
+	background: linear-gradient(135deg,  rgba(155,163,175,1) 0%,rgba(96,113,129,1) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#9ba3af', endColorstr='#607181',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+
 }
 
 @media(min-width:500px){
@@ -774,7 +792,7 @@ a.to-top:active{
     left: 0;
     float: left;
     display: block;
-    height: 160px;
+    height: 200px;
 }
 
 #bios .thumbnail a+.caption {
@@ -788,6 +806,7 @@ a.to-top:active{
     width: 100%;
     left: 0;
     top: 50%;
+    color: #E7E7E7;
 }
 #bios .thumbnail a+.caption a {
     position: relative;
