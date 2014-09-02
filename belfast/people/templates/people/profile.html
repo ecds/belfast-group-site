@@ -12,10 +12,7 @@
 
     <h1>
       {% if person.lastname and person.firstname %}
-      {{ person.firstname }} {{ person.lastname }}
-      <meta property="schema:familyName" content="{{ person.lastname }}"/>
-      <meta property="schema:givenName" content="{{ person.firstname }}"/>
-
+       <span property="schema:givenName">{{ person.firstname }}</span>  <span property="schema:familyName">{{ person.lastname }}</span>
       {% else %}
       <span property="schema:name">{{ person.name }}</span>
       {% endif %}

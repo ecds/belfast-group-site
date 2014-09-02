@@ -48,8 +48,11 @@ class PeopleViewsTest(TestCase):
                          'profile should return 200 for valid person id')
         # spot-check profile info
         self.assertContains(
-            response, '<h1>%s</h1>' % self.person.name, html=True,
-            msg_prefix='name should be used for profile page title')
+            response, '<span property="schema:givenName">%s</span>' % self.person.firstname, html=True,
+            msg_prefix='first name should be displayed as part of profile page title')
+        self.assertContains(
+            response, '<span property="schema:familyName">%s</span>' % self.person.lastname, html=True,
+            msg_prefix='last name should be displayed as part of profile page title')
         # RDF birthdate now suppressed on profile page
         # self.assertContains(
         #     response, 'Born %s' % self.person.birthdate,
@@ -169,4 +172,3 @@ class RdfPersonTest(TestCase):
         self.assert_('Royal Society of Literature' in names)
         self.assert_('Seamus Heaney' not in names)
         self.assert_('affiliation' in names['Belfast Group'])
-        
