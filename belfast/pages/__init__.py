@@ -1,0 +1,1 @@
+'''Flat pages for site content. :mod:`django.contrib.flatpages` '''

@@ -2,3 +2,4 @@ django-nose
 unittest2
 mock
 coverage
+sphinx

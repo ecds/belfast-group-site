@@ -53,5 +53,7 @@ gexf/belfastgroup.gexf
 
 gexf/bg1.gexf
 
-
 belfast/db.sqlite3
+
+#Documentation
+doc/_build
