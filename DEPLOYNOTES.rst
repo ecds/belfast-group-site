@@ -11,6 +11,11 @@ Initial setup
   brew install berkeley-db
   BERKELEYDB_DIR=$(brew --cellar)/berkeley-db/5.3.28 pip install bsddb3
 
+* libxml headers
+  On OSX, the libxml library requires Command Line Tools to be installed,
+  which need to be installed manually for the pip req to complete.
+  https://developer.apple.com/downloads/index.action?=command%20line%20tools#
+
 * Install python dependencies (virtualenv is recommended)::
 
   pip install -r pip-install-req.txt
