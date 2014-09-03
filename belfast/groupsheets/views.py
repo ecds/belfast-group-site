@@ -19,16 +19,26 @@ logger = logging.getLogger(__name__)
 
 
 def rdf_lastmod(request, *args, **kwargs):
+    '''Helper method to return RDF last-modified information, for use with
+    :meth:`django.views.decorators.http.last_modified`'''
     return rdf_data_lastmodified()
 
 
 def rdf_nx_lastmod(request, *args, **kwargs):
+    '''Helper method to most recent of RDF *or* Network graph files last-modified
+    information, for use with :meth:`django.views.decorators.http.last_modifie`'''
     return max(rdf_data_lastmodified(), network_data_lastmodified())
 
 # TODO: add etag/last-modified headers for views based on single-document TEI
 # use document last-modification date in eXist (should be similar to findingaids code)
 
 def view_sheet(request, id):
+    '''View method to find and display a single
+    :class:`~belfast.groupsheets.rdfmodels.TeiGroupSheet`
+
+    :param id: TEI identifier for the Group sheet to be viewed
+    '''
+
     context = {
         'extra_ns': {'bg': rdfns.BG, 'freebase': rdfns.FREEBASE},
         'page_rdf_type': 'bg:GroupSheet'
@@ -69,8 +79,14 @@ def teixml(request, name):
 
 @last_modified(rdf_lastmod)  # for now, list is based on rdf
 def list_groupsheets(request):
-    # without filters, find all group sheets
-    # results = GroupSheet.objects.all()
+    '''View to display a list of all Group sheets from the RDF data.  Includes
+    logic to generate and filter by facets for digital editions, authors, coverage
+    dates, and source collections.
+
+    Looks for a :class:`~django.contrib.flatpages.models.FlatPage` for this url,
+    and if found, passes to the template display at the top of the list of
+    Group sheets.
+    '''
 
     # get flatpage for this url, if any
     flatpage = get_flatpage(request)
@@ -183,6 +199,7 @@ def list_groupsheets(request):
 
 
 def search(request):
+    '''View for a simple keyword search on TEI Groupsheet content only.'''
     form = KeywordSearchForm(request.GET)
 
     context = {'form': form, 'page_rdf_type': 'schema:SearchResultsPage'}
@@ -200,7 +217,7 @@ def search(request):
             # calculate total to trigger exist query so error can be caught
             results.count()
         except ExistDBException as err:
-            logger.error('eXist query error: %s' % err)
+            logger.error('eXist query error: %s', err)
             context['query_error'] = True
 
     return render(request, 'groupsheets/search_results.html',
