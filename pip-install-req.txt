@@ -1,4 +1,4 @@
-Django
+Django<1.7
 django-tinymce
 eulexistdb
 rdflib<=4.1.0
