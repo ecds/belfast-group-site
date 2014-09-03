@@ -17,11 +17,13 @@ logger = logging.getLogger(__name__)
 
 
 class Contents(teimap._TeiBase):
+    '''Get title and items for groupsheet from the TEI (Text Encoding Initiative) XML.'''
     title = xmlmap.StringField('tei:p')
     items = xmlmap.StringListField('tei:list/tei:item')
 
 
 class Poem(teimap._TeiBase):
+    '''Maps Poem XML to id, title, the title xml node, body, back, and byline.'''
     id = xmlmap.StringField('@xml:id')    # is this the correct id to use?
     title = xmlmap.StringField('tei:front/tei:titlePage/tei:docTitle/tei:titlePart[@type="main"]')
     title_node = xmlmap.NodeField('tei:front/tei:titlePage/tei:docTitle/tei:titlePart[@type="main"]', xmlmap.XmlObject)
@@ -33,7 +35,7 @@ class Poem(teimap._TeiBase):
 
 
 class IdNumber(teimap._TeiBase):
-    # xmlobject for idno element, to provide access to ARK urls
+    '''xmlobject for idno element, to provide access to ARK urls'''
     type = xmlmap.StringField('@type')
     id = xmlmap.StringField('@n')
     value = xmlmap.StringField('./text()')
@@ -50,9 +52,9 @@ class ArkIdentifier(IdNumber, XmlModel):
 _id_from_ark = {}
 
 def id_from_ark(ark):
+    '''Simple method to look up a TEI id based on the ARK url
+       to allow linking within the current site based on an ARK'''
     global _id_from_ark
-    # simple method to look up a TEI id based on the ARK url,
-    # to allow linking within the current site based on an ARK
     if ark in _id_from_ark:
         return _id_from_ark[ark]
     try:
@@ -106,7 +108,7 @@ class TeiGroupSheet(XmlModel):
 
     @property
     def ark(self):
-        'ARK URL for this groupsheet'
+        '''ARK URL for this groupsheet'''
         for a in self.ark_list:
             if a.id == self.id:
                 return a.value
@@ -213,8 +215,8 @@ def groupsheet_by_url(url):
 
 
 def get_rdf_groupsheets(author=None, has_url=None, source=None, coverage=None):
-    # query rdf data to get a list of belfast group sheets
-    # optionally filter by author (takes a URI)
+    '''Query RDF data to get a list of belfast group sheets and
+        optionally filter by author (takes a URI)'''
     start = time.time()
     g = rdf_data()
     # in most cases, sort by last name and then title
