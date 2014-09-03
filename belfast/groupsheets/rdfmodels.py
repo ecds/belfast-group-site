@@ -17,35 +17,52 @@ logger = logging.getLogger(__name__)
 
 
 class Contents(teimap._TeiBase):
-    '''Get title and items for groupsheet from the TEI (Text Encoding Initiative) XML.'''
+    ''':class:`~eulxml.xmlmap.XmlObject` for table of contents information,
+    with a title and list of items, for a :class:`TeiGroupSheet`.'''
+    #: title - ``tei:p``
     title = xmlmap.StringField('tei:p')
+    #: list of items - ``tei:list/tei:item``
     items = xmlmap.StringListField('tei:list/tei:item')
 
 
 class Poem(teimap._TeiBase):
-    '''Maps Poem XML to id, title, the title xml node, body, back, and byline.'''
+    ''':class:`~eulxml.xmlmap.XmlObject` for a single Poem in a :class:`TeiGroupSheet`.'''
+    #: poem identifier
     id = xmlmap.StringField('@xml:id')    # is this the correct id to use?
+    #: poem title - uses ``tei:front/tei:titlePage/tei:docTitle/tei:titlePart[@type='main']``
     title = xmlmap.StringField('tei:front/tei:titlePage/tei:docTitle/tei:titlePart[@type="main"]')
+    #: access to title as an :class:`~eulxml.xmlmap.XmlObject`, to allow for generating formatting
+    #: or exposing tagged names within the title
     title_node = xmlmap.NodeField('tei:front/tei:titlePage/tei:docTitle/tei:titlePart[@type="main"]', xmlmap.XmlObject)
     # little bit hacky; access to title as node instead of string, to allow formatting
     # embedded content (i.e. tagged places or other names)
+    #: body of the poem ``tei:body``
     body = xmlmap.NodeField('tei:body', xmlmap.XmlObject)
+    #: back matter of the poem ``tei:back``
     back = xmlmap.NodeField('tei:back', xmlmap.XmlObject)
+    #: byline from the back matter, usually used for author attribution on :class:`TeiGroupSheet`
     byline = xmlmap.StringField('tei:back/tei:byline')
 
 
 class IdNumber(teimap._TeiBase):
-    '''xmlobject for idno element, to provide access to ARK urls'''
+    ''':class:`~eulxml.xmlmap.XmlObject` for ``tei:idno`` element, to provide
+    access to ARK urls stored in the TEI header of the Group sheet xml.'''
+    #: type ``@type``
     type = xmlmap.StringField('@type')
+    #:id ``@id``
     id = xmlmap.StringField('@n')
+    #: actual value of the id element (i.e., the ARK URL)
     value = xmlmap.StringField('./text()')
 
 
 class ArkIdentifier(IdNumber, XmlModel):
+    ''':class:`~eulexistdb.models.XmlModel` for searching eXist-db for
+    ``tei:idno`` elements.'''
     ROOT_NS = teimap.TEI_NAMESPACE
     ROOT_NAMESPACES = {
         'tei': ROOT_NS,
     }
+    #: manager for searching on ``//tei:idno[@type='ark']``
     objects = Manager('//tei:idno[@type="ark"]')
 
 # cache ark -> ids that have been looked up recently
@@ -58,38 +75,50 @@ def id_from_ark(ark):
     if ark in _id_from_ark:
         return _id_from_ark[ark]
     try:
-        id = ArkIdentifier.objects.get(value=ark).id
-        _id_from_ark[ark] = id
-        return id
+        ark_id = ArkIdentifier.objects.get(value=ark).id
+        _id_from_ark[ark] = ark_id
+        return ark_id
     except Exception as err:
-        logger.warn('Error attempting to retrieve TEI id for ARK %s : %s'
-                    % (ark, err))
-        pass
+        logger.warn('Error attempting to retrieve TEI id for ARK %s : %s',
+                    ark, err)
 
 
 class TeiDocument(XmlModel, teimap.Tei):
-    '''Simple top-level class to provide access to the full TEI document
-    (which may contain multiple groupsheets).'''
+    '''Simple top-level :class:`~eulxml.xmlmap.XmlObject` to provide access to
+    the full TEI document (which may contain more than one :class:`TeiGroupSheet`).'''
+    #: manager, searches on ``/tei:TEI``
     objects = Manager('/tei:TEI')
 
 
-# TODO: move to tei models?
+# NOTE: would it make more sense to split out RDF and TEI models?
+
+
 class TeiGroupSheet(XmlModel):
+    ''':class:`~eulexistdb.models.XmlModel` for searching and displaying a single
+    TEI Group sheet document.'''
+    #: root namespace
     ROOT_NS = teimap.TEI_NAMESPACE
     ROOT_NAMESPACES = {
         'tei': ROOT_NS,
     }
-
+    #: group sheet id
     id = xmlmap.StringField('@xml:id')
+    #: groupsheet title
     title = xmlmap.StringField('tei:head')
+    #: document author
     author = xmlmap.StringField('tei:docAuthor')
-    # map as node to allow exposing name info as RDFa
+    #: list of all authors, as :class:`~eulxml.xmlmap.XmlObject` so identifying
+    #: information can be used to expose name information via RDFa
     authors = xmlmap.NodeListField('tei:docAuthor', xmlmap.XmlObject)
+    #: document date
     date = xmlmap.StringField('tei:docDate')
+    #: table of contents, as :class:`Contents`
     toc = xmlmap.NodeField('tei:argument', Contents)
-    # in one case, list of Contents sections (multiple authors in a single sheet)
+    #: list of table of contents, as :class:`Contents` (in one group sheet, there
+    #: are multiple contents sections because there are multiple authors)
     toc_list = xmlmap.NodeListField('tei:argument', Contents)
 
+    #: list of poems in the groupsheet, as :class:`Poem`
     poems = xmlmap.NodeListField('tei:text', Poem)
 
     objects = Manager('//tei:text/tei:group/tei:group')
@@ -103,6 +132,7 @@ class TeiGroupSheet(XmlModel):
     # ARK urls are stored in the header as idno elements with
     # an `n` attribute referencing the group id
     # Provide access to all of them so we can retrieve the appropiate one
+    #: list of ARKs in the TEI header, as list of :class:`IdNumber`
     ark_list = xmlmap.NodeListField('ancestor::tei:TEI//tei:idno[@type="ark"]',
                                     IdNumber)
 
@@ -128,9 +158,14 @@ class TeiGroupSheet(XmlModel):
 # TBD: how do groupsheet and people apps share rdf models?
 
 class RdfDocument(RdfResource):
+    ''':class:`belfast.rdf.models.RdfResource` for an an RDF Document'''
+    #: :class:`~belfast.rdf.models.RdfResource` that this resource is part of,
+    #: via dc:isPartOf relation
     part_of = rdfmap.Resource(rdfns.DC.isPartOf, RdfResource)
 
 def archival_collections():
+    '''Find and return a list of all archival :class:`RdfArchivalCollection`
+    in the RDF data'''
     graph = rdf_data()
     subj = graph.subjects(rdflib.RDF.type, rdfns.ARCH.Collection)
     return [RdfArchivalCollection(graph, s) for s in subj]
@@ -144,10 +179,12 @@ class RdfArchivalCollection(RdfResource):
 
     # access to the webpage/findingaid that describes this collection
     # (NOTE: in at least one case, collection id does NOT resolve to findingaid)
+    #: list of :class:RdfDocument` that are about (``schema.org/about``) this document
     documents = rdfmap.ResourceList(rdfns.SCHEMA_ORG.about, RdfDocument,
                                     is_object=False)
     @property
     def access_url(self):
+        '''Access URL for this archival collection (i.e., URL to the finding aid).'''
         # subseries are part of primary findingaid docuent, so if there
         # is a partOf rel use that uri, otherwise use document uri
         for d in self.documents:
@@ -182,41 +219,55 @@ class RdfGroupSheet(RdfResource):
     # TODO: store this somewhere...
     @property
     def tei_id(self):
+        '''TEI identifier for this group sheet, retrieved via ARK URL'''
         if self.url:
             return id_from_ark(str(self.url.identifier))
 
     # more complex properties: aggregate, other resources
 
-    # single author
+    #: single author; :class:`RdfPerson` related via dc:creator
     author = rdfmap.Resource(rdfns.DC.creator, RdfPerson)
-    # author list - a very few groupsheets have multiple authors
+    #: list of authors (a very few groupsheets have multiple authors)
+    #: list of :class:`RdfPerson', related via dc:creator`
     author_list = rdfmap.ResourceList(rdfns.DC.creator, RdfPerson,
         sort=lambda author: author.lastname)
 
-    # single title as literal value
+    #: single title as literal value (dc:title)
     title = rdfmap.Value(rdfns.DC.title)
-    # title list as rdf:sequence
+    #: title list as rdf:sequence (dc:title)
     title_list = rdfmap.Sequence(rdfns.DC.title)
 
+    #: :class:`RdfArchivalCollection` sources that mention this document
     sources = rdfmap.ResourceList(rdfns.SCHEMA_ORG.mentions, RdfArchivalCollection,
                                   is_object=False)
 
+    #: list of :class:`RdfPerson` who owned this document, via schema.org/owns
     owners = rdfmap.ResourceList(rdfns.SCHEMA_ORG.owns, RdfPerson,
                                   is_object=False)
 
 def groupsheet_by_url(url):
+    '''Find :class:`RdfGroupSheet` by URL'''
     start = time.time()
     g = rdf_data()
     uris = list(g.subjects(rdfns.SCHEMA_ORG.URL, rdflib.URIRef(url)))
-    logger.debug('Found %d group sheet for url %s in %.02f sec' % (
-                 len(uris), url, time.time() - start))
+    logger.debug('Found %d group sheet for url %s in %.02f sec',
+                 len(uris), url, time.time() - start)
     # type should be rdfns.BG.GroupSheet, but probably don't need to confirm...
     return [RdfGroupSheet(g, u) for u in uris]
 
 
 def get_rdf_groupsheets(author=None, has_url=None, source=None, coverage=None):
-    '''Query RDF data to get a list of belfast group sheets and
-        optionally filter by author (takes a URI)'''
+    '''Query RDF data to get a list of :class:`RdfGroupSheet`
+    optionally filter by various attributes.
+
+    :param author: optional author URI; use to find Group sheets by a specific
+        author
+    :param has_url: filter to only those Group sheets with a URL (i.e., digital
+        editions on the site)
+    :param source: filter by source archival collection that includes the Group
+        sheet
+    :param coverag: filter by coverage dates
+    '''
     start = time.time()
     g = rdf_data()
     # in most cases, sort by last name and then title
@@ -276,24 +327,15 @@ def get_rdf_groupsheets(author=None, has_url=None, source=None, coverage=None):
                'rdf': rdflib.RDF, 'bg': rdfns.BG.GroupSheet,
                'filter': fltr, 'sort': sort}
 
-        # } ORDER BY ?sort_name ?sort_title
-
-    # FIXME: some untitled Group sheets have *no* title; fix query so title is not required
-    # (sort untitled either beginning or end of list...  end probably?)
-
     # NOTE: some group sheets have rdf:sequence for titles, others have literal titles
     # combining first title in sequence (if present) with dc:title literal
     # so literal and sequence titles can be sorted together
 
-    # TODO: use OPTIONAL {...} for author/name to include anonymous groupsheet
-    # but FIXME: making author optional results in *many* more group sheets, check
-    # rdf data/prep logic, cleanup...
-
     logger.debug(query)
     res = g.query(query)
 
-    logger.debug('Found %d group sheets in %.02f sec' % (len(res),
-                 time.time() - start))
+    logger.debug('Found %d group sheets in %.02f sec', len(res),
+                 time.time() - start)
 
     gs = [RdfGroupSheet(g, r['ms']) for r in res]
     return gs
