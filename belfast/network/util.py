@@ -2,6 +2,17 @@ import networkx as nx
 
 
 def annotate_graph(graph, fields=[]):
+    '''Annotate a :mod:`networkx` graph with network information.
+
+    :param graph: :class:`networkx.graph.Graph` or subclass
+    :param fields: list of fields to be added to the nodes in the graph;
+        can include any of: degree, in_degree, out_degree,
+        betweenness_centrality, eigenvector_centrality
+
+    :returns: a graph with the requested annotations added to each node
+        in the graph
+    '''
+
     if 'degree' in fields:
         degree = graph.degree()
     # TODO: do we need to check that graph is directional for in/out degree?
@@ -21,7 +32,6 @@ def annotate_graph(graph, fields=[]):
         eigenv = nx.algorithms.centrality.eigenvector_centrality(use_g)
 
 
-
     for node in graph.nodes():
         if 'degree' in fields:
             graph.node[node]['degree'] = degree[node]
@@ -38,6 +48,15 @@ def annotate_graph(graph, fields=[]):
 
 
 def filter_graph(graph, min_degree):
+    '''Filter a network graph by minimum degree.
+
+    :param graph: :class:`networkx.graph.Graph` or subclass
+    :param min_degree: minimum degree for nodes to be kept in the graph
+
+    :returns: graph with only the nodes with degree higher or equal to
+        the specified minimum, and all connecting edges among those nodes
+    '''
+
     # filter a network graph by minimum degree
     nodes_to_keep = []
     degree = graph.degree()

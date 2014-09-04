@@ -57,9 +57,9 @@ Network
 .. automodule:: belfast.network
 	:members:
 
-Models
+Utils
 ^^^^^^
-.. automodule:: belfast.network.models
+.. automodule:: belfast.network.util
  	:members:
 
 Views

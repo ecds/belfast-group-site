@@ -32,8 +32,14 @@ def rdf_nx_lastmod(request, *args, **kwargs):
 
 
 def overview(request):
-    # get flatpage for this url; if not available, 404 (?)
-    # flatpage = FlatPage.objects.get(url=request.path, sites__id=settings.SITE_ID)
+    '''Overview/intro page for network graphs and maps, with links to the
+    network graphs, chord diagrams, and maps.
+
+    Looks for a :class:`~django.contrib.flatpages.models.FlatPage` for this url,
+    and if found, passes to the template to include in display.  If no
+    page is found, results in a 404 not found error.
+    '''
+    # get flatpage for this url; if not available, 404
     fpage = get_object_or_404(FlatPage,
         url=relative_flatpage_url(request), sites__id=settings.SITE_ID)
     return render(request, 'network/overview.html', {'flatpage': fpage})
@@ -84,8 +90,24 @@ def _network_graph(min_degree=1, **kwargs):
 
 @last_modified(rdf_nx_lastmod)
 def full_js(request, mode):
-    # mode options:
-    #  full (node & link data) or adjacency (adjacency matrix)
+    '''Return full network graph data as JSON.  Optionally filter
+    the data by minimum degree, if min_degree is specified as a url parameter.
+    When generating the node and link data, nodes are annotated with
+    degree, in degree, out degree, betweenness centrality, and eigenvector
+    centrality if available.  (In/out degree is only available for directed
+    graphs.)
+
+
+    :param mode: full - node and link data; adjacency - adjacency matrix,
+        used to construct a chord diagram
+
+    .. deprecated:: 1.0
+
+       This network graph is too large to be usable or viewable in a
+       browser/javascript display environment, and should not be used;
+       :meth:`group_people` should be used instead.
+    '''
+
 
     # optionally filter by minimum degree
     min_degree =  request.GET.get('min_degree', None)
@@ -110,7 +132,8 @@ def full_js(request, mode):
 
 @last_modified(rdf_nx_lastmod)
 def full_gexf(request):
-    # generate same network graph as gexf for download/use in tools like gephi
+    '''Generate the same Belfast Group network data exposed in :meth:`full_js`
+    in the GEXF format, for download and use in tools like Gephi.'''
     graph = _network_graph()
     buf = StringIO()
     gexf.write_gexf(graph, buf)
@@ -121,18 +144,40 @@ def full_gexf(request):
 
 @last_modified(rdf_nx_lastmod)
 def force_graph(request):
-    # force directed graph of entire network
+    '''Display a force-directed graph of the entire network.
+
+    .. deprecated:: 1.0
+
+       This network graph is too large to be usable or viewable in a
+       browser/javascript display environment, and should not be used;
+       :meth:`group_people` should be used instead.
+    '''
     return render(request, 'network/graph.html')
 
 
 @last_modified(rdf_nx_lastmod)
 def chord_diagram(request):
-    # circular chord chart of entire network
+    '''Display a circular chord diagram of the Belfast Group network.
+
+    If a :class:`~django.contrib.flatpages.models.FlatPage` is found for
+    this url, it is passed to the template to include in display.
+    '''
     fpage = get_flatpage(request)
     return render(request, 'network/chord.html', {'flatpage': fpage})
 
 @last_modified(rdf_nx_lastmod)
 def group_people(request, mode='egograph'):
+    '''Display a force-directed graph of people associated with the
+    Belfast Group.
+
+    :param mode: egograph: display people directly connected to the
+       Belfast Group; groupsheet-model display a network model generated
+       from information about the Group sheets.
+
+    If a :class:`~django.contrib.flatpages.models.FlatPage` is found for
+    this url, it is passed to the template to include in display.
+    '''
+
     fpage = get_flatpage(request)
 
     # graph of just people directly connected to the belfast group
@@ -147,6 +192,23 @@ def group_people(request, mode='egograph'):
 
 @last_modified(rdf_nx_lastmod)
 def group_people_js(request, mode='egograph', output='full'):
+    '''Return Belfast Group network graph data as JSON, for use with
+    :meth:`group_people`.
+
+    Optionally filter
+    the data by minimum degree, if min_degree is specified as a url parameter.
+    When generating the node and link data, nodes are annotated with
+    degree, in degree, out degree, betweenness centrality, and eigenvector
+    centrality if available.  (In/out degree is only available for directed
+    graphs.)
+
+    :param mode: egograph: network information for a one- or two-degree
+        egograph centered around the Belfast Group; groupsheet-model:
+        alternate network graph based on the Group sheets themselves
+    :param output: full: node and link data; adjacency: adjacency matrix,
+        used for generating chord diagram
+    '''
+
     if mode == 'egograph':
         degree = request.GET.get('degree', 1)
         extra_opts = {}
@@ -196,6 +258,13 @@ def group_people_js(request, mode='egograph', output='full'):
 
 @last_modified(rdf_nx_lastmod)
 def node_info(request):
+    '''Return an HTML snippet with brief information about a node in the
+    network (e.g., name, number of Group sheets, link to profile page
+    if there is one).  Intended to be called via AJAX and displayed with
+    the network graphs.
+
+    Expects a url parameter ``id`` with the node identifier.
+    '''
     node_id = request.GET.get('id', None)
     # TODO: better to get from gexf or rdf ?
     graph = gexf.read_gexf(settings.GEXF_DATA['full'])
@@ -210,6 +279,13 @@ def node_info(request):
 
 
 def map(request):
+    '''Display a map of places associated with the people connected to the
+    Belfast Group or mentioned in the digitized Group sheets on the site.
+
+    If a :class:`~django.contrib.flatpages.models.FlatPage` is found for
+    this url, it is passed to the template to include in display.
+    '''
+
     fpage = get_flatpage(request)
 
     people = {}
@@ -230,8 +306,11 @@ def map(request):
 
 @last_modified(rdf_lastmod)
 def map_js(request):
+    '''Location data for places associated with the people connected to the
+    Belfast Group or mentioned in the digitized Group sheets on the site,
+    returned as JSON for use with :meth:`map`.
+    '''
     places = find_places()
-    # places = Place.objects.all()
     markers = []
     for pl in places:
         # lat/long should have been added in rdf data prep, but
