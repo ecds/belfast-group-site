@@ -73,12 +73,12 @@ RDF
 .. automodule:: belfast.rdf
 	:members:
 
+rdfmap
+^^^^^^
+.. automodule:: belfast.rdf.rdfmap
+    :members:
+
 Models
 ^^^^^^
 .. automodule:: belfast.rdf.models
- 	:members:
-
-Views
-^^^^^^
-.. automodule:: belfast.rdf.views
  	:members:

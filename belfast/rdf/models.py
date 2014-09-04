@@ -7,6 +7,7 @@ class RdfResource(rdflib.resource.Resource):
     '''Generic RDF :class:`~rdflib.resource.Resource` base class with
     common functionality, to be extended for specific rdf models.'''
 
+    #: list of rdf:type associated with this resource
     rdf_types =  rdfmap.ValueList(rdflib.RDF.type)
     # should be usable to confirm resource is expected type,
     # similar to requisite content models check in eulfedora
@@ -20,6 +21,9 @@ class RdfResource(rdflib.resource.Resource):
 
     @property
     def preferred_label(self):
+        '''Preferred label for this resource;
+        uses :meth:`~rdflib.graph.Graph.preferredLabel`.  If multiple
+        preferred labels are found, the first one is used.'''
         labels = self.graph.preferredLabel(self)
         # list of tuples: label type (preflabel or label), value
         if labels:
@@ -27,6 +31,7 @@ class RdfResource(rdflib.resource.Resource):
 
     @property
     def name(self):
+        'alias for :attr:`preferred_label`'
         l = self.preferred_label
         return l if l else self._name
 

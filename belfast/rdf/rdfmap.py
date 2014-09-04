@@ -1,5 +1,9 @@
-## descriptors for RDF
-# intended for use with rdflib.resource.Resource
+'''Descriptors for use with RDF data.
+
+Intended for use with :class:`rdflib.resource.Resource`, for more
+convenient, object-based access to properties in the RDF data associated
+with the specified resource.
+'''
 import rdflib
 from rdflib.collection import Collection
 
@@ -24,6 +28,9 @@ class Value(object):
         self.normalize = normalize
 
     def __get__(self, obj, objtype=None):
+        if obj is None:
+            return self
+
         val = obj.value(self.predicate)
         # if we got a 'none' return as is (don't convert to "None")
         if val is None:
@@ -55,6 +62,9 @@ class Resource(object):
         self.is_object = is_object
 
     def __get__(self, obj, objtype):
+        if obj is None:
+            return self
+
         # need to use subjects/objects instead of value to get a resource
         # and for consistency with ResourceList
         if self.is_object:
@@ -97,6 +107,9 @@ class ResourceList(object):
         self.sort = sort
 
     def __get__(self, obj, objtype):
+        if obj is None:
+            return self
+
         if self.is_object:
             meth = obj.objects
         else:
@@ -118,6 +131,9 @@ class Sequence(object):
         self.predicate = predicate
 
     def __get__(self, obj, obtype):
+        if obj is None:
+            return self
+
         # convert from resource to standard blank node
         # since collection doesn't seem to handle resource
         bnode = rdflib.BNode(obj.value(self.predicate))
@@ -139,6 +155,9 @@ class ValueList(object):
         self.transitive = transitive
 
     def __get__(self, obj, objtype=None):  # objtype is class of object, e.g. RdfPerson
+        if obj is None:
+            return self
+
         # TODO: share datatype logic, whitespace normalization with value
         if self.transitive:
             meth = obj.graph.transitive_objects
