@@ -25,11 +25,6 @@ Pages
 .. automodule:: belfast.pages
 	:members:
 
-Models
-^^^^^^
-.. automodule:: belfast.pages.models
- 	:members:
-
 Views
 ^^^^^^
 .. automodule:: belfast.pages.views
