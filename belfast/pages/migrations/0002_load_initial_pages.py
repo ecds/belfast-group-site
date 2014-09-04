@@ -24,12 +24,16 @@ class Migration(DataMigration):
         # iterate over html files in fixture dir and set flatpage content, if possible
         for doc in glob.glob(os.path.join(html_fixture_dir, '*.html')):
             basename, ext = os.path.splitext(os.path.basename(doc))
+            # if filname contains underscores, convert to / for nested URLs
+            url = '/%s/' % basename.replace('_', '/')
+            print 'url is ', url
             try:
-                fp = FlatPage.objects.get(url='/%s/' % basename)
+                fp = FlatPage.objects.get(url=url)
             except FlatPage.DoesNotExist:
                 # if somehow we have an html file that doesn't correspond
                 # to an existing flatpage, warn and skip
-                logger.warn('No flatpage found for "%s.html"', basename)
+                logger.warn('No flatpage found for "%s.html" (url)', basename)
+                # fp = FlatPage(url=url)
                 continue
 
             with open(doc) as html:
