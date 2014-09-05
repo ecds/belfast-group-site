@@ -7,8 +7,8 @@ from rdflib.collection import Collection as RdfCollection
 from belfast import rdfns
 from belfast.rdf.clean import normalize_whitespace
 
-# first-pass attempt to generate weighted network based on
-# type of rdf relation
+#: first-pass attempt to generate weighted network based on
+#: type of rdf relation
 connection_weights = {
     'sameAs': 10,
     'spouse': 9,
@@ -44,6 +44,8 @@ connection_weights = {
 
 
 class Rdf2Gexf(object):
+    '''Generate a :class:`networkx.MultiDiGraph` from an :class:`rdflib.rdf.Graph`
+    and output in GEXF format.'''
 
     # TODO: consider splitting out rdf -> nx logic from nx -> gexf
 
@@ -186,6 +188,10 @@ class Rdf2Gexf(object):
 
 
 class BelfastGroupGexf(object):
+    '''Generate a :class:`networkx.MultiDiGraph` for the Belfast Group in its
+    two time periods, based on information in the RDF dataset and the Group sheets,
+    and output in GEXF format.'''
+
     bg_label = 'Belfast Group'
     bg_periods = ['1963-1966', '1966-1972']
     bg_nodes = [

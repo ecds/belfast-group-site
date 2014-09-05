@@ -24,6 +24,18 @@ from belfast import rdfns
 logger = logging.getLogger(__name__)
 
 class HarvestRdf(object):
+    '''Harvest RDF data and add it to a local RDF datastore.
+
+    :params urls: list of urls to be harvested
+    :params output_dir: optional output directory for rdf files; deprecated
+    :params find_related: boolean flag, indicates whether related urls found
+        on any of the original list of urls should also be harvested
+    :param verbosity: verbosity level for output
+    :param format: RDF serialization format, if using output directory
+    :param graph: optional :class:`rdflib.graph.Graph`, if specified, harvested
+        data will be added to the existing graph with a new graph context for
+        each url
+    '''
 
     URL_QUEUE = set()  # use set to ensure we avoid duplication
     PROCESSED_URLS = set()
@@ -49,6 +61,7 @@ class HarvestRdf(object):
         self.process_urls()
 
     def process_urls(self):
+        '''Method to process urls; displays a progessbar if available & appropriate'''
         if (len(self.URL_QUEUE) >= 5 or self.find_related) \
            and ProgressBar and os.isatty(sys.stderr.fileno()):
             widgets = [Percentage(), ' (', SimpleProgress(), ')',
@@ -79,7 +92,9 @@ class HarvestRdf(object):
                    '' if self.errors == 1 else 's')
 
     def harvest_rdf(self, url):
+        '''Harvest RDF from a particular URL.
 
+        '''
         g = self.graph.get_context(url)
         if g and len(g):
             last_modified = g.value(g.identifier, rdfns.SCHEMA_ORG.dateModified)
@@ -218,6 +233,8 @@ class HarvestRdf(object):
                   (queued, 's' if queued != 1 else '')
 
     def filename_from_url(self, url):
+        '''Simple mechanism to generate a filename based on the harvested URL;
+        used when serializing RDF data to a local directory.'''
         # generate a filename based on the url (simple version)
         # NOTE: doesn't handle query string parameters, etc
         parsed_url = urlparse(url)
@@ -233,6 +250,9 @@ class HarvestRdf(object):
 
 
 class Annotate(object):
+    '''Annotate RDF data in the local graph by harvesting minimum required
+    information from other data souces, such as VIAF and DBpedia.'''
+
     # harvest only the bare minimum
     # for places, we need lat/long (and maybe authoritative name?)
     # for viaf people, we need dbpedia same as and possibly foaf names
@@ -253,6 +273,10 @@ class Annotate(object):
     geonames_id = re.compile('^http://[a-z]+.geonames.org/(?P<id>\d+)/?')
 
     def places(self):
+        '''Iterate over geonames identifiers in the local dataset and pull
+        needed information from geonames.org for those entities, including
+        latitude and longitude.'''
+
         # not sure what graph context makes the most sense, so grouping by source
         context = self.graph.get_context('http://geonames.org/')
         # FIXME: for geonames use ###/about.rdf instead?
@@ -325,6 +349,9 @@ class Annotate(object):
             progress.finish()
 
     def viaf_people(self):
+        '''Iterate over VIAF identifiers in the local dataset and pull
+        needed information from viaf.org for those entities, e.g. foaf:name.'''
+
         # not sure what graph context makes the most sense, so grouping by source
         context = self.graph.get_context('http://viaf.org/')
 
@@ -344,8 +371,8 @@ class Annotate(object):
             ''' % {'schema': rdfns.SCHEMA_ORG, 'rdf': rdflib.RDF,
                    'owl': rdflib.OWL, 'domain': self.current_site.domain}
         )
-        logger.info('Found %d VIAF person(s) in %s' % \
-                    (len(res), datetime.now() - start))
+        logger.info('Found %d VIAF person(s) in %s',
+                    len(res), datetime.now() - start)
 
         uris = [r['viaf'] for r in res]
 
@@ -384,12 +411,12 @@ class Annotate(object):
                     # NOTE: may need to restrict to names we know we need...
                 for n in names:
                     context.add((uri, rdfns.FOAF.name, n['name']))
-                    logger.debug('Adding name %s for %s' % (n['name'], uri))
+                    logger.debug('Adding name %s for %s',  n['name'], uri)
 
                 for obj in tmpgraph.objects(uri, rdflib.OWL.sameAs):
                     if 'dbpedia.org' in unicode(obj):
                         context.add((uri, rdflib.OWL.sameAs, obj))
-                        logger.debug('Adding %s sameAs %s' % (uri, obj))
+                        logger.debug('Adding %s sameAs %s', uri, obj)
 
             if progress:
                 processed += 1
@@ -400,6 +427,10 @@ class Annotate(object):
 
 
     def dbpedia_people(self):
+        '''Iterate over DBpedia identifiers in the local dataset and pull
+        needed information from DBpedia for those entities, particularly abstract
+        (description) and link to Wikipedia.'''
+
         # not sure what graph context makes the most sense, so grouping by source
         context = self.graph.get_context('http://dbpedia.org/')
 
@@ -422,8 +453,8 @@ class Annotate(object):
             ''' % {'schema': rdfns.SCHEMA_ORG, 'rdf': rdflib.RDF,
                    'owl': rdflib.OWL, 'domain': self.current_site.domain}
         )
-        logger.info('Found %d DBpedia person(s) in %s' % \
-                    (len(res), datetime.now() - start))
+        logger.info('Found %d DBpedia person(s) in %s',
+                    len(res), datetime.now() - start)
 
         uris = [unicode(r['dbp']).encode('ascii', 'ignore') for r in res]
 
@@ -446,7 +477,7 @@ class Annotate(object):
             try:
                 uriref = rdflib.URIRef(uri)
                 dbpedia_sparql.setQuery(u'DESCRIBE <%s>' % uriref)
-                logger.debug('describing %s' % uri)
+                logger.debug('describing %s', uri)
                 # NOTE: DESCRIBE <uri> is the simplest query that's
                 # close to what we want and returns a response that
                 # can be easily converted to an rdflib graph, but it generates
@@ -472,8 +503,7 @@ class Annotate(object):
                             obj = objects[0]
 
                         context.add((uriref, predicate, obj))
-                        logger.debug('Adding %s %s %s' % (uriref, predicate, obj))
-
+                        logger.debug('Adding %s %s %s', uriref, predicate, obj)
 
             except Exception as err:
                 print 'Error getting DBpedia data for %s : %s' % (uri, err)

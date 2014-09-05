@@ -32,7 +32,7 @@ Views
 
 
 People
------------
+------
 .. automodule:: belfast.people
     :members:
 
@@ -51,7 +51,7 @@ Views
 
 
 Network
------------
+-------
 .. automodule:: belfast.network
     :members:
 
@@ -66,14 +66,30 @@ Views
  	:members:
 
 
+RDF Namespaces
+--------------
+.. automodule:: belfast.rdfns
+    :members:
+
 RDF
------------
+---
 .. automodule:: belfast.rdf
     :members:
 
 rdfmap
 ^^^^^^
 .. automodule:: belfast.rdf.rdfmap
+    :members:
+
+data prep
+^^^^^^^^^
+.. automodule:: belfast.rdf.harvest
+    :members:
+.. automodule:: belfast.rdf.qub
+    :members:
+.. automodule:: belfast.rdf.clean
+    :members:
+.. automodule:: belfast.rdf.nx
     :members:
 
 Models

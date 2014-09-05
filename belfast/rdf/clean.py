@@ -11,6 +11,7 @@ import time
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
+from django.utils.functional import SimpleLazyObject
 from django.utils.text import slugify
 
 from belfast import rdfns
@@ -22,12 +23,17 @@ logger = logging.getLogger(__name__)
 
 
 def normalize_whitespace(s):
+    'utility method to normalize whitespace'
     # FIXME: if we want to use flags in python 2.6 needs to be compiled first
     return unicode(re.sub(r'\s+', u' ', s.strip(), flags=re.UNICODE | re.MULTILINE))
     # return unicode(re.sub(r'\s+', u' ', s.strip(), flags=re.UNICODE))
 
 
 class IdentifyGroupSheets(object):
+    '''Identify Belfast Group sheets in the RDF data, and label them with
+    a locally defined Group Sheet type, :attr:`belfast.rdfns.BG.GroupSheet`
+    so they can be identified quickly at run-time for display on the website.
+    '''
 
     total = 0
     def __init__(self, graph, verbosity=1):
@@ -115,11 +121,21 @@ class IdentifyGroupSheets(object):
 
         return found
 
-class SmushGroupSheets(object):
 
-    # base identifier for 'smushed' ids, based on configured site domain
-    BELFASTGROUPSHEET = rdflib.Namespace("http://%s/groupsheets/md5/" % \
-        Site.objects.get(id=settings.SITE_ID).domain)
+def get_local_domain():
+    return Site.objects.get(id=settings.SITE_ID).domain
+
+
+class SmushGroupSheets(object):
+    '''"Smush" Group sheets to de-dupe documents that are held in multiple
+    locations and group them into a single document.
+
+    Generates a local URI based on the author URI (if available) or name (if no
+    URI) and a slugified, sorted list of the titles in the document.
+    '''
+    #: base identifier for 'smushed' ids, based on configured site domain
+    BELFASTGROUPSHEET = SimpleLazyObject(lambda:
+        rdflib.Namespace("http://%s/groupsheets/md5/" % get_local_domain()))
 
     # dictionary of smushed ids by graph identifier, in order to guarantee
     # unique ids within a single graph and avoid smushing multiple, different
@@ -138,7 +154,7 @@ class SmushGroupSheets(object):
         # so that we don't collapse multiple untitled documents into a single doc
 
     def calculate_uri(self, uri, graph):
-        # calculate a 'smushed' uri for a single groupsheet
+        '''Calculate a 'smushed' uri for a single groupsheet'''
         titles = []
         title = graph.value(uri, rdfns.DC.title)
 
@@ -227,10 +243,10 @@ class SmushGroupSheets(object):
 
         # if not at least one title or title and author, skip this ms
         if not titles and not author:
-            logger.warn('No titles or author found for Group sheet %s' % uri)
+            logger.warn('No titles or author found for Group sheet %s', uri)
             return
 
-        logger.debug('author %s titles %s' % (author, titles))
+        logger.debug('author %s titles %s', author, titles)
 
         m = hashlib.md5()
         if author is None:
@@ -264,8 +280,10 @@ class SmushGroupSheets(object):
         return self.BELFASTGROUPSHEET[identifier]
 
     def process_graph(self, graph):
-        # build a dictionary of "smushed" URIs for belfast group sheets
-        # for this document
+        '''Process a single graph context and update the group sheet URIs in that
+        graph.  Builds a dictionary of "smushed" URIs for belfast group sheets
+        for this document so all tuples referring to the old document id can
+        be updated.'''
         new_uris = {}
 
         # smushing should be done after infer/identify group sheets
@@ -315,10 +333,14 @@ def smush(graph, urimap):
             graph.add((s, p, o))
 
 class Person(rdflib.resource.Resource):
-    # minimal person resource, for use in cleaning up person data
+    'minimal person resource, for use in cleaning up person data'
+    #: schema.org/name
     s_names = rdfmap.ValueList(rdfns.SCHEMA_ORG.name)
+    #: schema.org/givenName
     s_first_name = rdfmap.Value(rdfns.SCHEMA_ORG.givenName)
+    #: schema.org/familyName
     s_last_name = rdfmap.Value(rdfns.SCHEMA_ORG.familyName)
+    #: list of foaf:name
     f_names = rdfmap.ValueList(rdfns.FOAF.name)
 
 
@@ -403,6 +425,9 @@ class ProfileUris(object):
         return uri
 
     def belfast_group_people(self, graph):
+        '''Identify people associated with the Belfast Group and generate
+        local URIs for them so they can be quickly identified for display
+        on the website.'''
         # NOTE: if we adjust the script so inferred connections are added first
         # the second query alone would probably be sufficient
         # (adds affiliation rel for all groupsheet authors)
@@ -450,6 +475,9 @@ class ProfileUris(object):
 
     @staticmethod
     def convert_to_localprofile(graph, subject, full_graph, verbosity=1):
+        '''Convert a person URI to the new local person URI, updating all triples
+        that reference the old URI to use the new one.'''
+
         # takes context graph, person uri, full graph
         firstname, lastname = person_names(graph, subject)
         if firstname is None and lastname is None:
@@ -484,8 +512,8 @@ class ProfileUris(object):
         return uri
 
     def process_graph(self, graph):
-        # generate local URIs for people in the group, and make sure we have
-        # first and last names for everyone (where possible)
+        '''Process an rdf graph and generate local URIs for people in the group,
+        making sure there is a first and last names for each (where possible).'''
 
         # TODO: add more verbose output so it is easier to tell what is happening
         # and where things are going wrong when people get lost
@@ -546,6 +574,9 @@ class ProfileUris(object):
 
 
 class InferConnections(object):
+    '''Make inferences about the data and add explicit relations based on
+    implicit connections.'''
+
     first_period = {  # using cumulative dates for comparison
         'start': datetime.date(1963, 10, 1),
         'end': datetime.date(1966, 3, 30),
@@ -571,7 +602,7 @@ class InferConnections(object):
     # need to recognize dates in the following formats: YYYY, YYYY-MM-DD, or YYYY/YYYY
     # year_re = re.compile('^\d{4}$')
     # yearmonthday_re = re.compile('^(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})$')
-    date_re = re.compile('^(?P<year>\d{4})(-(?P<month>\d{2})-(?P<day>\d{2}))?(/(?P<year2>\d{4}))?$')
+    date_re = re.compile(r'^(?P<year>\d{4})(-(?P<month>\d{2})-(?P<day>\d{2}))?(/(?P<year2>\d{4}))?$')
 
 
     def __init__(self, graph):
@@ -582,8 +613,8 @@ class InferConnections(object):
             self.process_graph(ctx)
 
     def process_graph(self, graph):
-        # add direct relationships for authors of poems that mention other
-        # people, places, etc
+        '''Process a graph and add direct relationships for authors of poems
+        that mention other people, places, etc.'''
         self.writes_about(graph)
 
         ms = list(graph.subjects(predicate=rdflib.RDF.type, object=rdfns.BG.GroupSheet))
@@ -631,12 +662,12 @@ class InferConnections(object):
                     smush(self.full_graph, {r['person']: rdflib.URIRef(uri)})
 
     def time_period(self, ms, graph):
-        # determine whether a groupsheet is first or second period
-        # and store the corresponding dates for that period in the rdf
+        '''Determine whether a groupsheet is first or second period
+        and store the corresponding dates for that period in the RDF graph.
 
-        # if coverage is already present anywhere in the full graph
-        # (e.g., from TEI groupsheet or previous calculation),
-        # nothing needs to be done
+        If coverage is already present anywhere in the full graph
+        (e.g., from a TEI groupsheet or previous calculation),
+        nothing needs to be done.'''
         coverage = self.full_graph.value(ms, rdfns.DC.coverage)
         if coverage is not None:
             # a couple of TEI groupsheet dates need to be cleaned up
@@ -684,8 +715,9 @@ class InferConnections(object):
                       rdflib.Literal(self.second_period['coverage'])))
 
     def ownership(self, ms, graph):
-        # if possible, infer ownership of a manuscript based on the archival
-        # collection it came from
+        '''If possible, infer ownership of a manuscript based on the archival
+        collection it came from and add an owner relationship, for use in the
+        site network graphs.'''
         collection = list(self.full_graph.subjects(rdfns.SCHEMA_ORG.mentions, ms))
         for c in collection:
             types = list(self.full_graph.objects(c, rdflib.RDF.type))
@@ -714,6 +746,8 @@ class InferConnections(object):
                 graph.set((creator, rdfns.SCHEMA_ORG.owns, ms))
 
     def writes_about(self, graph):
+        '''Iterate over poems in the current graph and add an explicit relationship
+        between the poem's author and any entities mentioned in the poem.'''
         poems = list(graph.subjects(predicate=rdflib.RDF.type,
                      object=rdflib.URIRef('http://www.freebase.com/book/poem')))
 

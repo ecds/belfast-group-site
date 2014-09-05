@@ -8,6 +8,9 @@ from belfast import rdfns
 
 
 class QUB(object):
+    '''Generate RDF based on a local html file generated from the description of
+    the Hobsbaum collection of Belfast Group sheets from the archives at
+    Queen's University Belfast.'''
 
     # regex to grab names from description
     NAME_REGEX = re.compile(r'(?P<last>[A-Z][a-zA-Z]+), (?P<first>[A-Za-z. ]+)')  # include . for initials
@@ -17,6 +20,7 @@ class QUB(object):
     PAREN_REGEX = re.compile(r' ?\([^())]+\)')
     MULTIPLE_UNTITLED_REGEX = re.compile(r'\[(?P<note>\d untitled (poems|prose pieces))')
 
+    #: VIAF URIs for persons in the data with known identifiers
     NAME_URIS = {
         'Terry, Arthur': 'http://viaf.org/viaf/2490119',
         'Hobsbaum, Philip': 'http://viaf.org/viaf/91907300',
@@ -36,6 +40,7 @@ class QUB(object):
 
     # URI to PDF for Queen's description of their Belfast Group collection
     # FIXME: doesn't seem like the most stable of URIs...
+    #: url to the PDF document describing this collection at Queen's U Belfast
     QUB_BELFAST_COLLECTION = 'http://www.qub.ac.uk/directorates/InformationServices/TheLibrary/FileStore/Filetoupload,312673,en.pdf'
 
     # URIs not found for:
