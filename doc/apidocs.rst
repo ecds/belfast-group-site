@@ -23,7 +23,7 @@ Views
 Pages
 -----------
 .. automodule:: belfast.pages
-	:members:
+    :members:
 
 Views
 ^^^^^^
@@ -34,10 +34,13 @@ Views
 People
 -----------
 .. automodule:: belfast.people
-	:members:
+    :members:
 
 Models
 ^^^^^^
+
+.. automodule:: belfast.people.rdfmodels
+ 	:members:
 .. automodule:: belfast.people.models
  	:members:
 
@@ -50,7 +53,7 @@ Views
 Network
 -----------
 .. automodule:: belfast.network
-	:members:
+    :members:
 
 Utils
 ^^^^^^
@@ -66,7 +69,7 @@ Views
 RDF
 -----------
 .. automodule:: belfast.rdf
-	:members:
+    :members:
 
 rdfmap
 ^^^^^^

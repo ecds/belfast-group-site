@@ -17,7 +17,8 @@ logger = logging.getLogger(__name__)
 
 
 class RdfEntity(RdfResource):
-    # base class with common functionality for person, org
+    '''Base :class:`belftas.rdf.models.RdfResource` class with common
+    functionality for :class:`RdfPerson` and :class:`RdfOrganization`.'''
 
     _person_type = rdflib.resource.Resource
     _org_type = rdflib.resource.Resource
@@ -28,8 +29,14 @@ class RdfEntity(RdfResource):
         return unicode(self.identifier)
 
     def ego_graph(self, radius=1, types=None, min_degree=None):
-        'generate an undirected ego graph around the current person'
-        # TODO: options to specify distance
+        '''Generate an undirected ego graph around the current entity.
+
+        :param radius: radius or degree of the ego graph; defaults to 1
+        :param types: node types to be included in the graph (e.g., restrict
+            to people and organizations only)
+        :param min_degree: optionally filter nodes in the generated ego graph
+            by minimum degree
+        '''
         network = network_data()
         undirected_net = network.to_undirected()
 
@@ -133,11 +140,17 @@ class RdfEntity(RdfResource):
 
 
 class RdfLocation(RdfEntity):
+    '''RDF location'''
 
+    #: name
     name = rdfmap.Value(rdfns.SCHEMA_ORG.name)
+    #: geonames name
     geonames_name = rdfmap.Value(rdfns.GN.name)
+    #: dbpedia name
     dbpedia_name = rdfmap.Value(rdfns.DBPPROP.name)
+    #: latitude
     latitude = rdfmap.Value(rdfns.GEO.lat, rdflib.XSD.double)
+    #: longitude
     longitude = rdfmap.Value(rdfns.GEO.long, rdflib.XSD.double)
 
     # property to get preferred label value inherited from base rdf model class
@@ -153,19 +166,22 @@ class RdfLocation(RdfEntity):
 
     @property
     def texts(self):
-        # list of poems that mention this location
+        'list of poems that mention this location'
         return [RdfPoem(res.graph, res.identifier)
                 for res in self.mentioned_in
                 if rdfns.FREEBASE['book/poem'] in res.rdf_types]
 
     # current types of locations we support
+    #: list of persons who were born here
     born_here = rdfmap.ResourceList(rdfns.DBPEDIA_OWL.birthPlace, RdfEntity, is_object=False)
+    #: list of persons who worked here
     worked_here = rdfmap.ResourceList(rdfns.SCHEMA_ORG.workLocation, RdfEntity, is_object=False)
+    #: list of persons who resided here
     home_here = rdfmap.ResourceList(rdfns.SCHEMA_ORG.homeLocation, RdfEntity, is_object=False)
 
     @property
     def people(self):
-        # list of people connected to this location
+        '''List of :class:`RdfPerson` connected to this location.'''
         # NOTE: this seems clunky, but seems to be significantly faster than
         # getting the same data via sparql query
         return [RdfPerson(self.graph, r.identifier)
@@ -173,42 +189,51 @@ class RdfLocation(RdfEntity):
 
 
 class DBpediaEntity(RdfEntity):
+    '''Convenience object for a dbpedia resource'''
 
+    #: description (owl:abstract)
     description = rdfmap.Value(rdfns.DBPEDIA_OWL.abstract)     # FIXME: how to specify language?
+    #: wikipedia url (via foaf:isPrimaryTopicOf)
     wikipedia_url = rdfmap.Value(rdfns.FOAF.isPrimaryTopicOf)
+    #: thumbnail image (owl:thumbnail)
     thumbnail = rdfmap.Value(rdfns.DBPEDIA_OWL.thumbnail)
 
 
 class RdfOrganization(RdfEntity):
-    # specify expected rdf type?
-    # inherits standard name property
+    ''':class:`RdfEntity` for an organization.'''
 
     # FIXME: copied from rdfperson; move somewhere common
+    #: list of other URIs that are equilvaent to this one
     same_as = rdfmap.ValueList(rdflib.OWL.sameAs, transitive=True)
 
     @property
     def viaf_uri(self):
+        'VIAF URi for this organization'
         for uri in self.same_as:
             if 'viaf.org' in uri:
                 return uri
 
     @property
     def dbpedia_uri(self):
+        'DBpedia URI for this organization'
         for uri in self.same_as:
             if 'dbpedia.org' in uri:
                 return uri
 
     @property
     def dbpedia(self):
+        ':class:`DBpediaEntity` for this organization'
         if self.dbpedia_uri is not None:
             return DBpediaEntity(self.graph, self.dbpedia_uri)
 
 
 class RdfPerson(RdfEntity):
+    ''':class:`RdfEntity` for a person.'''
     _org_type = RdfOrganization
 
     @property
     def slug(self):
+        'slug identifier used for persons with local profiles'
         # all persons with profiles should have local, slug-based uris
         return self.identifier.strip('/').split('/')[-1]
 
@@ -221,16 +246,20 @@ class RdfPerson(RdfEntity):
 
     @property
     def local_uri(self):
+        'local site URI for the person'
         return str(self.identifier).startswith('http://%s' % self.current_site.domain)
 
     # NOTE: group sheet authors and other people with profiles on this site
     # should have first/last names added to the rdf data by the dataprep process
 
+    #: last name (schema.org/familyName)
     lastname = rdfmap.Value(rdfns.SCHEMA_ORG.familyName)
+    #: first name (schema.org/givenName)
     firstname = rdfmap.Value(rdfns.SCHEMA_ORG.givenName)
 
     @property
     def fullname(self):
+        'fullname (constructed from first and last names if available)'
         if self.lastname and self.firstname:
             return '%s %s' % (self.firstname, self.lastname)
         elif self.value(rdfns.FOAF.name):
@@ -238,34 +267,42 @@ class RdfPerson(RdfEntity):
         else:
             return self.name
 
+    #: list of other URIs equivalent to the current entity, via owl:sameAs
     same_as = rdfmap.ValueList(rdflib.OWL.sameAs, transitive=True)
 
     @property
     def dbpedia_uri(self):
+        'dbpedia URI'
         for uri in self.same_as:
             if 'dbpedia.org' in uri:
                 return uri
 
     @property
     def dbpedia(self):
+        ':class:`DBpediaEntity` for this resource'
         if self.dbpedia_uri is not None:
             return DBpediaEntity(self.graph, self.dbpedia_uri)
 
     @property
     def viaf_uri(self):
+        'VIAF URI'
         for uri in self.same_as:
             if 'viaf.org' in uri:
                 return uri
 
+    #: birth date
     birthdate = rdfmap.Value(rdfns.SCHEMA_ORG.birthDate)
+    #: birth place
     birthplace = rdfmap.Resource(rdfns.DBPEDIA_OWL.birthPlace, RdfLocation)
-
+    #: list of occupations
     occupation = rdfmap.ValueList(rdfns.SCHEMA_ORG.jobTitle)
+    #: description
     description = rdfmap.Value(rdfns.SCHEMA_ORG.description)
 
     @property
     def description_context(self):
-        # find the identifier for the document where the description of this
+        '''Description context - identifier for the document where the
+        description of this person comes from.'''
         # person comes from
         # NOTE: Using triples here because description text doesn't match (loses lang?)
         triples = list(self.graph.triples((self.identifier, rdfns.SCHEMA_ORG.description, None)))
@@ -292,16 +329,20 @@ class RdfPerson(RdfEntity):
 
     @property
     def desc_context_name(self):
+        'Name or label of the :attr:`description_context` source'
         # for some reason, context uri is coming through as a literal instead;
         # perhaps because it is being found via isPartOf rel?
         desc_context = rdflib.URIRef(self.description_context)
         return self.graph.value(desc_context, rdfns.SCHEMA_ORG.name)
 
+    #: list of work locations
     work_locations = rdfmap.ResourceList(rdfns.SCHEMA_ORG.workLocation, RdfLocation)
+    #: list of home locations
     home_locations = rdfmap.ResourceList(rdfns.SCHEMA_ORG.homeLocation, RdfLocation)
 
     @property
     def locations(self):
+        'all locations (work and home)'
         return self.work_locations + self.home_locations
 
     @property
@@ -313,10 +354,12 @@ class RdfPerson(RdfEntity):
 
     # TODO: need access to groupsheets by this person
 
+    #: list of documents authored by this person
     documents = rdfmap.ResourceList(rdfns.DC.creator, RdfResource, is_object=False)
 
     @property
     def groupsheets(self):
+        # list of Group sheets by this person
         return [d for d in self.documents if rdfns.BG.GroupSheet in d.rdf_types]
 
     @cached_property
@@ -331,7 +374,10 @@ class RdfPerson(RdfEntity):
 
 
 class RdfPoem(RdfEntity):
+    ':class:`RdfEntity` for a single poem'
+    #: author
     author = rdfmap.Resource(rdfns.SCHEMA_ORG.author, RdfPerson)
+    #: title
     title = rdfmap.Value(rdfns.SCHEMA_ORG.name, normalize=True)
 
 # FIXME! this is a hack; find a better way to do this...
@@ -344,10 +390,13 @@ RdfPerson._person_type = RdfPerson
 #BelfastGroup = RdfOrganization(rdf_data(), rdfns.BELFAST_GROUP_URIREF)
 
 def BelfastGroup():
-  return RdfOrganization(rdf_data(), rdfns.BELFAST_GROUP_URIREF)
+    '''Convenience method to initalize and return an :class:`RdfOrganization`
+    for the Belfast Group'''
+    return RdfOrganization(rdf_data(), rdfns.BELFAST_GROUP_URIREF)
 
 
 def profile_people():
+    'Generate a list of :class:`RdfPerson` with profiles on the site.'
     g = rdf_data()
     start = time.time()
     current_site = Site.objects.get(id=settings.SITE_ID)
@@ -375,6 +424,7 @@ def profile_people():
 
 
 def find_places():
+    'Generate a list of :class:`RdfLocation` associated with Belfast Group people.'
     g = rdf_data()
     return [RdfLocation(g, subj) for subj in g.subjects(predicate=rdflib.RDF.type,
                                                        object=rdfns.SCHEMA_ORG.Place)]

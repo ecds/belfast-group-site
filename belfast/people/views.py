@@ -28,15 +28,10 @@ def rdf_nx_lastmod(request, *args, **kwargs):
 
 # @last_modified(rdf_lastmod)  # for now, list is based on rdf
 def list(request):
-    # display a list of people one remove from belfast group
+    'Display a list of people one remove from the Belfast Group.'
     people = profile_people()
     # filter to only people with a description
     people = [p for p in people if p.has_profile]
-    # find profile pictures
-    # pictures = ProfilePicture.objects.filter(person_uri__in=[p.identifier for p in people])
-    # pics = dict([(p.person_uri, p) for p in pictures])
-    # # make a list of tuples: rdf person, corresponding profile pic if any
-    # people_pics = [(p, pics.get(str(p.identifier), None)) for p in people]
 
     return render(request, 'people/list.html',
                   {'people': people})
@@ -44,6 +39,7 @@ def list(request):
 
 # @last_modified(rdf_nx_lastmod)  # uses both rdf and gexf
 def profile(request, id):
+    'Display a profile page for a single person associated with the Belfast Group.'
     uri = local_uri(reverse('people:profile', args=[id]), request)
     g = rdf_data()
     uriref = rdflib.URIRef(uri)
@@ -61,14 +57,14 @@ def profile(request, id):
 
 # @last_modified(rdf_nx_lastmod)  # uses both rdf and gexf
 def egograph_js(request, id):
+    'Egograph information as JSON for a single person.'
     uri = local_uri(reverse('people:profile', args=[id]), request)
     g = rdf_data()
     person = RdfPerson(g, rdflib.URIRef(uri))
-    # TODO: possibly make ego-graph radius a parameter in future
     graph = person.ego_graph(radius=1,
                              types=['Person', 'Organization', 'Place'])
     # annotate nodes in graph with degree
-        # FIXME: not a directional graph; in/out degree not available
+    #  NOTE: not a directional graph, so in/out degree not available
 
     graph = annotate_graph(graph, fields=['degree', 'in_degree', 'out_degree',
                                           'betweenness_centrality',
@@ -87,6 +83,12 @@ def egograph_js(request, id):
 #     return render(request, 'people/ego_graph.html', {'person': person})
 
 def egograph_node_info(request, id):
+    '''HTML snippet to provide information about a node in the egograph.
+    Intended to be loaded and displayed via AJAX.
+
+    Some overlap with :meth:`belfast.network.views.node_info`.
+    '''
+
     # id is the person to whom this node is connected
     uri = local_uri(reverse('people:profile', args=[id]), request)
     g = rdf_data()
