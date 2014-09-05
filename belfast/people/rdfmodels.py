@@ -97,12 +97,14 @@ class RdfEntity(RdfResource):
                     weight += data.get('weight', 1)  # assume default of 1 if not set
                     rels.add(data['label'])
 
+            if 'knows' in rels and 'correspondedWith' in rels:
+                rels.remove('knows')
+
             # connections[res] = {'rels': rels, 'weight': weight}
             connections[res] = (rels, weight)
 
         # sort by weight so strongest connections will be listed first
         conn =  sorted(connections.items(), key=lambda x: x[1][1], reverse=True)
-
         return conn
 
     @cached_property
@@ -113,8 +115,8 @@ class RdfEntity(RdfResource):
         cumulative weight of the connection, sorted by strongest connection.'''
         start = time.time()
         conn = self.connections(rdfns.SCHEMA_ORG.Person, self._person_type)
-        logger.debug('Found %d people in %.02f sec' % (len(conn),
-                     time.time() - start))
+        logger.debug('Found %d people in %.02f sec',
+                     len(conn), time.time() - start)
         return conn
 
     @cached_property
@@ -125,8 +127,8 @@ class RdfEntity(RdfResource):
         sorted by strongest connection.'''
         start = time.time()
         conn = self.connections(rdfns.SCHEMA_ORG.Organization, self._org_type)
-        logger.debug('Found %d organizations in %.02f sec' % (len(conn),
-                     time.time() - start))
+        logger.debug('Found %d organizations in %.02f sec',
+                     len(conn), time.time() - start)
         return conn
 
 
