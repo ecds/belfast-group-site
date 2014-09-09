@@ -134,8 +134,7 @@ class SmushGroupSheets(object):
     URI) and a slugified, sorted list of the titles in the document.
     '''
     #: base identifier for 'smushed' ids, based on configured site domain
-    BELFASTGROUPSHEET = SimpleLazyObject(lambda:
-        rdflib.Namespace("http://%s/groupsheets/md5/" % get_local_domain()))
+    BELFASTGROUPSHEET = rdflib.Namespace("http://%s/groupsheets/md5/" % get_local_domain())
 
     # dictionary of smushed ids by graph identifier, in order to guarantee
     # unique ids within a single graph and avoid smushing multiple, different
@@ -165,8 +164,8 @@ class SmushGroupSheets(object):
                 normalized_title = normalize_whitespace(title)
                 # if normalized title is different, update value in graph
                 if unicode(title) != normalized_title:
-                    logger.debug('Replacing title "%s" with normalized version "%s"' \
-                                 % (title, normalized_title))
+                    logger.debug('Replacing title "%s" with normalized version "%s"',
+                                 title, normalized_title)
                     graph.set((uri, rdfns.DC.title, rdflib.Literal(normalized_title)))
                 titles.append(normalize_whitespace(title))
 
@@ -180,8 +179,8 @@ class SmushGroupSheets(object):
                 for t in title_collection:
                     normalized_title = normalize_whitespace(t)
                     if unicode(t) != normalized_title:
-                        logger.debug('Replacing title "%s" with normalized version "%s"' \
-                                 % (t, normalized_title))
+                        logger.debug('Replacing title "%s" with normalized version "%s"',
+                                     t, normalized_title)
 
                         # NOTE: AFAICT, it should be possible to update the value
                         # via collection, something like this:
@@ -196,6 +195,13 @@ class SmushGroupSheets(object):
                         graph.set((s, p, rdflib.Literal(normalized_title)))
 
                     titles.append(normalized_title)
+
+        # special case: incomplete group sheet doesn't de-dupe as it ought to
+        # beacause the data is incomplete; fill in titles so it will de-dupe properly
+        if "Grass Widow [cont'd]" in titles:
+            titles = [u"Wind and Tree", u"Hedges in Winter", u"Cuckoo Corn",
+                u"Siesta", u"Vampire", u"Grass Widow", u"The Indians on Alcatraz",
+                u"The Electric Orchard"]
 
         # ignore title order for the purposes of de-duping
         # - sort titles so we can get a consistent MD5
@@ -448,8 +454,8 @@ class ProfileUris(object):
         start = time.time()
         res = graph.query(query)
         if res:
-            logger.debug('Found %d group sheets author(s) in %.02f sec' % (len(res),
-                time.time() - start))
+            logger.debug('Found %d group sheets author(s) in %.02f sec', len(res),
+                time.time() - start)
         people = set([r['author'] for r in res])
 
         start = time.time()
@@ -467,8 +473,8 @@ class ProfileUris(object):
                     'local_domain': self.current_site.domain}
         res = graph.query(query)
         if res:
-            logger.debug('Found %d people connected to the Belfast Group in %.02f sec' % (len(res),
-                time.time() - start))
+            logger.debug('Found %d people connected to the Belfast Group in %.02f sec',
+                        len(res), time.time() - start)
         people |= set([r['person'] for r in res])
 
         return people
