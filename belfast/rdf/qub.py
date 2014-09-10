@@ -116,6 +116,11 @@ class QUB(object):
             g.add((coll, rdfns.SCHEMA_ORG.mentions, msnode))
             g.add((msnode, rdflib.RDF.type, rdfns.BIBO.Manuscript))
             g.add((msnode, rdflib.RDF.type, rdfns.BG.GroupSheet))
+
+            # explicitly set Hobsbaum as owner of all these manuscripts
+            g.add((rdflib.URIRef(self.NAME_URIS['Hobsbaum, Philip']),
+                  rdfns.SCHEMA_ORG.owns, msnode))
+
             ms_total += 1
 
             content = list(div.stripped_strings)
