@@ -118,6 +118,10 @@ def format_node(node, escape):
     # fall-back value for any unsupported tags that do not get converted
     start, end = '', ''
 
+    # TEMPORARY: skip publication notes for now
+    if node.tag == '{%s}note' % TEI_NAMESPACE and node.get('type') == 'pub':
+        return ''
+
     # simple tags that can be converted to html markup
     if node.tag in simple_tags.keys():
         start, end = simple_tags[node.tag]
