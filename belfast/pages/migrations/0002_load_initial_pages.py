@@ -26,7 +26,6 @@ class Migration(DataMigration):
             basename, ext = os.path.splitext(os.path.basename(doc))
             # if filname contains underscores, convert to / for nested URLs
             url = '/%s/' % basename.replace('_', '/')
-            print 'url is ', url
             try:
                 fp = FlatPage.objects.get(url=url)
             except FlatPage.DoesNotExist:
