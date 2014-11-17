@@ -9,7 +9,7 @@ import time
 from belfast import rdfns
 from belfast.rdf import rdfmap
 from belfast.rdf.models import RdfResource
-from belfast.util import rdf_data
+from belfast.util import rdf_data, cached_property
 from belfast.people.rdfmodels import RdfPerson
 
 
@@ -143,12 +143,14 @@ class TeiGroupSheet(XmlModel):
             if a.id == self.id:
                 return a.value
 
-    @property
+    @cached_property
     def multi_author(self):
         '''boolean indicating if this groupsheet includes content by
         multiple authors'''
+        # use > 1 so that groupsheet without any bylines is not detected
+        # as being multi-author
         return len(set([p.byline for p in self.poems
-                       if p.byline is not None])) != 1
+                       if p.byline is not None])) > 1
 
     # TODO: it would be nice if this were a little easier to access
     # or generate; xmlmap dictfield might get part way there..
