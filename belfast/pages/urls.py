@@ -9,4 +9,6 @@ urlpatterns = patterns('',
         name='bios'),
     url(r'^credits/$', fpviews.flatpage, {'url': '/credits/'},
         name='credits'),
+    url(r'^network/about/$', fpviews.flatpage, {'url': '/network/about/'},
+        name='network-about'),
 )
