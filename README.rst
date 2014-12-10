@@ -21,9 +21,12 @@ Major dependencies include Django_, rdflib_, and networkx_.
 License
 -------
 The code for the
-`Belfast Group Poetry|*Networks* <http://belfastgroup.digitalscholarship.emory.edu>`_
+`Belfast Group Poetry|Networks`_
 site is distributed under the
-`Apache 2.0 License <http://www.apache.org/licenses/LICENSE-2.0>`_.
+`Apache 2.0 License`_.
+
+.. _Belfast Group Poetry|Networks: http://belfastgroup.digitalscholarship.emory.edu
+.. _Apache 2.0 License: http://www.apache.org/licenses/LICENSE-2.0
 
 Components
 ----------
