@@ -361,8 +361,9 @@ function ForceGraph(config) {
     labels: false,
     nodesize: 5,
     curved_paths: false,
-    gravity: 0.5,
+    gravity: 1,
     link_distance: 100,
+    link_weight_adjustment: 1,
     charge: -1000,
     node_info: '#node-info',
     node_info_url: ''
@@ -446,10 +447,10 @@ function init_graph(json) {
 
   var path = vis.selectAll("path")
       .data(json.links)
-    .enter().append("svg:path")
+      .enter().append("svg:path")
       .attr("class", "link")
       // line width based on weight of the connection
-      .style("stroke-width", function(d) { return Math.sqrt(d.weight || 1); })
+      .style("stroke-width", function(d) { return Math.sqrt(d.weight || 1) * options.link_weight_adjustment; })
       .attr('source', function(d) { return d.source.id; })
       .attr('target', function(d) { return d.target.id; })
       .attr("d", function(d) {
