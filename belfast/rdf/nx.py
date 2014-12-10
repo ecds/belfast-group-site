@@ -240,12 +240,12 @@ class BelfastGroupGexf(object):
                         label=name,
                         type='Person')
                 # increase connection weight by one for each groupsheet
-                self.edge_weights[(author_id, bg_period)] += 0.2
+                self.edge_weights[(author_id, bg_period)] += 0.4
 
                 # make connection between co-authors
                 if len(authors) > (i + 1):
                     for co_author in authors[i+1:]:
-                        self.edge_weights[(author_id, str(co_author))] += 0.1
+                        self.edge_weights[(author_id, str(co_author))] += 0.2
 
             # groupsheet owners are also associated with the group of the same period
             # and the groupsheet authors
@@ -268,15 +268,15 @@ class BelfastGroupGexf(object):
                         label=name,
                         type='Person')
                 # increase connection weight by one for each groupsheet
-                self.edge_weights[(owner_id, bg_period)] += 0.1
+                self.edge_weights[(owner_id, bg_period)] += 0.2
 
                 # connected to groupsheet authors
                 for auth in authors:
-                    self.edge_weights[(owner_id, str(auth))] += 0.1
+                    self.edge_weights[(owner_id, str(auth))] += 0.2
                 # connected to other groupsheet owners
                 if len(owners) > (i + 1):
                     for co_owner in owners[i+1:]:
-                        self.edge_weights[(owner_id, str(co_owner))] += 0.1
+                        self.edge_weights[(owner_id, str(co_owner))] += 0.2
 
 
         # convert dict into list of tuple that can be easily added to the network graph
