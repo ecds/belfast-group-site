@@ -45,6 +45,9 @@
         node_info_url: "{% url 'network:node-info' %}",
         gravity: 0.7,
         link_distance: 75,
+        {% if mode == 'groupsheet-model' %}
+        link_weight_adjustment: 3,
+        {% endif %}
       }
     });
    </script>
