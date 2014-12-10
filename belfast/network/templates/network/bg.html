@@ -15,6 +15,14 @@
   {% include "flatpages/snippets/flatpage_content.html" %}
 {% endif %}
 
+{% if mode == 'egograph' %}
+  {% url 'network:gexf' mode='group-people' as gexf_url %}
+{% else %}
+  {% url 'network:gexf' mode='groupsheets' as gexf_url %}
+{% endif %}
+<p>Download <a href="{{ gexf_url }}">network data for this graph as GEXF</a>.</p>
+
+
 {% include 'network/snippets/graph_with_controls.html' %}
 
 
@@ -35,7 +43,7 @@
         degree_toggles: [1, 2],    // enable toggling between one- and two- degree egographs
         {% endif %}
         node_info_url: "{% url 'network:node-info' %}",
-        gravity: 0.2,
+        gravity: 0.7,
         link_distance: 75,
       }
     });

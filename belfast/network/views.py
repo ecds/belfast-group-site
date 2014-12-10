@@ -17,7 +17,7 @@ from belfast.util import network_data, rdf_data,  \
 from belfast.rdfns import BELFAST_GROUP_URI
 from belfast.groupsheets.rdfmodels import RdfGroupSheet
 from belfast.people.rdfmodels import RdfOrganization, RdfPerson, find_places
-from belfast.network.util import annotate_graph, filter_graph
+from belfast.network.util import annotate_graph
 
 
 logger = logging.getLogger(__name__)
@@ -139,6 +139,27 @@ def full_gexf(request):
     gexf.write_gexf(graph, buf)
     response = HttpResponse(buf.getvalue(), content_type='application/gexf+xml')
     response['Content-Disposition'] = 'attachment; filename=belfastgroup.gexf'
+    return response
+
+
+@last_modified(rdf_nx_lastmod)
+def gexf_content(request, mode):
+    '''Make network data available as GEXF files for download and use in
+    tools like Gephi.'''
+    if mode == 'all':
+        graph = network_data()
+    elif mode == 'group-people':
+        # filtered graph of people/places/organizations used for
+        # first BG network graph displayed on the site
+        # - same data used in :meth:`full_js`
+        graph = _network_graph()
+    elif mode == 'groupsheets':
+        graph = gexf.read_gexf(settings.GEXF_DATA['bg1'])
+
+    buf = StringIO()
+    gexf.write_gexf(graph, buf)
+    response = HttpResponse(buf.getvalue(), content_type='application/gexf+xml')
+    response['Content-Disposition'] = 'attachment; filename=belfastgroup-%s.gexf' % mode
     return response
 
 

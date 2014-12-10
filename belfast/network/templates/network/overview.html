@@ -60,9 +60,13 @@
       </div>
     </div>
   </div>
-  
+
   {% include "flatpages/snippets/flatpage_content.html" %}
-  
+
+{% url 'network:gexf' mode='all' as gexf_url %}
+<p>Download our <a href="{{ gexf_url }}">network data as GEXF</a>.</p>
+
+
 {% endblock %}
 
 
