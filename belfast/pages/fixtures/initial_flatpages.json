@@ -133,5 +133,20 @@
     "content": "<p>information about data harvesting/processing</p>",
     "enable_comments": false
   }
+},
+{
+  "pk": 10,
+  "model": "flatpages.flatpage",
+  "fields": {
+    "registration_required": false,
+    "title": "Essays",
+    "url": "/essays/",
+    "template_name": "pages/overview.html",
+    "sites": [
+      1
+    ],
+    "content": "<p>place-holder content</p>",
+    "enable_comments": false
+  }
 }
 ]

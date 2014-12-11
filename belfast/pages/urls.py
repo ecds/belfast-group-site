@@ -11,4 +11,6 @@ urlpatterns = patterns('',
         name='credits'),
     url(r'^network/about/$', fpviews.flatpage, {'url': '/network/about/'},
         name='network-about'),
+    url(r'^essays/$', fpviews.flatpage, {'url': '/essays/'},
+        name='essays'),
 )

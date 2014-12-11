@@ -62,6 +62,8 @@ by default; use page_rdf_type to override with a webpage subclass.
           <li><a {% if request.path = people_list %} class="current"{% endif %} href="{{ people_list }}">Bios</a></li>
           {% url 'network:overview' as network_url %}
           <li><a {% if request.path = network_url %} class="current"{% endif %} href="{{ network_url }}">Networks &amp; Maps</a></li>
+          {% url 'essays' as essay_url %}
+          <li><a {% if request.path = essay_url %} class="current"{% endif %} href="{{ essay_url }}">Essays</a></li>
           {% url 'credits' as credits_url %}
           <li><a {% if request.path = credits_url %} class="current"{% endif %} href="{{ credits_url }}">Credits</a></li>
           {% if user.is_authenticated and user.is_staff %}
