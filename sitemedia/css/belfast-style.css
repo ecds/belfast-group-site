@@ -157,7 +157,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     padding-top: 15px;
     padding-bottom: 15px;
   }
-  
+
   .navbar-white .nav > li:before{
     content: '|';
     float: left;
@@ -165,14 +165,14 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     position: absolute;
     padding-top: 15px;
   }
-  
+
   .navbar-white .nav > li:first-child:before{
     content: '';
   }
   .section .lead {
     font-size: 16px;
   }
-  
+
   .navbar-nav .search{
     margin-right: -35px;
   }
@@ -401,7 +401,7 @@ footer {
 /* RESPONSIVE CSS */
 
 @media (max-width: 1200px) {
-  
+
   .headline > .container > h1 {font-size: 140px;}
   .headline > .container > h2 {font-size: 63px;}
   .section-divider {margin: 50px 0;}
@@ -409,11 +409,11 @@ footer {
   .section-image.pull-right {margin-left: 20px;}
   .section-heading {font-size: 33px;}
   .section .lead{font-size: 16px;}
-  
+
 }
 
 @media (max-width: 991px) {
-  
+
   .headline > .container > h1 {font-size: 105px;}
   .headline > .container > h2 {font-size: 50px;}
   .section-divider {margin: 40px 0;}
@@ -422,15 +422,15 @@ footer {
   .section-image.pull-right {margin-left: 10px;}
   .section-heading {font-size: 30px;}
   .section .lead{font-size: 13px;}
-  
+
 }
 
 @media (max-width: 768px) {
-  
+
   .container {margin: 0 15px;}
   .section-divider {margin: 40px 0;}
   .section-heading {font-size: 25px;}
-  
+
   body{
     padding-top: 0px;
   }
@@ -441,28 +441,28 @@ footer {
 
 
 @media (max-width: 668px) {
-  
+
   .headline > .container > h1 {font-size: 70px;}
   .headline > .container > h2 {font-size: 32px;}
   .section-divider {margin: 30px 0;}
-  
+
 }
 
 @media (max-width: 640px) {
-  
+
   .headline {padding: 75px 0 25px 0;}
   .headline > .container > h1 {font-size: 60px;}
   .headline > .container > h2 {font-size: 30px;}
-  
+
 }
 
 @media (max-width: 375px) {
-  
+
   .section-divider {margin: 10px 0;}
   .section-image {max-width: 100%;}
   .section-image.pull-left {margin-right: 0; margin-bottom: 10px;}
   .section-image.pull-right {margin-left: 0; margin-bottom: 10px;}
-  
+
 }
 
 
@@ -479,7 +479,7 @@ footer {
     float: right;
     width: 50%;
   }
-  
+
   .list-label{
     width:100%;
     padding-left:5px;
@@ -501,7 +501,7 @@ footer {
     background-color: #EAEEF5;
     border-radius: 7px;
   }
-  
+
   .sidenav.affix li.active a,
   .sidenav.affix-top li.active a{
     background-color: #EAEEF5;
@@ -524,7 +524,7 @@ footer {
     border-radius: 7px;
     color: #4A6F91;
   }
-  
+
 }
 
 
@@ -545,14 +545,14 @@ footer {
     display: none!important;
     height: 0!important;
   }
-  
+
   .navbar-toggle {
     display: block;
   }
   .container>.navbar-header, .container>.navbar-collapse {
     margin-right: 0;
     margin-left: 0;
-    
+
     width: 100%;
   }
   .nav>li>a {
@@ -572,7 +572,7 @@ footer {
   }
   .navbar-nav>li {
     float: none;
-    
+
   }
   .navbar-nav li.search form{
     width:80%;
@@ -581,7 +581,7 @@ footer {
   }
   .navbar-nav li.search form input{
     width:80%;
-    
+
   }
 }
 
@@ -620,23 +620,23 @@ footer {
 }
 
 @media(max-width:767px){
-  
+
   .toggle-section{
     display: inline-block;
   }
-  
+
   .sidebar ul{
     padding:0;
     margin-left:-5px;
     float: left;
     width: 100%;
   }
-  
+
   .sidebar ul.active-filters{
     border-bottom: 1px solid #DFDFDF;
     background: rgba(233, 233, 233, 0.63);
   }
-  
+
   .sidebar ul li {
     float: left;
     margin: 5px;
@@ -663,7 +663,7 @@ footer {
     float: left;
     width: 100%;
     clear: both;
-    
+
     padding: 10px 0;
     margin: 0;
   }
@@ -697,7 +697,7 @@ footer {
   background: -ms-linear-gradient(-45deg,  rgba(155,163,175,1) 0%,rgba(96,113,129,1) 100%); /* IE10+ */
   background: linear-gradient(135deg,  rgba(155,163,175,1) 0%,rgba(96,113,129,1) 100%); /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#9ba3af', endColorstr='#607181',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
-  
+
 }
 
 @media(min-width:500px){
@@ -705,7 +705,7 @@ footer {
     width:180px;
     white-space: nowrap;
   }
-  
+
 }
 
 #chart svg{
@@ -952,7 +952,7 @@ figure.thumbnail.text-center {
   }
   .lits{
     float: none;
-    
+
     margin: auto;
   }
 }
@@ -1018,9 +1018,9 @@ sup.note a {
 }
 
 /* highlight target reference or in-text note so it's easier to find */
-sup.note:target, ol.notes li:target a {
+sup.note:target, ol.notes li:target a:first-child {
   background-color: #FFF3DA;
 }
-sup.note:target a, .notes li:target a {
+sup.note:target a, .notes li:target a:first-child {
   color: gray;
 }
