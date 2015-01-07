@@ -43,7 +43,7 @@ urlpatterns = patterns(
         content_type='text/xml'), name='bg-ontology'),
     url(r'^robots\.txt$',
         TemplateView.as_view(template_name='robots.txt',
-        content_type='text/plan'), name='robots.txt'),
+        content_type='text/plain'), name='robots.txt'),
 )
 
 # xml sitemaps for search-engine discovery
