@@ -10,6 +10,7 @@ from networkx.readwrite import gexf
 from django.conf import settings
 from django.contrib.flatpages.models import FlatPage
 from django.contrib.sites.models import Site, get_current_site
+from django.db import connections
 
 
 logger = logging.getLogger(__name__)
@@ -19,17 +20,12 @@ logger = logging.getLogger(__name__)
 def normalize_whitespace(str):
     return re.sub(r'\s+', ' ', str.strip())
 
-_rdf_data = None
 
 def rdf_data():
-    global _rdf_data
-    # TODO: check if there is a way to open this read-only?
-    # only requires read access for normal site operation
-    if _rdf_data is None:
-        # method to get a copy of the conjunctive graph with rdf data for the site
-        _rdf_data = rdflib.ConjunctiveGraph('Sleepycat')
-        _rdf_data.open(settings.RDF_DATABASE)
-    return _rdf_data
+    # NOTE: this utility method is now a wrapper around django database code
+    # which will handle closing the rdf db, but keeping the utility method
+    # hee for backwards compatibility, and to avoid updating code throughout the app
+    return connections['rdf'].db_connection
 
 
 def local_uri(path, request=None):
