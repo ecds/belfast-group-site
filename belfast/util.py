@@ -10,7 +10,9 @@ from networkx.readwrite import gexf
 from django.conf import settings
 from django.contrib.flatpages.models import FlatPage
 from django.contrib.sites.models import Site, get_current_site
+from django.core.signals import request_finished
 from django.db import connections
+from django.dispatch import receiver
 
 
 logger = logging.getLogger(__name__)
@@ -26,6 +28,12 @@ def rdf_data():
     # which will handle closing the rdf db, but keeping the utility method
     # hee for backwards compatibility, and to avoid updating code throughout the app
     return connections['rdf'].db_connection
+
+
+@receiver(request_finished)
+def close_db_connection(sender, **kwargs):
+    # try to force rdf db connection to close when running under apache
+    connections['rdf'].db_connection.close()
 
 
 def local_uri(path, request=None):
