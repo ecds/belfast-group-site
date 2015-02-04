@@ -745,11 +745,11 @@ class InferConnections(object):
             if creator:
                 # NOTE: this identifier is most likely a VIAF URI;
                 # we probably want to use the local profile uri instead;
-                # consider usingsame-as rel to find?
+                # consider using same-as rel to find?
 
                 # using schema.org owns rel here - intended for product ownership,
                 # but seems to be close enough for our purposes
-                graph.set((creator, rdfns.SCHEMA_ORG.owns, ms))
+                graph.add((creator, rdfns.SCHEMA_ORG.owns, ms))
 
     def writes_about(self, graph):
         '''Iterate over poems in the current graph and add an explicit relationship
