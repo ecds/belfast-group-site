@@ -1,13 +1,11 @@
+import logging
+import rdflib
+from rdflib.store import NO_STORE, VALID_STORE
+
 from djangotoolbox.db.base import NonrelDatabaseFeatures, \
     NonrelDatabaseOperations, NonrelDatabaseWrapper, NonrelDatabaseClient, \
     NonrelDatabaseValidation, NonrelDatabaseIntrospection, \
     NonrelDatabaseCreation
-
-import rdflib
-from rdflib.store import NO_STORE, VALID_STORE
-
-import logging
-
 
 logger = logging.getLogger(__name__)
 
@@ -63,4 +61,3 @@ class DatabaseWrapper(NonrelDatabaseWrapper):
         if self.db_connection.store.is_open():
             logger.debug('closing Sleepycat RDF DB connection')
             self.db_connection.close()
-
