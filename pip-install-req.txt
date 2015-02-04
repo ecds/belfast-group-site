@@ -9,6 +9,7 @@ networkx>=1.9
 eulcommon
 html5lib
 progressbar
+djangotoolbox
 
 # Django Image Tools
 # if normal import doesn't work, get the package directly:
