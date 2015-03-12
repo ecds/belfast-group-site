@@ -24,6 +24,7 @@ class QUB(object):
     NAME_URIS = {
         'Terry, Arthur': 'http://viaf.org/viaf/2490119',
         'Hobsbaum, Philip': 'http://viaf.org/viaf/91907300',
+        'Hobsbaum, Hannah': 'http://viaf.org/viaf/311466624',
         'Heaney, Seamus': 'http://viaf.org/viaf/109557338',
         'Pakenham, John': 'http://viaf.org/viaf/40930958',
         'Bredin, Hugh T.': 'http://viaf.org/viaf/94376522',   # seems likely (lecturer at Queen's Univ. Belfast)
