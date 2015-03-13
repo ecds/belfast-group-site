@@ -413,8 +413,13 @@ class Annotate(object):
                     context.add((uri, rdfns.FOAF.name, n['name']))
                     logger.debug('Adding name %s for %s',  n['name'], uri)
 
-                for obj in tmpgraph.objects(uri, rdflib.OWL.sameAs):
+                # VIAF now using schema.org/sameAs instead of owl:sameAs
+                same_as = list(tmpgraph.objects(uri, rdflib.OWL.sameAs))
+                same_as.extend(list(tmpgraph.objects(uri, rdfns.SCHEMA_ORG.sameAs)))
+                for obj in same_as:
                     if 'dbpedia.org' in unicode(obj):
+                        # for convenience, use owl:sameAs locally, since
+                        # that is what the other code will be looking for
                         context.add((uri, rdflib.OWL.sameAs, obj))
                         logger.debug('Adding %s sameAs %s', uri, obj)
 
@@ -535,17 +540,6 @@ class HarvestRelated(object):
 
     def run(self):
         dbpedia_sparql = SPARQLWrapper.SPARQLWrapper("http://dbpedia.org/sparql")
-
-        # load all files into a single graph so we can query distinct
-        # g = rdflib.Graph()
-        # for infile in self.files:
-        #     basename, ext = os.path.splitext(infile)
-        #     fmt = ext.strip('.')
-        #     try:
-        #         g.parse(infile, format=fmt)
-        #     except Exception as err:
-        #         print "Error parsing '%s' as RDF -- %s" % (infile, err)
-        #         continue
 
         for name, url in self.sources:
             # find anything that is a subject or object and has a
