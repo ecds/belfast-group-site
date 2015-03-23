@@ -1052,16 +1052,4 @@ ol ol ol li {
   margin-left: 30px;
 }
 
-/*
-ol.numeric-decimals { counter-reset:section; list-style-type:none; }
-ol.numeric-decimals li { list-style-type:none; }
-ol.numeric-decimals li ol { counter-reset:subsection; }
-ol.numeric-decimals li:before{
-    counter-increment:section;
-    content:counter(section) ". ";/*content:"Section " counter(section) ". ";*/
-/*}
-ol.numeric-decimals li ul li:before {
-    counter-increment:subsection;
-    content:counter(section) "." counter(subsection) " ";
-}*/
 
