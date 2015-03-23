@@ -599,7 +599,7 @@ footer {
 @media(min-width:994px){
   .nav-list.sidenav.affix {
     position: fixed!important;
-    max-width: 30%;
+    max-width: 25%;
   }
   .nav-list.sidenav.affix.relative{
     position: relative!important;
