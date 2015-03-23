@@ -1024,3 +1024,44 @@ sup.note:target, ol.notes li:target a:first-child {
 sup.note:target a, .notes li:target a:first-child {
   color: gray;
 }
+
+ol {
+  counter-reset: item
+}
+ol li {
+  display: block;
+  text-indent: -20px;
+  margin-left: 20px;
+}
+ol li p {
+  text-indent: 0;
+}
+ol li:before {
+  font-weight: bold;
+  display: inline-block;
+  width: 20px;
+  content: counters(item, ".") ". "; counter-increment: item
+}
+
+ol ol ol li:before {
+  width: 30px;
+}
+
+ol ol ol li {
+  text-indent: -30px;
+  margin-left: 30px;
+}
+
+/*
+ol.numeric-decimals { counter-reset:section; list-style-type:none; }
+ol.numeric-decimals li { list-style-type:none; }
+ol.numeric-decimals li ol { counter-reset:subsection; }
+ol.numeric-decimals li:before{
+    counter-increment:section;
+    content:counter(section) ". ";/*content:"Section " counter(section) ". ";*/
+/*}
+ol.numeric-decimals li ul li:before {
+    counter-increment:subsection;
+    content:counter(section) "." counter(subsection) " ";
+}*/
+
