@@ -42,8 +42,9 @@ Initial setup
 * Log in to the Django admin site and configure the default **Site**
   to match the domain where the application is deployed.
 
-* Configure **RDF_DATABASE** and **GEXF_DATA** in ``localsettings.py``;
-  run manage command to harvest and prepare the RDF data for the site::
+* Configure your **rdf** database connection under **DATABASES** and set
+  **GEXF_DATA** in ``localsettings.py``; run manage command to harvest
+  and prepare the RDF data for the site::
 
     python manage.py prep_dataset
 
