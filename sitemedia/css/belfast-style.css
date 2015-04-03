@@ -597,9 +597,12 @@ footer {
 }
 
 @media(min-width:994px){
+  .nav-list.sidenav.affix-top {
+    max-width: 245px;
+  }
   .nav-list.sidenav.affix {
     position: fixed!important;
-    max-width: 25%;
+    max-width: 245px;
   }
   .nav-list.sidenav.affix.relative{
     position: relative!important;
