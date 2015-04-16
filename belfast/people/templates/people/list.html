@@ -17,7 +17,8 @@
           {% if person.picture %}
           <a href="{{ person }}">
             <figure>
-              <img src="{{ person.picture.image.get__thumbnail }}" alt="{{ person.picture.image.alt_text }}">
+              <img src="{{ person.picture.image.get__thumbnail }}" alt="{{ person.picture.image.alt_text }}"
+                 title="{{ person.picture.image.title }}">
             </figure>
           </a>
           {% endif %}
