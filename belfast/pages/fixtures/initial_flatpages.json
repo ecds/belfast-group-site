@@ -148,5 +148,20 @@
     "content": "<p>place-holder content</p>",
     "enable_comments": false
   }
+},
+{
+  "pk": 11,
+  "model": "flatpages.flatpage",
+  "fields": {
+    "registration_required": false,
+    "title": "Group Sheet Dates",
+    "url": "/groupsheet/dates/",
+    "template_name": "",
+    "sites": [
+      1
+    ],
+    "content": "<p>place-holder content</p>",
+    "enable_comments": false
+  }
 }
 ]
