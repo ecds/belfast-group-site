@@ -155,7 +155,7 @@
   "fields": {
     "registration_required": false,
     "title": "Group Sheet Dates",
-    "url": "/groupsheet/dates/",
+    "url": "/groupsheets/dates/",
     "template_name": "",
     "sites": [
       1
