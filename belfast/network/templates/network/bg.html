@@ -15,16 +15,7 @@
   {% include "flatpages/snippets/flatpage_content.html" %}
 {% endif %}
 
-{% if mode == 'egograph' %}
-  {% url 'network:gexf' mode='group-people' as gexf_url %}
-{% else %}
-  {% url 'network:gexf' mode='groupsheets' as gexf_url %}
-{% endif %}
-<p>Download <a href="{{ gexf_url }}">network data for this graph as GEXF</a>.</p>
-
-
 {% include 'network/snippets/graph_with_controls.html' %}
-
 
   <script src="{% static 'js/d3.min.js' %}" charset="utf-8"></script>
   <link type="text/css" href="{% static 'css/d3.force.css' %}" rel="stylesheet" media="screen"/>
