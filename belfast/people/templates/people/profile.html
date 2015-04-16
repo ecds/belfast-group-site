@@ -27,8 +27,8 @@
             {% endif %}
           <figure typeof="schema:ImageObject" class="thumbnail text-center">
               <h4 property="schema:caption">{{ pic.title }}</h4>
-              <img src="{{ pic.image.get__profile }}"
-              property="schema:contentUrl"/>
+              <img src="{{ pic.image.get__profile }}" alt="{{ pic.image.alt_text }}" title="{{ pic.image.title }}"
+                property="schema:contentUrl"/>
               <figcaption class="caption">
                 <ul class="list-inline small">
                   {% if pic.date %}<li property="schema:dateCreated">{{ pic.date }}</li>{% endif %}
