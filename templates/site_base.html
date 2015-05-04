@@ -59,7 +59,7 @@ by default; use page_rdf_type to override with a webpage subclass.
           <li><a {% if request.path = groupsheet_list %} class="current"{% endif %} href="{{ groupsheet_list }}">Group Sheets</a></li>
           {# FIXME: use people list or bios here? #}
           {% url 'people:list' as people_list %}
-          <li><a {% if request.path = people_list %} class="current"{% endif %} href="{{ people_list }}">Bios</a></li>
+          <li><a {% if request.path = people_list %} class="current"{% endif %} href="{{ people_list }}">People</a></li>
           {% url 'network:overview' as network_url %}
           <li><a {% if request.path = network_url %} class="current"{% endif %} href="{{ network_url }}">Networks &amp; Maps</a></li>
           {% url 'essays' as essay_url %}
