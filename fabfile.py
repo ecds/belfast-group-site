@@ -22,16 +22,16 @@ def all_deps():
     if os.path.exists('pip-local-req.txt'):
         local('pip install -r pip-local-req.txt')
 
-
+@task
 def test():
     '''Locally run all tests.'''
     if os.path.exists('test-results'):
         shutil.rmtree('test-results')
 
-    local('python manage.py test --with-coverage --cover-package=%(project)s --cover-xml --with-xunit' \
+    local('python manage.py test --noinput --with-coverage --cover-package=%(project)s --cover-xml --with-xunit' \
         % env)
 
-
+@task
 def doc():
     '''Locally build documentation.'''
     with lcd('doc'):
