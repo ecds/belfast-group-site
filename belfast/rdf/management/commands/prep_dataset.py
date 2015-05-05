@@ -16,6 +16,7 @@ from belfast.rdf.qub import QUB
 from belfast.rdf.clean import SmushGroupSheets, IdentifyGroupSheets, \
     InferConnections, ProfileUris
 from belfast.rdf import nx
+from belfast.util import rdf_data
 
 class Command(BaseCommand):
     '''Harvest and prep Belfast Group RDF dataset'''
@@ -99,8 +100,12 @@ class Command(BaseCommand):
                              options['connect']])
 
         # initialize graph persistence
-        graph = rdflib.ConjunctiveGraph('Sleepycat')
-        graph.open(settings.RDF_DATABASE, create=True)
+        # graph = rdflib.ConjunctiveGraph('Sleepycat')
+        # graph.open(settings.RDF_DATABASE, create=True)
+
+        graph = rdf_data()
+
+
         # if clear is specified, remove the entire db
         if options['clear']:
             if self.verbosity >= self.v_normal:
