@@ -64,3 +64,8 @@ Developer Notes
     brew install berkeley-db
     BERKELEYDB_DIR=$(brew --cellar)/berkeley-db/5.3.28 pip install bsddb3
 
+* Running the tests requires the **REUSE_DB** setting because of the RDF
+  database:
+
+     env REUSE_DB=1 ./manage.py test
+

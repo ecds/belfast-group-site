@@ -28,7 +28,7 @@ def test():
     if os.path.exists('test-results'):
         shutil.rmtree('test-results')
 
-    local('python manage.py test --noinput --with-coverage --cover-package=%(project)s --cover-xml --with-xunit' \
+    local('env REUSE_DB=1 python manage.py test --noinput --with-coverage --cover-package=%(project)s --cover-xml --with-xunit' \
         % env)
 
 @task

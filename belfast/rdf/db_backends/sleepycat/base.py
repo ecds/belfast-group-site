@@ -1,6 +1,7 @@
 import logging
 import rdflib
 from rdflib.store import NO_STORE, VALID_STORE
+from django.conf import settings
 
 from djangotoolbox.db.base import NonrelDatabaseFeatures, \
     NonrelDatabaseOperations, NonrelDatabaseWrapper, NonrelDatabaseClient, \
@@ -32,7 +33,10 @@ class DatabaseValidation(NonrelDatabaseValidation):
     pass
 
 class DatabaseIntrospection(NonrelDatabaseIntrospection):
-    pass
+
+    # minimal instrospection to allow django to run tests
+    def get_table_list(self, *args, **kwargs):
+        return []
 
 class DatabaseWrapper(NonrelDatabaseWrapper):
     def __init__(self, *args, **kwds):
@@ -56,8 +60,13 @@ class DatabaseWrapper(NonrelDatabaseWrapper):
         elif rval != VALID_STORE:
             logger.error('Sleepycat RDF DB is not valid')
 
-
     def close(self):
+        # when running unit tests, django seems to close the db
+        # connection before we expect
+        # (but never seems to close it under apache!)
+        # belfast rdf testutil plugin sets this variable for testing.
+        if getattr(settings, 'RDF_DATABASE_TESTMODE', False):
+            return
         if self.db_connection.store.is_open():
             logger.debug('closing Sleepycat RDF DB connection')
             self.db_connection.close()

@@ -30,6 +30,9 @@ try:
             graph = rdflib.ConjunctiveGraph('Sleepycat')
             graph.open(settings.RDF_DATABASE, create=True)
 
+            # track that we are in test mode, so db wrapper can skip closing
+            settings.RDF_DATABASE_TESTMODE = True
+
         def finalize(self, result):
             print >> sys.stderr, "Removing test RDF Database: %s" % settings.RDF_DATABASE
             shutil.rmtree(settings.RDF_DATABASE)
@@ -37,6 +40,8 @@ try:
                 # print >> sys.stderr, "Restoring RDF Database: %s" \
                 #     % self.stored_rdf_database
                 settings.RDF_DATABASE = self.stored_rdf_database
+
+            settings.RDF_DATABASE_TESTMODE = False
 
         def help(self):
             return 'Setup and use a test RDF database for tests.'
