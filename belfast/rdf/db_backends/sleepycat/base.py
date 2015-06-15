@@ -61,11 +61,13 @@ class DatabaseWrapper(NonrelDatabaseWrapper):
             logger.error('Sleepycat RDF DB is not valid')
 
     def close(self):
+        logger.debug('RDF DB wrapper close requested')
         # when running unit tests, django seems to close the db
         # connection before we expect
         # (but never seems to close it under apache!)
         # belfast rdf testutil plugin sets this variable for testing.
         if getattr(settings, 'RDF_DATABASE_TESTMODE', False):
+            logger.debug('RDF DB testmode, not closing Sleepycat RDF DB connection')
             return
         if self.db_connection.store.is_open():
             logger.debug('closing Sleepycat RDF DB connection')
