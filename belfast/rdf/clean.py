@@ -54,6 +54,9 @@ class IdentifyGroupSheets(object):
         # (irishmisc, ormsby)
         # first look for a manuscript with an author that directly
         # references the belfast group
+        # NOTE: previously rel was ?ms schema:mentions Belfast Group
+        # findingaids have now been updated to use schema:producer
+        # -- for now, leaving the rel unspecified to catch all items
         res = graph.query('''
             PREFIX dc: <%(dc)s>
             PREFIX rdf: <%(rdf)s>
@@ -61,7 +64,7 @@ class IdentifyGroupSheets(object):
             SELECT ?ms
             WHERE {
                 ?ms rdf:type bibo:Manuscript .
-                ?ms schema:mentions <%(belfast_group)s> .
+                ?ms ?rel <%(belfast_group)s> .
                 ?ms dc:creator ?auth
             }
             ''' % {'dc': rdfns.DC,
