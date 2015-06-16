@@ -114,7 +114,7 @@ class HarvestRdf(object):
                 if response.status_code in [requests.codes.moved,
                                             requests.codes.see_other,
                                             requests.codes.found]:
-                    self.URL_QUEUE.add(response.headers['location'])
+                    self.queue_url(response.headers['location'])
                     return
 
                 elif response.status_code == requests.codes.not_modified:
@@ -134,11 +134,15 @@ class HarvestRdf(object):
 
         else:
             try:
-                response = requests.get(url, allow_redirects=False)
+                headers = {}
+                if self.no_cache:
+                    headers['cache-control'] = 'no-cache'
+                response = requests.get(url, headers=headers,
+                    allow_redirects=False)
                 if response.status_code in [requests.codes.moved,
                                             requests.codes.see_other,
                                             requests.codes.found]:
-                    self.URL_QUEUE.add(response.headers['location'])
+                    self.queue_url(response.headers['location'])
                     return
 
             except Exception as err:
@@ -210,8 +214,7 @@ class HarvestRdf(object):
                    (subj, rdflib.OWL.sameAs, rdflib.URIRef(url)) in data:
                     related_url = unicode(obj)
                     # add to queue if not already queued or processed
-                    if related_url not in self.URL_QUEUE or self.PROCESSED_URLS:
-                        self.URL_QUEUE.add(related_url)
+                    if self.queue_url(related_url):
                         queued += 1
 
             # follow all related link relations
@@ -224,8 +227,7 @@ class HarvestRdf(object):
                 # if subj == orig_url or \
                 #    (subj, rdflib.OWL.sameAs, rdflib.URIRef(url)) in data:
                 related_url = unicode(obj)
-                if related_url not in self.URL_QUEUE or self.PROCESSED_URLS:
-                    self.URL_QUEUE.add(related_url)
+                if self.queue_url(related_url):
                     queued += 1
 
         if queued and self.verbosity > 1:
@@ -247,6 +249,14 @@ class HarvestRdf(object):
             filebase += '_%s' % path
             #  NOTE: save as .rdf since it may or may not be rdf xml
             return os.path.join(self.base_dir, '%s.%s' % (filebase, self.format))
+
+    def queue_url(self, url):
+        # Add a url to the queue if it is not already queued
+        # or processed.  Returns True if a url was queued.
+        if url not in self.URL_QUEUE and url not in self.PROCESSED_URLS:
+            self.URL_QUEUE.add(url)
+            return True
+        return False
 
 
 class Annotate(object):
