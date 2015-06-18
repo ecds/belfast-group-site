@@ -1002,13 +1002,12 @@ p.iframe iframe{
 
 /* footnotes in overview essay */
 
-/* adjust footnote anchor targets so they display after fixed site header */
-sup.note:before {
+/* adjust footnote anchor targets so they display well below fixed site header */
+sup.note {
+  padding-top: 285px;
+  margin-top: -285px;
   display: inline-block;
-  content: " ";
-  margin-top: -200px;
-  height: 200px;
-  visibility: hidden;
+  background: transparent;
 }
 
 ol.notes li {
@@ -1021,7 +1020,7 @@ sup.note a {
 }
 
 /* highlight target reference or in-text note so it's easier to find */
-sup.note:target, ol.notes li:target a:first-child {
+sup.note:target a, ol.notes li:target a:first-child {
   background-color: #FFF3DA;
 }
 sup.note:target a, .notes li:target a:first-child {
