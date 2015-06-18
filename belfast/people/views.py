@@ -31,7 +31,7 @@ def list(request):
     'Display a list of people one remove from the Belfast Group.'
     people = profile_people()
     # filter to only people with a description
-    people = [p for p in people if p.has_profile]
+    people = [p for p in people if p.has_profile and p.picture]
 
     return render(request, 'people/list.html',
                   {'people': people})
