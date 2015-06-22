@@ -621,13 +621,22 @@ class InferConnections(object):
         for ctx in graph.contexts():
             self.process_graph(ctx)
 
+        # NOTE: running this only on context graphs **misses* some people
+        # (probably due to a bug with context earlier in the data prep
+        # process, possibly relating to external data like VIAF)
+        # Run on the entire network to avoid missing anyone.
+        self.bg_associates(graph)
+
     def process_graph(self, graph):
         '''Process a graph and add direct relationships for authors of poems
         that mention other people, places, etc.'''
+
+        # add direct connection between authors and entities they write about
         self.writes_about(graph)
 
+        # add any missing group sheet information
         ms = list(graph.subjects(predicate=rdflib.RDF.type, object=rdfns.BG.GroupSheet))
-        # if no manuscripts are found, skip
+        # if no manuscripts are found, we're done
         if len(ms) == 0:
             return
 
@@ -638,6 +647,7 @@ class InferConnections(object):
             # infer ownership of groupsheet copies based on archival collection
             self.ownership(m, graph)
 
+    def bg_associates(self, graph):
         # *** find authors and owners of groupsheets and explicitly associate
         # them with the Belfast Group
         res = graph.query('''
@@ -669,6 +679,7 @@ class InferConnections(object):
                 if uri is not None:
                     # if local uri was generated, convert everywhere in the graph
                     smush(self.full_graph, {r['person']: rdflib.URIRef(uri)})
+
 
     def time_period(self, ms, graph):
         '''Determine whether a groupsheet is first or second period
