@@ -8,14 +8,17 @@
   <link rel="schema.DCTERMS" href="http://purl.org/dc/terms/"/>
   <meta name="DC.title" content="Belfast Group Poetry|Networks"/>
   <meta name="DC.publisher" content="Emory Center for Digital Scholarship"/>
-  <link rel="DC.publisher" href="http://id.loc.gov/authorities/names/no2015049801" title="Emory Center for Digital Scholarship">
+  <link rel="DC.publisher" href="http://viaf.org/viaf/315602699" title="Emory Center for Digital Scholarship">
   <meta name="DC.contributor" content="Rebecca Sutton Koeser"/>
   <meta name="DC.contributor" content="Brian Croxall"/>
   <meta name="DC.contributor" content="Alice Hickcox"/>
   <meta name="DC.contributor" content="Elizabeth Russey Roke"/>
   <meta name="DC.contributor" content="Kevin Glover"/>
   <meta name="DC.contributor" content="Stephen Enniss"/>
-  <meta name="DC.publisher" content="Emory Center for Digital Scholarship, Emory University"/>
+  {# orcid/viaf ids for above contributors that have them #}
+  <link rel="DC.contributor" href="http://orcid.org/0000-0001-5602-6830" title="Brian Croxall"/>
+  <link rel="DC.contributor" href="http://orcid.org/0000-0002-8762-8057" title="Rebecca Sutton Koeser"/>
+  <link rel="DC.contributor" href="http://viaf.org/viaf/26999872" title="Stephen Ennis"/>
   <meta name="DCTERMS.issued" scheme="XSD.date" content="2015"/>
   <meta name="DC.description" content="The Belfast Group, a group of literary writers that formed a writing workshop at Queen's University in Belfast, Northern Ireland, met regularly from 1963 to 1972. These pages collect a substantial amount of documentary information on the history of the Belfast Group, including biographical notes on the participants (well-known and obscure); a catalog of all known Group sheets; and fully searchable electronic texts of Group sheets by Seamus Heaney, Philip Hobsbaum, Michael Longley, Paul Muldoon, and James Simmons. The site also takes a data-centric approach to understanding the relationships among the participants of the Group and provides visualizations of these relationships as well as peer-reviewed essays about what has been learned about literary communities and archives thanks to the data-centric approach. "/>
   <meta name="DC.subject" scheme="LCSH" content="Carson, Ciaran, 1948-"/>
@@ -33,6 +36,10 @@
   <meta name="DC.subject" scheme="LCSH" content="Parker, Stewart, 1941-1988"/>
   <meta name="DC.subject" scheme="LCSH" content="Simmons, James, 1933-"/>
   <meta name="DC.subject" scheme="LCSH" content="Terry, Arthur"/>
+  {# include viaf/dbpedia URIs from the data for all people with profiles on the site #}
+  {% for person in people %}{% if person.viaf_uri or person.dbpedia_uri %}
+  <link rel="DC.subject" href="{% firstof person.viaf_uri person.dbpedia_uri %}" title="{% firstof person.preferred_label person.fullname person %}"/>{# probably not authoritative form of name; including so we can tell which id is which #}
+  {% endif %}{% endfor %}
   <meta name="DC.subject" scheme="LCSH" content="Queen's University of Belfast."/>
   <meta name="DC.subject" scheme="LCSH" content="Poets, Irish--20th century."/>
   <meta name="DC.subject" scheme="LCSH" content="Irish poetry--20th century."/>
