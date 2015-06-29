@@ -1,10 +1,15 @@
 from django.shortcuts import render
+from django.views.decorators.http import last_modified
 from belfast.people.models import ProfilePicture
 from belfast.people.rdfmodels import profile_people
+from belfast.util import rdf_data_lastmodified
 
-# NOTE: last-modified would be good here, but probably should be based
-# on profile picture modification dates, which is not currently stored
+def rdf_lastmodified(request, *args, **kwargs):
+    # NOTE: last-modified would be good here, but probably should be based
+    # on profile picture modification dates, which is not currently stored
+    return rdf_data_lastmodified()
 
+@last_modified(rdf_lastmodified)
 def site_index(request):
     '''Site home page.  Includes a random-order list of profile pictures
     for display at the bottom of the home page.

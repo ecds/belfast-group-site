@@ -16,7 +16,7 @@ from belfast.rdf.qub import QUB
 from belfast.rdf.clean import SmushGroupSheets, IdentifyGroupSheets, \
     InferConnections, ProfileUris
 from belfast.rdf import nx
-from belfast.util import rdf_data
+from belfast.util import rdf_data, set_site_lastmodified
 
 class Command(BaseCommand):
     '''Harvest and prep Belfast Group RDF dataset'''
@@ -162,5 +162,7 @@ class Command(BaseCommand):
             nx.Rdf2Gexf(graph, settings.GEXF_DATA['full'])
             nx.BelfastGroupGexf(graph, settings.GEXF_DATA['bg1'])
 
+        # set last-modification time
+        set_site_lastmodified(graph)
         graph.close()
 

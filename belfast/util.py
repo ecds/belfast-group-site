@@ -12,6 +12,7 @@ from django.contrib.flatpages.models import FlatPage
 from django.contrib.sites.models import Site, get_current_site
 from django.db import connections
 
+from belfast import rdfns
 
 logger = logging.getLogger(__name__)
 
@@ -53,12 +54,37 @@ def local_uri(path, request=None):
 # handling within the site
 # NOTE: the methods below are probably out of date
 
+def set_site_lastmodified(graph):
+    # store a site modification date time in the RDF data based on
+    # configured site url, for use as rdf data modification
+    current_site = Site.objects.get(id=settings.SITE_ID)
+    site_uri = rdflib.URIRef('http://%s/' % current_site.domain.rstrip('/'))
+    graph.set((site_uri, rdfns.SCHEMA_ORG.dateModified,
+        rdflib.Literal(datetime.now(), datatype=rdflib.XSD.dateTime)))
+
+
+def get_site_lastmodified(graph):
+    # get site modification time from the rdf data
+    current_site = Site.objects.get(id=settings.SITE_ID)
+    site_uri = rdflib.URIRef('http://%s/' % current_site.domain.rstrip('/'))
+    return graph.value(site_uri, rdfns.SCHEMA_ORG.dateModified)
+
+
 def rdf_data_lastmodified():
-    # get a last modification time for rdf data, based on the
-    # most recently modified file in the db
-    # TODO: store date last loaded in the database instead?
+    # get a last modification time for the rdf data
+    try:
+        # first choice: get date stored in the data the last time
+        # the data prep script was run
+        date = get_site_lastmodified(rdf_data())
+        if date is not None:
+            return date.toPython()
+    except:
+        pass
+
+    # fall-back logic: get the most recently modified file in the db
+    # NOTE: this is not very accurate, since the db gets updated
+    # and modified just by opening it and using it
     filelist = os.listdir(settings.RDF_DATABASE)
-    # filelist = filter(lambda x: not os.path.isdir(x) and x.endswith('.xml'), filelist)
     newest = max([os.stat(os.path.join(settings.RDF_DATABASE, x)).st_mtime for x in filelist])
     return datetime.fromtimestamp(newest)
 
