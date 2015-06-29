@@ -31,11 +31,13 @@ class ProfilePictureAdminForm(forms.ModelForm):
             'person_uri': DynamicSelect(choices=profile_persons),
             'collection_uri': DynamicSelect(choices=collections),
         }
+        fields = '__all__'
 
 
 class ProfilePictureAdmin(admin.ModelAdmin):
     form = ProfilePictureAdminForm
     list_display = ('person', 'title', 'creator', 'date', 'publisher', 'collection', 'thumbnail')
+
 
 
 admin.site.register(ProfilePicture, ProfilePictureAdmin)

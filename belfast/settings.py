@@ -128,7 +128,6 @@ INSTALLED_APPS = [
     'tinymce',
     'eulexistdb',
     'django_image_tools',
-    'south',
     'belfast.pages',
     'belfast.groupsheets',
     'belfast.people',
