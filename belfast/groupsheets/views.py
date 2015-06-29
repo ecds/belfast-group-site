@@ -74,7 +74,7 @@ def teixml(request, name):
     except DoesNotExist:
         raise Http404
     tei_xml = doc.serialize(pretty=True)
-    return HttpResponse(tei_xml, mimetype='application/xml')
+    return HttpResponse(tei_xml, content_type='application/xml')
 
 
 @last_modified(rdf_lastmod)  # for now, list is based on rdf
