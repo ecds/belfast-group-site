@@ -1,4 +1,6 @@
 import logging
+import glob
+import os
 import rdflib
 from rdflib.store import NO_STORE, VALID_STORE
 from django.conf import settings
@@ -50,7 +52,24 @@ class DatabaseWrapper(NonrelDatabaseWrapper):
 
         logger.debug('opening Sleepycat RDF DB connection')
         self.db_connection = rdflib.ConjunctiveGraph('Sleepycat')
-        rval = self.db_connection.open(self.settings_dict['NAME'], create=False)
+        try:
+            rval = self.db_connection.open(self.settings_dict['NAME'], create=False)
+        except MemoryError:
+            logger.warn('Sleepycat RDF DB MemoryError; clearing __db.00x files')
+            # if we got far enough to open the store, close it
+            if self.db_connection.store.is_open():
+                self.db_connection.close()
+            # this is a hack...
+            # Under apache/django the rdf db doesn't get closed and we
+            # eventually run out of db sessions (or something like that).
+            # Removing the __db.00x files clears the sessions and makes
+            # it possible to re-open a connection without losing any
+            # of the RDF data.
+            db_session_files = glob.glob(os.path.join(self.settings_dict['NAME'], '__db.00?'))
+            for dbfile in db_session_files:
+                os.remove(dbfile)
+            # re-open the db, which should create new __db.00x files
+            rval = self.db_connection.open(self.settings_dict['NAME'], create=False)
 
         if rval == NO_STORE:
             # if store doesn't exist yet, go ahead and create it
