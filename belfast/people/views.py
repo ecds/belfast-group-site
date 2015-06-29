@@ -1,8 +1,7 @@
 from django.conf import settings
-from django.contrib.sites.models import get_current_site
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from django.views.decorators.http import last_modified
 import json
 from networkx.readwrite import json_graph, gexf
@@ -12,9 +11,7 @@ from belfast import rdfns
 from belfast.util import rdf_data, rdf_data_lastmodified, \
     network_data_lastmodified, local_uri
 from belfast.groupsheets.rdfmodels import get_rdf_groupsheets
-from belfast.people.models import ProfilePicture
-from belfast.people.rdfmodels import BelfastGroup, profile_people, \
-  RdfPerson, RdfPoem
+from belfast.people.rdfmodels import profile_people, RdfPerson, RdfPoem
 from belfast.network.util import annotate_graph
 
 
@@ -26,7 +23,7 @@ def rdf_nx_lastmod(request, *args, **kwargs):
     return max(rdf_data_lastmodified(), network_data_lastmodified())
 
 
-# @last_modified(rdf_lastmod)  # for now, list is based on rdf
+@last_modified(rdf_lastmod)  # for now, list is based on rdf
 def list(request):
     'Display a list of people one remove from the Belfast Group.'
     people = profile_people()
@@ -36,8 +33,7 @@ def list(request):
     return render(request, 'people/list.html',
                   {'people': people})
 
-
-# @last_modified(rdf_nx_lastmod)  # uses both rdf and gexf
+@last_modified(rdf_nx_lastmod)  # uses both rdf and gexf
 def profile(request, id):
     'Display a profile page for a single person associated with the Belfast Group.'
     uri = local_uri(reverse('people:profile', args=[id]), request)
@@ -55,7 +51,7 @@ def profile(request, id):
                   'page_rdf_type': 'schema:ProfilePage'})
 
 
-# @last_modified(rdf_nx_lastmod)  # uses both rdf and gexf
+@last_modified(rdf_nx_lastmod)  # uses both rdf and gexf
 def egograph_js(request, id):
     'Egograph information as JSON for a single person.'
     uri = local_uri(reverse('people:profile', args=[id]), request)
