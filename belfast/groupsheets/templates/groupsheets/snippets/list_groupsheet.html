@@ -1,22 +1,22 @@
 {# snippet to display a single rdf groupsheet #}
-{% load groupsheet_tags %}
+{% load groupsheet_tags %}{% load humanize %}
 <p>
   {% if not profile  or doc.author_list|length != 1 %} {# suppress single author on profile page list #}
       {% for author in doc.author_list %}
-        <b>{{ author.lastname }}, {{ author.firstname }}</b>{% if not forloop.last %}; {% endif %}
+        <b>{{ author.lastname }}, {{ author.firstname }}</b>{% if not forloop.last %}; {% else %}.{% endif %}
         {# NOTE: on profile page, should we list all authors or only other authors than profile? #}
       {% empty %}
-        <b>Anonymous</b>
+        <b>Anonymous</b>.
       {% endfor %}
   {% endif %}
 {% for t in doc.title_list %}  {# list of titles if multiple #}
-"{{ t }},"
+&ldquo;{{ t }},&rdquo;
 {% empty %} {# single title if we have one, or untitled + genre if available #}
-  {% if doc.title %}"{{ doc.title }},"{% else %}Untitled{{ ' '|add:doc.genre|default:'' }}{% endif %}
+  {% if doc.title %}&ldquo;{{ doc.title }},&rdquo;{% else %}Untitled{{ ' '|add:doc.genre|default:'' }}{% endif %}
 {% endfor %}
 {% if doc.date %}{{ doc.date|natural_date }}{% else %}no date{% endif %}{% if doc.num_pages %}, {% else %}.{% endif %}
 {# perhaps simply omit the no date since the majority are undated? #}
-{% if doc.num_pages %}{{ doc.num_pages }} page{{ doc.num_pages|pluralize }}.{% endif %}
+{% if doc.num_pages %}{{ doc.num_pages|apnumber }} page{{ doc.num_pages|pluralize }}.{% endif %}
 {% if doc.description %}({{ doc.description }}){% endif %}
 </p>
 {% if doc.tei_id %}
