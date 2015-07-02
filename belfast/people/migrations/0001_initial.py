@@ -1,50 +1,32 @@
 # -*- coding: utf-8 -*-
-from south.utils import datetime_utils as datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import models, migrations
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'ProfilePicture'
-        db.create_table(u'people_profilepicture', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('person_uri', self.gf('django.db.models.fields.URLField')(unique=True, max_length=200)),
-            ('img', self.gf('django.db.models.fields.files.ImageField')(max_length=100)),
-            ('thumbnail', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
-            ('title', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('date', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('collection_uri', self.gf('django.db.models.fields.URLField')(max_length=200, null=True, blank=True)),
-            ('creator', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('publisher', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('publisher_url', self.gf('django.db.models.fields.URLField')(max_length=200, blank=True)),
-            ('permissions', self.gf('django.db.models.fields.TextField')()),
-        ))
-        db.send_create_signal(u'people', ['ProfilePicture'])
+    dependencies = [
+        ('django_image_tools', '__first__'),
+    ]
 
-
-    def backwards(self, orm):
-        # Deleting model 'ProfilePicture'
-        db.delete_table(u'people_profilepicture')
-
-
-    models = {
-        u'people.profilepicture': {
-            'Meta': {'object_name': 'ProfilePicture'},
-            'collection_uri': ('django.db.models.fields.URLField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'}),
-            'creator': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'date': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'img': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
-            'permissions': ('django.db.models.fields.TextField', [], {}),
-            'person_uri': ('django.db.models.fields.URLField', [], {'unique': 'True', 'max_length': '200'}),
-            'publisher': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'publisher_url': ('django.db.models.fields.URLField', [], {'max_length': '200', 'blank': 'True'}),
-            'thumbnail': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '255'})
-        }
-    }
-
-    complete_apps = ['people']
+    operations = [
+        migrations.CreateModel(
+            name='ProfilePicture',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('person_uri', models.URLField(unique=True, verbose_name=b'Person')),
+                ('date', models.CharField(help_text=b'Date of the photo, if known', max_length=255, blank=True)),
+                ('collection_uri', models.URLField(help_text=b'MARBL Archival collection source for the original picture (for MARBL content)', null=True, verbose_name=b'Archival Collection', blank=True)),
+                ('creator', models.CharField(help_text=b'Photographer or whoever else is responsible for creating the image, if known', max_length=255, blank=True)),
+                ('creator_url', models.URLField(help_text=b'Photographer website URL, if available', verbose_name=b'Creator Website', blank=True)),
+                ('publisher', models.CharField(help_text=b'Name of the publisher, if applicable', max_length=255, blank=True)),
+                ('publisher_url', models.URLField(help_text=b'Publisher URL, if known;\n        used with publisher name to generate a link on profile page', verbose_name=b'Publisher Website', blank=True)),
+                ('permissions', models.TextField(help_text=b'Statement of Permissions')),
+                ('image', models.ForeignKey(related_name='profilepicture_set', to='django_image_tools.Image')),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+    ]
