@@ -16,8 +16,6 @@ RDF data harvesting and preparation
 * A command-line user can run a script to harvest RDF data from DBpedia, VIAF, and GeoNames for persons, places, and organizations referenced in the harvested RDF, so that additional data can be queried or referenced in the new Belfast Group website.
 * A user will be able to harvest and prep RDF dataset with a single script so the process is reliable and repeatable.
 * When a user runs the script to harvest and prep the Belfast Group RDF dataset,  manuscripts will be recognized and labeled as Belfast Group sheets so that all Belfast Group sheets can easily be identified for display and visualization on the site.
-
-.. Note: not a story but worth mentioning/describing somehow; data or site-specific?
 * Custom RDF ontology which includes a Belfast Group Sheet type
 
 
