@@ -1,0 +1,45 @@
+{% extends 'page_base.html' %}
+{% load static %}
+
+{% block page-subtitle %} : {{ flatpage.title }}{% endblock %}
+
+{% block head-extras %}
+  {{ block.super }}
+   {# <link href="{% static 'js/jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.min.css' %}" rel="stylesheet" media="screen"/> #}
+ <link href="{% static 'js/jquery-ui/css/redmond/jquery-ui.min.css' %}" rel="stylesheet" media="screen"/>
+  <script type="text/javascript" src="{% static 'js/jquery-ui/js/jquery-ui-1.10.3.custom.min.js' %}"></script>
+{% endblock %}
+
+{% block page-content %}
+{% if flatpage %}
+  {% include "flatpages/snippets/flatpage_content.html" %}
+{% endif %}
+
+{% include 'network/snippets/graph_with_controls.html' %}
+
+  <script src="{% static 'js/d3.min.js' %}" charset="utf-8"></script>
+  <link type="text/css" href="{% static 'css/d3.force.css' %}" rel="stylesheet" media="screen"/>
+   <script type="text/javascript" src="{% static 'js/d3.force.js' %}"></script>
+   <script type="text/javascript">
+     ForceGraphControls({
+      target: '#graph-controls',
+      graph_options: {
+        target: "#network-graph",
+        url: "{% url js_view %}",
+        width: 'auto',
+        height: 450,
+        highlight: ['{{ bg_uri }}', 'Belfast Group, 1966-1972', 'Belfast Group, 1963-1966'],
+        labels: true,
+        {% if mode == 'egograph' %}
+        degree_toggles: [1, 2],    // enable toggling between one- and two- degree egographs
+        {% endif %}
+        node_info_url: "{% url 'network:node-info' %}",
+        gravity: 0.7,
+        link_distance: 75,
+        {% if mode == 'groupsheet-model' %}
+        link_weight_adjustment: 3,
+        {% endif %}
+      }
+    });
+   </script>
+{% endblock %}

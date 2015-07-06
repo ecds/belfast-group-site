@@ -1,0 +1,66 @@
+{% extends 'page_base.html' %}
+{% load static %}
+
+{% block page-subtitle %} : {{ flatpage.title }}{% endblock %}
+
+{% block page-content %}
+{% if flatpage %}
+  {% include "flatpages/snippets/flatpage_content.html" %}
+{% endif %}
+
+{% with min_degree=3 %}
+<div class="row">
+ <div id="chart" class="col-xs-12 col-sm-8">
+  <div class="graph-loading text-center">Loading...</div>
+ </div>
+{% comment %}
+<!-- rotate controls -->
+ <div class="controls">
+  <ul>
+    <li class="rotate-up">
+      <a href="#">Up</a>
+    </li>
+    <li class="rotate-down">
+      <a href="#">Down</a>
+    </li>
+  </ul>
+ </div>
+{% endcomment %}
+
+ <div id="key" class="col-xs-12 col-sm-4">
+ </div>
+</div>
+
+  <script src="{% static 'js/d3.min.js' %}" charset="utf-8"></script>
+  <link type="text/css" href="{% static 'css/d3.chord.css' %}" rel="stylesheet" media="screen"/>
+   <script type="text/javascript" src="{% static 'js/d3.chord.js' %}"></script>
+   <script type="text/javascript">
+      var options = {
+        target: '#chart',
+        matrix: "{% url 'network:bg-js-matrix' %}",
+        nodes: "{% url 'network:bg-js' %}",
+        max_size: 720,
+        node_info_url: "{% url 'network:node-info' %}",
+      };
+      ChordDiagram(options);
+
+      function resize_chorddiagram() {
+        console.log('resizing');
+        var width = d3.min([options.max_size, parseInt(d3.select(options.target).style('width'), 10)]);
+        var current_width = d3.min([options.max_size, parseInt(d3.select(options.target + ' svg').style('width'), 10)]);
+        // chord diagram has to be reloaded in order to set size
+        // this is expensive, so only resize if we're actually changing width
+        if (width != current_width) {
+            d3.select(options.target + ' svg').remove();
+            $('.graph-loading').show();   // show loading indicator while graph is re-initialized
+            ChordDiagram(options);
+        }
+
+      }
+
+      d3.select(window).on('resize', resize_chorddiagram);
+
+   </script>
+
+{% endwith %}
+{% endblock %}

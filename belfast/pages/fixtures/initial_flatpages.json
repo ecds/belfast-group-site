@@ -1,0 +1,167 @@
+[
+{
+  "pk": 1,
+  "model": "flatpages.flatpage",
+  "fields": {
+    "registration_required": false,
+    "title": "Overview",
+    "url": "/overview/",
+    "template_name": "pages/overview.html",
+    "sites": [
+      1
+    ],
+    "content": "<p>place-holder content</p>",
+    "enable_comments": false
+  }
+},
+{
+  "pk": 2,
+  "model": "flatpages.flatpage",
+  "fields": {
+    "registration_required": false,
+    "title": "Networks & Maps",
+    "url": "/network/",
+    "template_name": "",
+    "sites": [
+      1
+    ],
+    "content": "<p>overview/intro content for BG network graphs and maps; something on how the data was collected?; overview/links to SNA resources?</p>",
+    "enable_comments": false
+  }
+ },
+{
+  "pk": 3,
+  "model": "flatpages.flatpage",
+  "fields": {
+    "registration_required": false,
+    "title": "Belfast Group Network graph",
+    "url": "/network/belfast-group/",
+    "template_name": "",
+    "sites": [
+      1
+    ],
+    "content": "<p>Force-directed network graph of people connected to the Belfast Group.  Nodes are colored by type.  Mouse over a label to see the text more clearly.</p>",
+    "enable_comments": false
+  }
+ },
+{
+  "pk": 4,
+  "model": "flatpages.flatpage",
+  "fields": {
+    "registration_required": false,
+    "title": "Belfast Group network based on the Group Sheets",
+    "url": "/network/belfast-group/groupsheets/",
+    "template_name": "",
+    "sites": [
+      1
+    ],
+    "content": "<p>This graph was generated based on the data of the group sheets themselves:  treating the two periods of the group as two separate entities, and inferring connections between the authors and owners of group sheets and the period of  the group that a particular document is associated with.  The weight of the connection is based on the number of groupsheets owned or authors, and co-authors and co-owners of a particular groupsheet are linked because presumably they attended the group together.</p>",
+    "enable_comments": false
+  }
+ },
+{
+  "pk": 5,
+  "model": "flatpages.flatpage",
+  "fields": {
+    "registration_required": false,
+    "title": "Belfast Group - Chord Diagram",
+    "url": "/network/chord/",
+    "template_name": "",
+    "sites": [
+      1
+    ],
+    "content": "<p>Chord diagram of people and organizations connected to the Belfast Group. Mouse over labels to see the connections specific to that person or entity; mouse over the smaller, unlabeled sections to see the name.</p>",
+    "enable_comments": false
+  }
+ },
+{
+  "pk": 6,
+  "model": "flatpages.flatpage",
+  "fields": {
+    "registration_required": false,
+    "title": "Places in the Network",
+    "url": "/network/map/",
+    "template_name": "",
+    "sites": [
+      1
+    ],
+    "content": "<p>brief intro text for map if needed</p>",
+    "enable_comments": false
+  }
+ },
+{
+  "pk": 7,
+  "model": "flatpages.flatpage",
+  "fields": {
+    "registration_required": false,
+    "title": "Credits",
+    "url": "/credits/",
+    "template_name": "",
+    "sites": [
+      1
+    ],
+    "content": "<p>credits place-holder page</p>",
+    "enable_comments": false
+  }
+},
+{
+  "pk": 8,
+  "model": "flatpages.flatpage",
+  "fields": {
+    "registration_required": false,
+    "title": "Group Sheets",
+    "url": "/groupsheets/",
+    "template_name": "",
+    "sites": [
+      1
+    ],
+    "content": "<p>introductory text about the groupsheets</p><p>these are drafts, yada yada</p><p>some info on the dates (unknown, inferred, etc)</p>",
+    "enable_comments": false
+  }
+},
+{
+  "pk": 9,
+  "model": "flatpages.flatpage",
+  "fields": {
+    "registration_required": false,
+    "title": "About the data",
+    "url": "/network/about/",
+    "template_name": "",
+    "sites": [
+      1
+    ],
+    "content": "<p>information about data harvesting/processing</p>",
+    "enable_comments": false
+  }
+},
+{
+  "pk": 10,
+  "model": "flatpages.flatpage",
+  "fields": {
+    "registration_required": false,
+    "title": "Essays",
+    "url": "/essays/",
+    "template_name": "pages/overview.html",
+    "sites": [
+      1
+    ],
+    "content": "<p>place-holder content</p>",
+    "enable_comments": false
+  }
+},
+{
+  "pk": 11,
+  "model": "flatpages.flatpage",
+  "fields": {
+    "registration_required": false,
+    "title": "Group Sheet Dates",
+    "url": "/groupsheets/dates/",
+    "template_name": "",
+    "sites": [
+      1
+    ],
+    "content": "<p>place-holder content</p>",
+    "enable_comments": false
+  }
+}
+]

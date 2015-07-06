@@ -1,0 +1,29 @@
+Django>=1.7,<1.8
+django-tinymce
+eulexistdb
+rdflib<=4.1.0
+Pillow
+# for sleepycat/berkeleydb persistence
+bsddb3
+networkx>=1.9
+eulcommon
+html5lib
+progressbar
+djangotoolbox
+
+# NOTE: can't upgrade to django 1.8 yet because of djangtoolbox
+#https://github.com/django-nonrel/djangotoolbox/issues/61
+
+# Django Image Tools
+# if normal import doesn't work, get the package directly:
+# https://pypi.python.org/packages/source/d/django-image-tools/django-image-tools-0.8.b3.tar.gz
+django-image-tools>=0.8.b3
+
+
+# additional rdf script reqs
+requests>=1.1
+BeautifulSoup4
+SPARQLWrapper
+
+# for graph matrices
+numpy

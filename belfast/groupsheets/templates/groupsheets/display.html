@@ -1,0 +1,90 @@
+{% extends 'page_base.html' %}
+{% load tei %} {% load static %}
+
+{% block page-subtitle %} : {{ document.title }}{% endblock %}
+
+{% block head-extras %}
+  {% if document.ark %}
+    <link href="{{ document.ark }}" rel="bookmark"/>
+  {% endif %}
+  <link rel="alternate" type="application/rdf+xml" href="{% url 'groupsheets:view' document.id %}RDF/"/>
+  {# NOTE: not strictly an alternate (may contain multiple groupsheets), but close... #}
+  <link rel="alternate" type="application/xml" href="{% url 'groupsheets:xml' document.document_name %}"/>
+  {# styles specific to the poetry #}
+  <link href="{% static 'css/poetry.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block body-attrs %}data-spy="scroll" data-target=".local-sidenav" data-offset-top="200"{% endblock %}
+
+{% block page-content %}
+<div class="row" id="top">
+  </div>
+  <div class="row">
+  <div class="contents col-md-4 local-sidenav">
+    {# use toc item titles for RDF title list #}
+    {% for toc in document.toc_list %}
+      {% for item in toc.items %}
+      <meta property="dc:title" inlist="inlist" content="{{ item }}"/>
+      {% endfor %}
+    {% endfor %}
+
+    {# NOTE: there is a table of contents item list, but it does not include ids #}
+    {# generating toc from the actual poems instead #}
+    <ul class="nav nav-list sidenav">
+        {# heading must be in list to stay fixed #}
+        {# <li><h4>{{ document.toc.title }}</h4></li> #}
+        {# NOTE: hard-coding ToC heading because multi-author groupsheet displays oddly #}
+        <li><h4>Workshop Poems</h4></li>
+         {% for poem in document.poems %}
+        {# display authors by section if groupsheet has multiple authors #}
+        {% if document.multi_author %}
+          {% ifchanged %}<li class="list-label">{{ poem.byline }}</li>{% endifchanged %}
+        {% endif %}
+          <li><a href="#{{ poem.id }}">{{ poem.title|default:'[untitled]' }}</a></li>
+        {% endfor %}
+
+    </ul>
+  </div> {# end sidenav #}
+
+  <div class="col-md-7">
+    <h1 property="schema:name">{{ document.title }}</h1>
+    <div>
+      <p><strong>Time period</strong>: <span property="dc:coverage">{{ document.date }}</span></p>
+      {# NOTE: using byline from the first poem rather than document.author in order to generate RDF person info #}
+      <p><strong>Poet{{ document.authors|pluralize }}</strong>:
+          {% for author in document.authors %}{{ author|format_tei}}{% if not forloop.last %}; {% endif %}{% endfor %}
+        </p>
+      {% if document.ark %}
+      <p><strong>Permanent URL</strong>:
+          <a href="{{ document.ark }}" rel="bookmark schema:URL">{{ document.ark }}</a></p>
+      {% endif %}
+
+      <p><strong>Source{{ sources|pluralize }}</strong>:
+        {% for src in sources %}
+        <a href="{{ src.access_url }}">{{ src.name }}</a>{% if not forloop.last %}; {% endif %}
+        {% endfor %}
+      </p>
+    </div>
+
+    {% for poem in document.poems %}
+    {# NOTE: using ARK URL plus the poem id for poem URI #}
+      <div class="poem" typeof="schema:CreativeWork freebase:book/poem" about="{{ document.ark}}#{{poem.id }}" id="{{ poem.id }}">
+        <hr/>
+        <a name="{{ poem.id }}">
+          {% if poem.title %}
+            <a href="#top" class="to-top"><span class="glyphicon glyphicon-chevron-up"></span>Back to top</a>
+            <h3><span property="schema:name">{{ poem.title_node|format_tei }}</span></h3>
+          {% endif %}
+        </a>
+        {{ poem.body|format_tei }}
+        {% if poem.byline %}
+          <p class="byline">{{ poem.back|format_tei }}</p>
+        {% endif %}
+      </div>
+    {% endfor %}
+    <a href="#top" class="to-top"><span class="glyphicon glyphicon-chevron-up"></span>Back to top</a>
+    <p class="pull-right"><a href="{% url 'groupsheets:xml' document.document_name %}" rel="alternate">TEI XML</a></p>
+  </div> {# end right column #}
+
+ </div> {# end row #}
+{% endblock %}

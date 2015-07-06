@@ -1,0 +1,62 @@
+{# common template layout for force-directed graph with control and info divs #}
+<div class="row">
+  <div class="col-md-9">
+     <div id="network-graph">
+        <div class="graph-loading text-center">Loading...</div>
+     </div>
+  </div>
+  <div class="col-md-3">
+    <div id="graph-controls">
+        <h4>Graph Settings
+        <a data-toggle="modal" data-target="#graph-help" title="Help and Usage">
+            <span class="glyphicon glyphicon-info-sign"></span>
+        </a>
+    </h4>
+    </div>
+
+  <!-- Modal help text -->
+  <div class="modal" id="graph-help" tabindex="-1" role="dialog" aria-labelledby="modal-label" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&#xd7;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" id="modal-label">Network Graph Help</h4>
+          </div>
+          <div class="modal-body">
+
+           
+           <p>Nodes in the graph are arranged based on the strength of connection between 
+           individuals or organizations, with an attempt to avoid overlapping labels 
+           for readability. The strength of a connection is determined by the number and kinds of 
+           relationships between individuals or organizations. For example, a founder of 
+           the Belfast Group has a stronger relationship to that organization than does someone 
+           who was just a participant; spouses have stronger connections than people who simply
+           corresponded with each other; and so on.</p>
+
+			<p>You can change the appearance of the graph to explore its content. You can drag nodes to different positions on the graph. Doing this may help you see which individuals are connected to one another. Clicking on any individual node will also fix it in place, which is indicated by a black outline. You can make the node float freely again by double-clicking on it.</p>
+
+			<p>You can resize nodes based on their network properties (see below), and you can turn the labels on or off, which may make it easier to identify authors or see the connections among them. When labels are turned off, you can hover your pointer over a particular node on the graph and see the name of the person it represents. You can also set the labels to appear only on nodes that are a particular size or larger.</p>
+
+			<p>When sized by <strong>degree</strong>, a node’s size is determined by how many connections (or “edges”) it has to other nodes. The larger the node, the more edges it has to other nodes in the network. This option helps to identify the most connected nodes.</p>
+
+			<p>When sized by <strong>betweeness</strong>, a node’s size is determined by how often it lies on the shortest path between two other nodes. The larger the node, the more often it appears on the shortest paths that exist throughout the network. Nodes that feature a high degree of betweenness act as brokers for other nodes in the system. People with a high degree of betweenness are often not the central actor in a group but instead help connect disparate groups.</p>
+
+			<p>When sized by <strong>eigenenvector centrality</strong>, a node’s size is determined by how many 
+			connections <em>its</em> connections have. The larger the node, the more connections exist on the 
+			nodes that <em>it</em> is connected to. This measure of centrality often helps identify the most 
+			influential individual in a network.</p>
+                   
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+       </div>
+      </div>
+  </div>
+
+  <div id="node-info">
+    <small>Click on a node or node label for more information</small>
+  </div>
+
+  </div>
+</div>

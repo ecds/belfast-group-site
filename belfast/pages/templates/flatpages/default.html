@@ -1,0 +1,8 @@
+{% extends 'page_base.html' %}
+
+{% block page-subtitle %} : {{ flatpage.title }}{% endblock %}
+
+{% block page-content %}
+  <h1 property="schema:name">{{ flatpage.title }}</h1>
+  {% include "flatpages/snippets/flatpage_content.html" %}
+{% endblock %}

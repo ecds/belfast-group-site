@@ -1,0 +1,217 @@
+{% extends 'page_base.html' %}
+{% load static %}
+
+{% block page-subtitle %} : Members : {{ person.name }}{% endblock %}
+
+{% block head-extras %}
+{% endblock %}
+
+{% block page-content %}
+<div rel="schema:about">
+  <div typeof="schema:Person">
+
+    <h1>
+      {% if person.lastname and person.firstname %}
+       <span property="schema:givenName">{{ person.firstname }}</span>  <span property="schema:familyName">{{ person.lastname }}</span>
+      {% else %}
+      <span property="schema:name">{{ person.name }}</span>
+      {% endif %}
+    </h1>
+    <div class="row">
+      {% if person.picture %}
+      {% with pic=person.picture %}
+        <div class="col-xs-6 col-md-4 pull-right" rel="schema:image">
+            {# admin edit link, if user has permission to edit profile pictures #}
+            {% if perms.people.change_profilepicture %}
+                <a class="pull-right btn" href="{% url 'admin:people_profilepicture_change' pic.id %}"><span class="glyphicon glyphicon-edit"></span></a>
+            {% endif %}
+          <figure typeof="schema:ImageObject" class="thumbnail text-center">
+              <h4 property="schema:caption">{{ pic.title }}</h4>
+              <img src="{{ pic.image.get__profile }}" alt="{{ pic.image.alt_text }}" title="{{ pic.image.title }}"
+                property="schema:contentUrl"/>
+              <figcaption class="caption">
+                <ul class="list-inline small">
+                  {% if pic.date %}<li property="schema:dateCreated">{{ pic.date }}</li>{% endif %}
+                  {% if pic.creator %}<li property="schema:author">
+                      {% if pic.creator_url %}
+                      <a href="{[ pic.creator_url ]}">{{ pic.creator }}</a>
+                      {% else %}{{ pic.creator }}{% endif %}
+                      </li>{% endif %}
+                  {% if pic.publisher %}
+                  <li rel="schema:publisher">
+                    <span typeof="schema:Organization">
+                      {% if pic.publisher_url %}
+                      <a property="schema:url" href="{{ pic.publisher_url }}"><span property="schema:name">{{ pic.publisher }}</span></a>
+                      {% else %}<span property="schema:name">{{ pic.publisher }}</a>{% endif %}
+                    </span>
+                  </li>
+                  {% endif %}
+                </ul>
+                {% if pic.collection %}
+                <p><small><a href="{{ pic.rdfcollection }}">{{ pic.collection }}</a></small></p>
+                {% endif %}
+                {% if pic.permissions %}
+                <p><i class="small">{{ pic.permissions }}</i></p>
+                {# NOTE: if url, could use schema:license #}
+                {% endif %}
+
+              </figcaption><!--/.caption-->
+          </figure>
+        </div>
+        {% endwith %}
+      {% endif %}
+
+    <div class="col-md-8">
+      {% comment %}  {# Using local profile images instead of dbpedia thumbnails #}
+      {% if person.dbpedia.thumbnail %}
+      <div class="pull-right">
+        <img src="{{ person.dbpedia.thumbnail }}"/>
+        <p><small><i>image via <a href="{{ person.dbpedia.wikipedia_url }}">Wikipedia</a></i></small></p>
+      </div>
+      {% endif %}
+      {% endcomment %}
+
+      {# suppressing rdf occupation, locations, birth date & place - redundant with description #}
+      {% comment %}
+      {% if person.occupation %}
+      <p><b>Occupation:</b> {{ person.occupation|join:', ' }}</p>
+      {% endif %}
+
+      {% if person.locations %}
+      <p><b>Locations:</b>
+          {# for now, link to outside URI location; eventually may want in-site links #}
+        {% for loc in person.locations %}
+        <a href="{{ loc.identifier }}">{{ loc }}</a>{% if not forloop.last %}; {% else %}.{% endif %}
+        {% endfor %}
+        </p>
+      {% endif %}
+
+      {% if person.birthdate %}
+      <p>Born {{ person.birthdate }}
+          {% if person.birthplace %}
+          in <a href="{{ person.birthplace.identifier }}">{{ person.birthplace }}</a>{% endif %}.</p>
+      {% endif %}
+      {% endcomment %}
+
+      {# keeping redundant rdf info invisible, but make some of it available via rdfa #}
+      {% for occ in person.occupation %}
+      <span property="schema:jobTitle" content="{{ occ }}"/>
+      {% endfor %}
+      {% if person.birthdate %}<span property="schema:birthDate" content="{{ person.birthdate }}"/>{% endif %}
+
+      {% if person.dbpedia_uri %}<a property="schema:sameAs" href="{{ person.dbpedia_uri}}"></a>{% endif %}
+      {% if person.viaf_uri %}<a property="schema:sameAs" href="{{ person.viaf_uri}}"></a>{% endif %}
+
+
+      {% if person.description %}
+      <p property="schema:description" class="description">{{ person.description }}
+        {% if person.description_context and person.desc_context_name %}
+        {# link to the source of the description *if* it has a label (i.e., findingaid where the description comes from) #}
+        <small><i>(<a href="{{ person.description_context }}">{{ person.desc_context_name }}</a>)</i></small>
+        {% endif %}
+      </p>
+      {% elif person.dbpedia.description %}
+      <p>{{ person.dbpedia.description }}
+        <small><i>({% if person.dbpedia.wikipedia_url %}<a href="{{ person.dbpedia.wikipedia_url }}">Wikipedia</a>{% else %}Wikipedia{% endif %})</i></small></p>
+        {% endif %}
+
+    </div>
+  </div><!-- /.row -->
+
+  <div class="row">
+    <ul class="nav nav-tabs nav-justified" id="vizTab">
+      {% if groupsheets %}
+      <li class="active"><a href="#groupsheets">Group Sheets</a></li>
+      {% endif %}
+      {# only display connections & network tab if there are any #}
+      {% if person.connected_people|length or person.connected_organizations|length %}
+      <li {% if not groupsheets %}class="active"{% endif %}><a href="#graph">Network Graph</a></li>
+      <li><a href="#connections">Connections</a></li>
+      {% endif %}
+
+    </ul>
+
+    <div class="tab-content">
+      {% if groupsheets %}
+      <div class="tab-pane active" id="groupsheets">
+        <ul class="groupsheet-list list-group">
+          {% for doc in groupsheets %}
+            <li class="list-group-item">{% include 'groupsheets/snippets/list_groupsheet.html' with profile=True %}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      {% if person.connected_people|length or person.connected_organizations|length %}
+      <div class="tab-pane {% if not groupsheets %}active{% endif %}" id="graph">
+        {% include "people/ego_graph.html" %}
+      </div>
+
+      <div class="tab-pane" id="connections">
+
+        {% if person.connected_people %}
+        <h4>People</h4>
+        <ul>
+          {% for conn, rel_info in person.connected_people %}
+          <li>
+            {% if conn.has_profile %} {# if connected person has a profile, link to it #}
+            <a href="{{ conn.identifier }}">{{ conn.fullname }}</a>
+            {% else %}
+            {{ conn.fullname }}
+            {% endif %}
+
+            {# link to viaf, wikipedia with icons #}
+            {% if conn.viaf_uri %}
+            <a href="{{ conn.viaf_uri }}"><img src="{% static 'img/viaf.png' %}" alt="VIAF"/></a>
+            {% endif %}
+            {% if conn.dbpedia_uri %}
+            {# link to wikipedia page if we can; if not, link to dbpedia #}
+            <a href="{% firstof conn.dbpedia.wikipedia_url conn.dbpedia %}">
+              <img src="{% static 'img/wikipedia.png' %}" alt="Wikipedia"/>
+            </a>
+            {% endif %}
+
+            {% if rel_info.0 %} - {{ rel_info.0|join:', '}}{% endif %}
+            {% if debug %}<small>(weight: {{ rel_info.1 }})</small>{% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if person.connected_organizations %}
+        <h4>Organizations</h4>
+        <ul>
+          {% for conn, rel_info in person.connected_organizations %}
+          <li>{{ conn.name }}
+            {# link to viaf, wikipedia with icons #}
+            {% if conn.viaf_uri %}
+            <a href="{{ conn.viaf_uri }}"><img src="{% static 'img/viaf.png' %}" alt="VIAF"/></a>
+            {% endif %}
+            {% if conn.dbpedia_uri %}
+            {# link to wikipedia page if we can; if not, link to dbpedia #}
+            <a href="{% firstof conn.dbpedia.wikipedia_url conn.dbpedia %}"><img src="{% static 'img/wikipedia.png' %}" alt="Wikipedia"/></a>
+            {% endif %}
+
+            {% if rel_info %} - {{ rel_info.0|join:', '}}{% endif %}
+            {% if debug %}<small>(weight: {{ rel_info.1 }})</small>{% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+
+      {% endif %}
+    </div>
+
+  </div> {# person #}
+</div> {# about #}
+</div>
+<script>
+$(function () {
+  $('#vizTab a').on('click',function (e) {
+    e.preventDefault();
+    $(this).tab('show');
+  });
+});
+</script>
+{% endblock %}

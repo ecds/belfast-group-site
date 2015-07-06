@@ -1,0 +1,718 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="simmons1_1072">
+  <teiHeader><fileDesc>
+      <titleStmt>
+        <title> Simmons Workshops</title>
+        <author><name type="person">
+          <choice>
+            <sic>James Simmons</sic>
+            <reg>Simmons, James, 1933-</reg>
+          </choice>
+          </name></author>
+        <respStmt>
+          <resp>Compiled and edited by</resp>
+          <name>Staff</name>
+        </respStmt>
+      </titleStmt>
+      <extent>43 Kb</extent>
+      <publicationStmt>
+        <publisher>Lewis H. Beck Center</publisher>
+        <pubPlace>Emory University</pubPlace>
+        <address>
+          <addrLine>Atlanta, Georgia</addrLine>
+        </address>
+        <idno type="ark" n="simmons1_1035">http://pid.emory.edu/ark:/25593/17md1</idno>
+        <idno type="ark" n="simmons1_1069">http://pid.emory.edu/ark:/25593/17mf5</idno>
+        <availability>
+          <p xml:id="simmons1_101">1996 Emory University. Permission is granted to
+download, transmit, or otherwise reproduce, distribute or display the
+contributions to the work claimed by Emory University for non-profit
+educational purposes, provided this header is included in its
+entirety.  For inquiries about commercial uses, contact either:
+Electronic Poetry Project or Lewis H. Beck Center for Electronic
+collections and services, Emory University, Atlanta, Georgia 30322</p>
+        </availability><date>1996</date></publicationStmt>
+      <seriesStmt>
+        <title>Irish Poets</title>
+      </seriesStmt>
+      <sourceDesc>
+        <bibl>Belfast Group Sheets, Manuscript, Archives, and Rare Book Library, Robert W. Woodruff Library, Emory University, Atlanta GA</bibl>
+      </sourceDesc>
+    </fileDesc><encodingDesc><projectDesc>
+        <p xml:id="simmons1_102">This text is produced in conjunction with the Electronic Poetry Project at Emory University</p>
+      </projectDesc>
+            <refsDecl><p>In the publicationStmt/idno the n attribute contains the id of the corresponding group.</p></refsDecl></encodingDesc><revisionDesc><change><name>Stewart Varner</name> transformed this document from p4 to p5 on <date when="2010-03-22">March 22, 2010</date></change><change xmlns="http://www.tei-c.org/ns/1.0"><date>1999</date><label>Staff</label><name>Jason Lemon</name>SGML tags inserted in compliance with TEI guidelines using TEILITE</change><change xmlns="http://www.tei-c.org/ns/1.0"><date>December 2008</date><label>Electronic Text Specialist</label><name>Alice Hickcox</name>idno elements containing ark identifiers added to publicationStmt.</change></revisionDesc></teiHeader>
+  <text xml:id="simmons1_1071">
+    <front xml:id="simmons1_103"/>
+    <group xml:id="simmons1_1070">
+      <group xml:id="simmons1_1035">
+        <head>POEMS BY JAMES SIMMONS</head>
+        <docAuthor>James Simmons</docAuthor>
+        <docDate>1963-1966</docDate>
+        <argument>
+          <p xml:id="simmons1_104">Workshop Poems</p>
+          <list type="simple">
+            <head/>
+            <item>Drinker's Blues</item>
+            <item>Fahan Strand</item>
+            <item>Old Lady's Song</item>
+            <item>Ramble Away</item>
+            <item>The Young Airforce Men</item>
+            <item>The Ulster Soldier Boy</item>
+          </list>
+        </argument>
+
+        <text xml:id="simmons1_109">
+          <front xml:id="simmons1_106">
+            <titlePage xml:id="simmons1_105">
+              <docTitle>
+                <titlePart type="main">DRINKER'S BLUES</titlePart>
+              </docTitle>
+            </titlePage>
+          </front>
+          <body xml:id="simmons1_107">
+            <lg type="stanza">
+              <l n="1">I drank all night and I didn't get up till nine.</l>
+              <l>How could I get into work on time?</l>
+            </lg>
+            <lg type="stanza">
+              <l>I put on my clothes and left the house about ten.</l>
+              <l>I cashed a cheque and went into a bar again.</l>
+            </lg>
+            <lg type="stanza">
+              <l>The barman said, "I envy youse boys on sprees."</l>
+              <l>"Look, this isn't fun," I told him.   "It's a disease."</l>
+            </lg>
+            <lg type="stanza">
+              <l>He laughed and he laughed every time he rang the till.</l>
+              <l>"Jesus, I wish I had your money - wouldn't I be ill."</l>
+            </lg>
+            <lg type="stanza">
+              <l>I ordered a sandwich of good fresh bread and ham.</l>
+              <l>How did I ever get into the state that I am.</l>
+            </lg>
+            <lg type="stanza">
+              <l>I looked out the window and the big, broad sky was blue.</l>
+              <l>What a wonderful day, if I only had something to do.</l>
+            </lg>
+            <lg type="stanza">
+              <l>About six o'clock in the evening it began to rain.</l>
+              <l>By eight I was singing, and by ten I felt no pain.</l>
+            </lg>
+            <lg type="stanza">
+              <l>I got up next morning and at work they took my excuse,</l>
+              <l>So I'm laying by money for the next time I have the blues.</l>
+            </lg>
+          </body>
+          <back xml:id="simmons1_108">
+            <byline>James Simmons</byline>
+          </back>
+        </text><text xml:id="simmons1_1014">
+          <front xml:id="simmons1_1011">
+            <titlePage xml:id="simmons1_1010">
+              <docTitle>
+                <titlePart type="main">FAHAN STRAND</titlePart>
+              </docTitle>
+            </titlePage>
+          </front>
+          <body xml:id="simmons1_1012">
+            <lg type="stanza">
+              <l n="1">On a sunny day in June or May</l>
+              <l>When we had time in hand,</l>
+              <l>We'ld take our bykes or hitch-hike</l>
+              <l>For a bathe along Fahan strand.</l>
+              <l>The sand is smooth, the water shallow,</l>
+              <l>Tepid to your hand,</l>
+              <l>And sparkles in the sun like stars</l>
+              <l>All along Fahan Strand.</l>
+            </lg>
+            <lg type="stanza">
+              <l>In the war we'ld descend to buy at Bridge End</l>
+              <l>Boiled sweets in paper bags,</l>
+              <l>And the tougher the guys got in supplies</l>
+              <l>Of the cheaper Free State fags;</l>
+              <l>But before I bought cigarettes or thought</l>
+              <l>Of holding girls by the hand,</l>
+              <l>I knew the route out past Burnfoot</l>
+              <l>That leads to sweet Fahan Strand.</l>
+            </lg>
+            <lg type="stanza">
+              <l>To my distress the Lough Swilly express</l>
+              <l>Is running there no more.</l>
+              <l>Past Elagh Hall it took us all</l>
+              <l>Along that lovely shore.</l>
+              <l>It went so slow that girls I know</l>
+              <l>Stept off to gather posies,</l>
+              <l>And climbed again on board the train</l>
+              <l>With armfulls of wild roses.</l>
+            </lg>
+            <lg type="stanza">
+              <l>It's a trip I like, by train or byke;</l>
+              <l>It's not too near or far;</l>
+              <l>And last July my wife and I</l>
+              <l>Went down there in the car.</l>
+              <l>I thought of friends I used to know</l>
+              <l>And a boy who used to stand,</l>
+              <l>A bit like me, but young and free,</l>
+              <l>And gaze across Fahan Strand.</l>
+            </lg>
+          </body>
+          <back xml:id="simmons1_1013">
+            <byline>James Simmons</byline>
+          </back>
+        </text><text xml:id="simmons1_1019">
+          <front xml:id="simmons1_1016">
+            <titlePage xml:id="simmons1_1015">
+              <docTitle>
+                <titlePart type="main">OLD LADY'S SONG</titlePart>
+              </docTitle>
+            </titlePage>
+          </front>
+          <body xml:id="simmons1_1017">
+            <lg type="stanza">
+              <l n="1">I'm glad to be old and tied to my chair.</l>
+              <l>I sing to myself; they think I'm not all there;</l>
+              <l>But all that they do and they think (this is the truth)</l>
+              <l>I've done or I've thought in the days of my youth.</l>
+            </lg>
+            <lg type="stanza">
+              <l>I smile and I knit, they feel tender derision,</l>
+              <l>But it's them that I watch though they've bought me television.</l>
+            </lg>
+            <lg type="stanza">
+              <l>Their loves and their hates and their joy and their woe</l>
+              <l>Are child's play to my life, a long time ago.</l>
+            </lg>
+            <lg type="stanza">
+              <l>Their flights and their troubles, delights and dispair,</l>
+              <l>They think would be too much for my old heart to bear:</l>
+              <l>I pretend I don't hear them, for young folk can't see</l>
+              <l>Whatever they do they will end up like me.</l>
+            </lg>
+            <lg type="stanza">
+              <l>To heaven or Hell I will soon get my call;</l>
+              <l>Though I think more and more I'm going nowhere at all.</l>
+              <l>Goodbye to my knitting, to warmth and to cold,</l>
+              <l>To the air, to the sun, and to feeling too old.</l>
+            </lg>
+          </body>
+          <back xml:id="simmons1_1018">
+            <byline>James Simmons</byline>
+          </back>
+        </text><text xml:id="simmons1_1024">
+          <front xml:id="simmons1_1021">
+            <titlePage xml:id="simmons1_1020">
+              <docTitle>
+                <titlePart type="main">RAMBLE AWAY</titlePart>
+              </docTitle>
+            </titlePage>
+          </front>
+          <body xml:id="simmons1_1022">
+            <lg type="stanza">
+              <l n="1">I like to go walking down Bachelor's Walk,</l>
+              <l>To see the young women and hold them in talk,</l>
+              <l>Well aware that my manner will lead them astray,</l>
+              <l>For I am the young man they call Ramble Away.</l>
+            </lg>
+            <lg type="stanza">
+              <l>Chorus:</l>
+            </lg>
+            <lg type="stanza">
+              <l>Ramble away, ramble away.</l>
+              <l>Yes, I'm the young man they call Ramble Away.</l>
+            </lg>
+            <lg type="stanza">
+              <l>I went to a cafe and sat smoking there</l>
+              <l>And talked to a waitress with dark auburn hair.</l>
+              <l>With my purple stripe shirt and my suit of dark grey</l>
+              <l>There's few are indifferent to Ramble Away.</l>
+            </lg>
+            <lg type="stanza">
+              <l>Chorus:</l>
+            </lg>
+            <lg type="stanza">
+              <l>When darkness had fallen I climbed in her yard,</l>
+              <l>But the door of the kitchen was bolted and barred.</l>
+              <l>I called up her name and I heard a voice say,</l>
+              <l>"Are you the young man they call Ramble Away?"</l>
+            </lg>
+            <lg type="stanza">
+              <l>Chorus.</l>
+            </lg>
+            <lg type="stanza">
+              <l>When a number of months had slipped into the past</l>
+              <l>And she found that the clips of her skirt wouldn't fasten,</l>
+              <l>I knew that I'd come to the end of my stay.</l>
+              <l>When the kissing is over I ramble away.</l>
+            </lg>
+            <lg type="stanza">
+              <l>Chorus.</l>
+            </lg>
+            <lg type="stanza">
+              <l>I can't abide crying or nagging at all,</l>
+              <l>So I left her a note on the stand in the hall,</l>
+              <l>"You can tell your old mother she was right yesterday</l>
+              <l>When she warned you to steer clear of Ramble Away."</l>
+            </lg>
+            <lg type="stanza">
+              <l>Chorus.</l>
+            </lg>
+            <lg type="stanza">
+              <l>There's endless diversion in my kind of life,</l>
+              <l>But, before I am played out, I'll find a good wife,</l>
+              <l>And plough my own furrow and ream my own hay</l>
+              <l>And let them call someone else Ramble Away.</l>
+            </lg>
+            <lg type="stanza">
+              <l>Chorus:</l>
+            </lg>
+            <lg type="stanza">
+              <l>Ramble away, ramble away,</l>
+              <l>Remember the sweet touch of Ramble Away.</l>
+            </lg>
+            <lg type="stanza">
+              <l>So all you young women who make yourselves free</l>
+              <l>With wanton young rambling fellows like me;</l>
+              <l>You're laying up treasure to count on the day</l>
+              <l>Your breath starts to leave you like Ramble Away.</l>
+            </lg>
+            <lg type="stanza">
+              <l>Chorus:</l>
+            </lg>
+            <lg type="stanza">
+              <l>Ramble away, ramble away,</l>
+              <l>Sweet life will desert you like Ramble Away.</l>
+            </lg>
+          </body>
+          <back xml:id="simmons1_1023">
+            <byline>James Simmons</byline>
+          </back>
+        </text><text xml:id="simmons1_1029">
+          <front xml:id="simmons1_1026">
+            <titlePage xml:id="simmons1_1025">
+              <docTitle>
+                <titlePart type="main">THE YOUNG AIRFORCE MEN</titlePart>
+              </docTitle>
+            </titlePage>
+          </front>
+          <body xml:id="simmons1_1027">
+            <lg type="stanza">
+              <l n="1">To a bar where I drink comes a middle-aged woman</l>
+              <l>Its marvelous the memories a few gins can summon,</l>
+              <l>The stories she tells and the tunes she is hummin'</l>
+              <l>Are all of her days with the young airforce men.</l>
+            </lg>
+            <lg type="stanza">
+              <l>"It's twenty long years wince I first saw them flying,</l>
+              <l>Young lads out of school who would shortly be dying.</l>
+              <l>I wonder, at times, are their mothers still crying</l>
+              <l>Like I do when I think of the airforce men.</l>
+            </lg>
+            <lg type="stanza">
+              <l>I served them their drinks, some were sad, some were grinning,</l>
+              <l>It's hard to believe those young fellas were sinning -</l>
+              <l>Its a sin to kill men even when they are winning.</l>
+              <l>Oh, Glorio to the young airforce men.</l>
+            </lg>
+            <lg type="stanza">
+              <l>They laughed at the grand things that Churchill was saying</l>
+              <l>And their faces looked bored when the padre was praying:</l>
+              <l>At times you'ld have thought it was games they were playing.</l>
+              <l>Oh, glorio to the young airforce men.</l>
+            </lg>
+            <lg type="stanza">
+              <l>Like a silly young girl I'd wake up at night screaming</l>
+              <l>To think of eyes glazed that I'd often watched gleaming:</l>
+              <l>I only see eyes that bright now when I'm dreaming.</l>
+              <l>Oh, glorio etc.</l>
+            </lg>
+            <lg type="stanza">
+              <l>An engine would stop and we'd shut up to listen</l>
+              <l>For nearly each morning some young face was missing</l>
+              <l>And missing his fair share of loving and kissing.</l>
+              <l>Oh, glorio etc.</l>
+            </lg>
+            <lg type="stanza">
+              <l>I give them the glory that memory can lend them,</l>
+              <l>But most men who praise them would only offend them:</l>
+              <l>You don't have to swallow half truths to defend them.</l>
+              <l>Oh, glorio etc.</l>
+            </lg>
+            <lg type="stanza">
+              <l>Come here you young fella, your schooldays are over,</l>
+              <l>Your dancing and drinking with your arms round your lover.</l>
+              <l>The boy that I loved was washed in down near Dover.</l>
+              <l>Oh, glorio to the young airforce men.</l>
+            </lg>
+          </body>
+          <back xml:id="simmons1_1028">
+            <byline>James Simmons</byline>
+          </back>
+        </text><text xml:id="simmons1_1034">
+          <front xml:id="simmons1_1031">
+            <titlePage xml:id="simmons1_1030">
+              <docTitle>
+                <titlePart type="main">THE ULSTER SOLDIER BOY</titlePart>
+              </docTitle>
+            </titlePage>
+          </front>
+          <body xml:id="simmons1_1032">
+            <lg type="stanza">
+              <l n="1" rend="indent5">Oh have you heard the speeches, Mary? War has just begun.</l>
+              <l rend="indent5">The posters say that duty calls, have you seem the tanks and guns?</l>
+              <l rend="indent5">I'm going to join the army for there's no work here for me,</l>
+              <l rend="indent5">And the government will pay your ront when I'm in Germany.</l>
+            </lg>
+            <lg type="stanza">
+              <l>Oh Billy, close your ears to what the cultured voices say;</l>
+              <l>Don't let no lying tales of glory steal my love away.</l>
+              <l>I feel the bullets strike as sure as I feel your child in me;</l>
+              <l>You're better hungry here at home than dead in Germany.</l>
+            </lg>
+            <lg type="stanza">
+              <l>I wish that you could come along in a lorry in the rear</l>
+              <l>To cheer me up, and join us when we're stopping off for beer.</l>
+              <l>You'ld make a tent a grand hotel, and think of all you'ld see;</l>
+              <l>The soldiers throwing their lives away on the road to Germany.</l>
+            </lg>
+            <lg type="stanza">
+              <l>From every town and village here have gone the finest lads</l>
+              <l>To fight the cruel wars abroad, and all the news is bad.</l>
+              <l>The winter was the coldest one that I will ever see.</l>
+              <l>It's cold at home and in the fields on the road to Germany.</l>
+            </lg>
+            <lg type="stanza">
+              <l>The corn our old men planted in the earth has risen high,</l>
+              <l>The fruit weighs down the branches and the larks sing in the sky.</l>
+              <l>The son I bore my husband sits here smiling on my knee.</l>
+              <l>I curse the hunger drove his father on to Germany.</l>
+            </lg>
+            <lg type="stanza">
+              <l>I got a letter from the King to say that Billy died</l>
+              <l>A hero's death for England, but I feel no surge of pride.</l>
+              <l>It's easy with the pension now, but I hate security</l>
+              <l>That Billy bought me with his life on the road to Germany.</l>
+            </lg>
+          </body>
+          <back xml:id="simmons1_1033">
+            <byline>James Simmons</byline>
+          </back>
+        </text></group>
+      <group xml:id="simmons1_1069">
+        <head>POEMS BY JAMES SIMMONS</head>
+        <docAuthor>James Simmons</docAuthor>
+        <docDate>1963-1968</docDate>
+        <argument>
+          <p xml:id="simmons1_1036">Workshop Poems</p>
+          <list type="simple">
+            <head/>
+            <item>Sonnets for the Class of 58</item>
+            <item>One Man - Two Voices</item>
+            <item>On Gardens</item>
+            <item>At Cordelia's Grave</item>
+            <item>Soliloquy for a Ghost</item>
+          </list>
+        </argument>
+
+        <text xml:id="simmons1_1041">
+          <front xml:id="simmons1_1038">
+            <titlePage xml:id="simmons1_1037">
+              <docTitle>
+                <titlePart type="main">SONNETS FOR THE CLASS OF 58</titlePart>
+              </docTitle>
+            </titlePage>
+          </front>
+          <body xml:id="simmons1_1039">
+            <lg type="stanza">
+              <l n="1">No longer students and not likely to succeed,</l>
+              <l>Tonight I remember old friends, scattered far,</l>
+              <l>Who wanted so much once, and now need</l>
+              <l>Only a rise of a hundred pounds or a car</l>
+              <l>Or a holiday abroad without the wife,</l>
+              <l>Or time to read more, or more fun.</l>
+              <l>Perhaps never, or only when drunk, does life</l>
+              <l>Seem as it once seemed, a war to be won.</l>
+              <l>The moving and influential things they devised</l>
+              <l>Have all be said and done, it seems, by others.</l>
+              <l>Some do the very things that they despised</l>
+              <l>And recognise the enemy as brothers;</l>
+              <l>And even those who've gained more power or sense</l>
+              <l>Feel sorry when they feel the difference.</l>
+            </lg>
+          </body>
+          <back xml:id="simmons1_1040">
+            <byline>JAMES SIMMONS</byline>
+          </back>
+        </text><text xml:id="simmons1_1046">
+          <front xml:id="simmons1_1043">
+            <titlePage xml:id="simmons1_1042">
+              <docTitle>
+                <titlePart type="main">ONE MAN - TWO VOICES</titlePart>
+              </docTitle>
+            </titlePage>
+          </front>
+          <body xml:id="simmons1_1044">
+            <lg type="stanza">
+              <l n="1">A. Helen, last year you gave my love the bird.</l>
+              <l rend="indent3">Since then strange bits of poem fill my head;</l>
+              <l rend="indent3">Don Quixote was one image that recurred.</l>
+            </lg>
+            <lg type="stanza">
+              <l>B. Try poet rampant flogging horse stone dead.</l>
+            </lg>
+            <lg type="stanza">
+              <l>A. And then a war-horse, used to pull a cart,</l>
+              <l rend="indent3">Who tried to bolt when someone blew a trumpet.</l>
+              <l rend="indent3">These were, of course, to represent my part.</l>
+            </lg>
+            <lg type="stanza">
+              <l>B. Why not a greedy child that grabs a crumpet.</l>
+            </lg>
+            <lg type="stanza">
+              <l>A. Windmills and trumpets seemed to fit your beauty -</l>
+              <l rend="indent3">You needed me although you didn't know it -</l>
+              <l rend="indent3">Showing me faithful to the call of duty.</l>
+            </lg>
+            <lg type="stanza">
+              <l>B. Emotional good-time girl and ageing poet.</l>
+            </lg>
+            <lg type="stanza">
+              <l>A. But how am I to learn to trust my eyes</l>
+              <l rend="indent3">If truth and beauty live inside my head?</l>
+              <l rend="indent3">You must have lured me with your practised lies.</l>
+            </lg>
+            <lg type="stanza">
+              <l>B. Christ!  You persisted when she cut you dead.</l>
+            </lg>
+            <lg type="stanza">
+              <l>A. When I am cured I'll learn to pity you;</l>
+              <l rend="indent3">The "dame sans merci" has a bitches life.</l>
+              <l rend="indent3">My heart starves if it must, I will be true.</l>
+            </lg>
+            <lg type="stanza">
+              <l>B. Only to those who don't become your wife.</l>
+            </lg>
+            <lg type="stanza">
+              <l>A. Time and the odds against true counterparts</l>
+              <l rend="indent3">(Our minds grow wiser as our bones decay)</l>
+              <l rend="indent3">Make tales ring true that tell of broken hearts.</l>
+            </lg>
+            <lg type="stanza">
+              <l>B. You'll live to fornicate another day.</l>
+            </lg>
+          </body>
+          <back xml:id="simmons1_1045">
+            <byline>JAMES SIMMONS</byline>
+          </back>
+        </text><text xml:id="simmons1_1051">
+          <front xml:id="simmons1_1048">
+            <titlePage xml:id="simmons1_1047">
+              <docTitle>
+                <titlePart type="main">ON GARDENS</titlePart>
+              </docTitle>
+            </titlePage>
+          </front>
+          <body xml:id="simmons1_1049">
+            <lg type="stanza">
+              <l n="1">I wanted a walled garden's protected peace,</l>
+              <l>With many bushes, tall flowers and trees,</l>
+              <l>A wooden, well-aired bower in a simple design,</l>
+              <l>With a watertight roof and a dry seat, to be mine.</l>
+              <l>A gardener would come, but not to groom it for shows</l>
+              <l>And not in the long afternoons when the pubs close.</l>
+              <l>He would grumble because it is wild, but not care,</l>
+              <l>And I'd be securely alone in the open air.</l>
+            </lg>
+            <lg type="stanza">
+              <l>But walls are a warning not to break the laws</l>
+              <l>Of trespass.  Damn it!  Already I see the flaws:</l>
+              <l>Boys, forbidden or fined, would upset my peace.</l>
+              <l>They would clamber or mock if I didn't connive with police</l>
+              <l>To catch them.   The knowledge of good and evil seems</l>
+              <l>To infect any garden.   I'd squirm with dreams</l>
+              <l>Of others wanting a part of my too great share</l>
+              <l>In the this overpopulous country.   I would care.</l>
+              <l>I'd have no contempt for those who would dispossess me.</l>
+              <l>However strident or powerless, they could distress me.</l>
+            </lg>
+            <lg type="stanza">
+              <l>I try to contrast the good work I might do</l>
+              <l>With the wrong that privilege is from the other view;</l>
+              <l>But to live in a garden's the only way to find</l>
+              <l>That the story is true and no one was left behind.</l>
+            </lg>
+          </body>
+          <back xml:id="simmons1_1050">
+            <byline>JAMES SIMMONS</byline>
+          </back>
+        </text><text xml:id="simmons1_1057">
+          <front xml:id="simmons1_1053">
+            <titlePage xml:id="simmons1_1052">
+              <docTitle>
+                <titlePart type="main">AT CORDELIA'S GRAVE</titlePart>
+              </docTitle>
+            </titlePage>
+          </front>
+          <body xml:id="simmons1_1055">
+            <epigraph>
+              <p xml:id="simmons1_1054">(France speaks)</p>
+            </epigraph>
+            <lg type="stanza">
+              <head>1</head>
+              <l n="1">My wife:  a martyr.</l>
+              <l>I have undressed this small perfect body:</l>
+              <l>It's holy now. I have caressed her white neck</l>
+              <l>Which is bruised where the rope choked her.</l>
+              <l>This mouth I have pressed with my mouth</l>
+              <l>Will not kiss and not argue again.</l>
+              <l>The mind behind her eyes is blank</l>
+              <l>And can't try to explain why truth was tricked</l>
+              <l>And gentleness abused, why youth met death.</l>
+              <l>And all those years I was expecting</l>
+              <l>Have been cancelled - the new life she won,</l>
+              <l>Married to me, free from her mad relations.</l>
+            </lg>
+            <lg type="stanza">
+              <l>Martyr indeed!  Her sisters were undone by loving</l>
+              <l>Edmund - lucky bastard, only a liar could reach them;</l>
+              <l>It was a family quarrel that Cordelia won.</l>
+            </lg>
+            <lg type="stanza">
+              <head>2</head>
+              <l>It was the acuteness of her love</l>
+              <l>That made her silent, not pride.</l>
+              <l>Her love and her dear father would be justified</l>
+              <l>When time taught him to see the only way.</l>
+              <l>I could agree, but then, "My father is being tried</l>
+              <l>Too far - and tried by whom?" she'd say.</l>
+              <l>"None of these people understands his ways</l>
+              <l>Like me. There isn't time for holidays!"</l>
+              <l>"Not holidays," I said.  "Your life is here.</l>
+              <l>He must choose now, you've made the issues clear.</l>
+              <l>This follows from your silence - you weren't cold</l>
+              <l>But wise, kind in the bravest way."  She said, "He's old."</l>
+            </lg>
+            <lg type="stanza">
+              <head>3</head>
+              <l>I gave her many good and interesting gifts</l>
+              <l>And new friends with wit and courage equal to hers.</l>
+              <l>While they were analysing and construing</l>
+              <l>And recommending liberal reforms, she'd say,</l>
+              <l>"I must go home, What is Goneril going?"</l>
+              <l>"To keep control of things I should have lied.</l>
+              <l>Truth is a luxury and I'd rather</l>
+              <l>Stop serving ideals and serve my father."</l>
+              <l>I told her there was no control of outcomes,</l>
+              <l>"Your father would have suffered either way;</l>
+              <l>Pain is the rent on life.  Whoever chooses</l>
+              <l>Wisely will still suffer when others lose."</l>
+              <l>"Well, then I should have stayed like Kent."</l>
+              <l>My patience tried too far I said,</l>
+              <l>"Kent has the virtues of an English dog - that's all.</l>
+              <l>He serves blindly, barks at his master's enemies,</l>
+              <l>Comes to his call always and finally dies</l>
+              <l>On his master's grave - humorous, brave, useful;</l>
+              <l>But for all his good service, what will he save?"</l>
+              <l>She only answered, "He's better than you or I -</l>
+              <l>Give me your army."  And I, to please her,</l>
+              <l>Have let me own countrymen go to die.</l>
+              <l>Why are so many involved?  Why?  Why?</l>
+            </lg>
+            <lg type="stanza">
+              <head>4</head>
+              <l>Oh they were fascinators - Lear and his children -</l>
+              <l>Mad, bad, treacherous;  all of them found</l>
+              <l>Faithful servants to watch and set forward</l>
+              <l>Their family spree of love and hate.  They cared</l>
+              <l>Nothing for us, all for their damned family</l>
+              <l>And yet I am crying, I am ready to lie down</l>
+              <l>And die like Gloucester did and Kent will, like the clown.</l>
+            </lg>
+          </body>
+          <back xml:id="simmons1_1056">
+            <byline>JAMES SIMMONS</byline>
+          </back>
+        </text><text xml:id="simmons1_1062">
+          <front xml:id="simmons1_1059">
+            <titlePage xml:id="simmons1_1058">
+              <docTitle>
+                <titlePart type="main">SINGING AT A COFFEE PARTY</titlePart>
+              </docTitle>
+            </titlePage>
+          </front>
+          <body xml:id="simmons1_1060">
+            <lg type="stanza">
+              <l n="1">I hit the strings with my curved fingers</l>
+              <l>To warn the people in the room:</l>
+              <l>They ignore me:  I, never the less, begin</l>
+              <l>To sing a song I respect and delight in</l>
+              <l>And have practised and sing well.</l>
+              <l>The talking pauses, I relax and sing better,</l>
+              <l>The talking swells slowly, louder and louder:</l>
+              <l>No one is moved, I blush and deteriorate.</l>
+              <l>"What will I do?" I ask myself -</l>
+              <l>Still singing, but choked with shame.</l>
+              <l>Should I stop?  Should I shout?  I shrug</l>
+              <l>And go on singing, hearing myself:</l>
+              <l>I practise for a time when people are listening:</l>
+              <l>My singing improves.</l>
+              <l rend="indent21">I move upstairs</l>
+              <l>To sing on the landing and the crowd is hostile</l>
+              <l>Still, but more docile.  They hear me out</l>
+              <l>And are pleased enough:  I sing quite well;</l>
+              <l>But the people grow restive, are talking</l>
+              <l>After two more songs.   I sing one more</l>
+              <l>And move to the hall for another performance.</l>
+            </lg>
+          </body>
+          <back xml:id="simmons1_1061">
+            <byline>JAMES SIMMONS</byline>
+          </back>
+        </text><text xml:id="simmons1_1068">
+          <front xml:id="simmons1_1064">
+            <titlePage xml:id="simmons1_1063">
+              <docTitle>
+                <titlePart type="main">SOLILOQUY FOR A GHOST</titlePart>
+              </docTitle>
+            </titlePage>
+          </front>
+          <body xml:id="simmons1_1066">
+            <epigraph>
+              <p xml:id="simmons1_1065">(Leeds.  Saturday afternoon.  October.)</p>
+            </epigraph>
+            <lg type="stanza">
+              <l n="1">Going home alone this deserted Saturday,</l>
+              <l>As a child goes back to heaven, the longest way,</l>
+              <l>I knock at my usual doors to company</l>
+              <l>But pubs and coffee-lounge are closed, even the library.</l>
+              <l>It is clear to my mind when lifted awhile from self-pity</l>
+              <l>That blessings fall as surely as the soot</l>
+              <l>That made this spire a member of the black city -</l>
+              <l>God's mission to bankers or banker's loot.</l>
+              <l>Red-brick terrace houses and bare trees</l>
+              <l>Etched on a water-coloured sky, a cage of girders,</l>
+              <l>The worn pavement, all that my eye sees</l>
+              <l>Please me, being themselves, my beloved warders.</l>
+              <l>They are clothed in today's unique weather - not queer</l>
+              <l>But clearly defined by hour, season and year.</l>
+              <l>I am blessed and neglect the blessing and walk again,</l>
+              <l>Blindly hearing the mind rehearse its pain.</l>
+              <l>"I am not myself.  These streets were the scene</l>
+              <l>Of my daily life.  Involved in projects and routine</l>
+              <l>I passed here often and return as a ghost</l>
+              <l>To tour sites, seeing where my time was lost.</l>
+              <l>Ghosts should accuse their murderers;  I shiver</l>
+              <l>At my own moaning but have no message to deliver.</l>
+              <l>A perturbed spirit with meal time for a clock</l>
+              <l>I start back as the bells say, "six o'clock"</l>
+              <l>To the nicest woman I have ever met,</l>
+              <l>Where my bed is made and tea table set.</l>
+            </lg>
+          </body>
+          <back xml:id="simmons1_1067">
+            <byline>JAMES SIMMONS</byline>
+          </back>
+        </text></group>
+    </group>
+  </text>
+</TEI>

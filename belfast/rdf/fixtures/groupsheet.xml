@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:dc="http://purl.org/dc/terms/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:schema="http://schema.org/"
+>
+  <rdf:Description rdf:nodeID="Ne2e84c5df82d48b7bc90f25510232fed">
+    <rdf:rest rdf:nodeID="N98db6262b69b497c9b321e32478d847d"/>
+    <rdf:first xml:lang="en">Boy Driving his
+                                Father to Confession</rdf:first>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://viaf.org/viaf/110228045">
+    <rdf:type rdf:resource="http://schema.org/Person"/>
+    <schema:name xml:lang="en">Derek Mahon</schema:name>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nc1a20c720a5c485e9d011743928e3ec8">
+    <rdf:rest rdf:nodeID="N3fc32fa7d1f0400d934d6642f4e9e764"/>
+    <rdf:first xml:lang="en">Blackberry-Picking</rdf:first>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://viaf.org/viaf/91907300">
+    <rdf:type rdf:resource="http://schema.org/Person"/>
+    <schema:name xml:lang="en">Philip Hobsbaum</schema:name>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://viaf.org/viaf/39398205">
+    <rdf:type rdf:resource="http://schema.org/Person"/>
+    <schema:name xml:lang="en">Michael Longley</schema:name>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://viaf.org/viaf/64048541">
+    <rdf:type rdf:resource="http://schema.org/Person"/>
+    <schema:name xml:lang="en">Paul Muldoon</schema:name>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N3fc32fa7d1f0400d934d6642f4e9e764">
+    <rdf:rest rdf:nodeID="N66fed9178982485fa635a7613d2bd399"/>
+    <rdf:first xml:lang="en">Saint
+                                Francis and the Birds</rdf:first>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N99bf67df8ba24b2595ab6f817bdf90a4">
+    <rdf:rest rdf:nodeID="Nadbbba8ed70844e48ff87cd50b2c8185"/>
+    <rdf:first xml:lang="en">On Hogarth's Engraving 'Pit
+                                Ticket for the Royal Sport'</rdf:first>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N3bee8d11b25544e68cf8bca84a30c218">
+    <dc:creator rdf:resource="http://viaf.org/viaf/109557338"/>
+    <rdf:type rdf:resource="http://purl.org/ontology/bibo/Manuscript"/>
+    <schema:URL rdf:resource="http://pid.emory.edu/ark:/25593/17kjg"/>
+    <dc:title rdf:nodeID="Ne2e84c5df82d48b7bc90f25510232fed"/>
+    <dc:date xml:lang="en">1965-04-27</dc:date>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://pid.emory.edu/ark:/25593/8zkmf#collection">
+    <schema:mentions rdf:nodeID="N3bee8d11b25544e68cf8bca84a30c218"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N66fed9178982485fa635a7613d2bd399">
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    <rdf:first xml:lang="en">At a
+                                Potato Digging</rdf:first>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nadbbba8ed70844e48ff87cd50b2c8185">
+    <rdf:rest rdf:nodeID="Nc1a20c720a5c485e9d011743928e3ec8"/>
+    <rdf:first xml:lang="en">Synge on Aran</rdf:first>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N98db6262b69b497c9b321e32478d847d">
+    <rdf:rest rdf:nodeID="N99bf67df8ba24b2595ab6f817bdf90a4"/>
+    <rdf:first xml:lang="en">To A Wine
+                                Jar</rdf:first>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://sws.geonames.org/2655984/">
+    <rdf:type rdf:resource="http://schema.org/Place"/>
+    <schema:name xml:lang="en">Belfast</schema:name>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://localhost:8001/documents/longley744/series8/">
+    <schema:dateModified xml:lang="en">2013-12-13</schema:dateModified>
+    <rdf:type rdf:resource="http://schema.org/WebPage"/>
+    <dc:isPartOf xml:lang="en">http://pid.emory.edu/ark:/25593/8zkmf</dc:isPartOf>
+    <schema:about rdf:resource="http://pid.emory.edu/ark:/25593/8zkmf#collection"/>
+    <schema:about rdf:resource="http://viaf.org/viaf/123393054"/>
+    <schema:relatedLink rdf:resource="http://pid.emory.edu/ark:/25593/8zgst"/>
+    <schema:name xml:lang="en">Michael Longley papers, 1960-2000; Series 8: Belfast Group sheets</schema:name>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://viaf.org/viaf/109557338">
+    <rdf:type rdf:resource="http://schema.org/Person"/>
+    <schema:name xml:lang="en">Seamus Heaney</schema:name>
+    <schema:name xml:lang="en">Heaney, Seamus</schema:name>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://viaf.org/viaf/123393054">
+    <schema:affiliation rdf:resource="http://viaf.org/viaf/110228045"/>
+    <schema:affiliation rdf:resource="http://viaf.org/viaf/109557338"/>
+    <schema:affiliation rdf:resource="http://viaf.org/viaf/39398205"/>
+    <schema:affiliation rdf:resource="http://viaf.org/viaf/64048541"/>
+    <schema:location rdf:resource="http://sws.geonames.org/2655984/"/>
+    <schema:founder rdf:resource="http://viaf.org/viaf/91907300"/>
+    <rdf:type rdf:resource="http://schema.org/Organization"/>
+    <schema:foundingDate xml:lang="en">1960</schema:foundingDate>
+  </rdf:Description>
+</rdf:RDF>

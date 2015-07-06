@@ -1,0 +1,62 @@
+/* chords */
+#circle circle {
+  fill: none;
+  pointer-events: all;
+}
+
+#chart{
+	margin-top: -2em;
+}
+
+@media(min-width: 600px){
+	#chart{
+		margin-top: -5em;
+	}
+}
+
+#chart svg{
+	overflow: inherit;
+}
+
+.group path {
+  fill-opacity: .5;
+}
+
+path.chord {
+  stroke: #000;
+  stroke-width: .1px;
+}
+
+#circle:hover path.fade {
+  display: none;
+}
+
+g.group {
+    cursor: pointer;
+}
+
+div#key .panel{
+	box-shadow: 0px 1px 6px 1px rgba(146, 146, 146, 0.6);
+	background-color: #F5F5F5;
+	padding: 0 10px;
+	margin-top: -5em;
+}
+
+@media (min-width:768px){
+	#chart{
+		margin-bottom: 100px;
+		padding: 50px;
+		margin-top: 0;
+	}
+	div#key .panel{
+		margin-top:20%;
+	}
+}
+
+@media (min-width:993px){
+	div#key .panel{
+		margin-top:10%;
+		position: fixed;
+		width: 100%;
+	}
+}

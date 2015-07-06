@@ -1,0 +1,31 @@
+[
+{
+  "pk": 1,
+  "model": "django_image_tools.filter",
+  "fields": {
+    "numeric_parameter": null,
+    "name": "bw",
+    "filter_type": 0
+  }
+},
+{
+  "pk": 1,
+  "model": "django_image_tools.size",
+  "fields": {
+    "width": 350,
+    "name": "profile",
+    "auto": 1,
+    "height": 350
+  }
+},
+{
+  "pk": 2,
+  "model": "django_image_tools.size",
+  "fields": {
+    "width": 220,
+    "name": "thumbnail",
+    "auto": 0,
+    "height": 220
+  }
+}
+]

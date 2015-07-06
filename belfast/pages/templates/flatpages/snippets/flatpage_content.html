@@ -1,0 +1,5 @@
+{# common template logic for displaying flatpages, for embedding in other templates #}
+{% include 'flatpages/snippets/flatpage_addedit.html' %}
+<div class="text-content">
+  {{ flatpage.content|safe }}
+</div>

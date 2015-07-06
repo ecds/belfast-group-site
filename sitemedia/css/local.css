@@ -1,0 +1,58 @@
+/* site css for sticky footer */
+html, body {
+   height: 100%;
+ }
+
+/* Wrapper for page content to push down footer */
+#wrap {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    /* Negative indent footer by it's height */
+    margin: 0px auto -30px;
+}
+
+#wrap > .container-fluid {
+    padding-top: 60px;
+}
+
+/* fixed height of the footer */
+#push, #footer {
+    height: 30px;
+}
+#footer {
+    background-color: #f5f5f5;
+}
+
+/* Tablet  ------------------------- */
+@media (max-width: 767px) {
+
+    /* adjust footer for responsive CSS */
+    #footer {
+        margin-left: -20px;
+        margin-right: -20px;
+        padding-left: 20px;
+        padding-right: 20px;
+        height: auto;
+    }
+
+    /* Sidenav */
+    .local-sidenav {
+        width: auto;
+        margin-bottom: 20px;
+    }
+    .local-sidenav .affix {
+        position: static;
+        width: auto;
+        top: 0;
+    }
+
+    /* adjust page content margin */
+    #wrap > .container-fluid {
+        padding-top: 0;
+    }
+}
+
+}
+
+

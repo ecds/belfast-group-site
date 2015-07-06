@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+
+# pip deps
+# rdflib
+
+import argparse
+
+from belfast.rdf.qub import QUB
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Generate RDF from Queens University Belfast Group description'
+    )
+    parser.add_argument('file', metavar='FILE',
+                        help='HTML file to be parsed for generating RDF')
+    args = parser.parse_args()
+    QUB(args.file)

@@ -1,0 +1,50 @@
+{% extends 'page_base.html' %}
+{% load static %}
+
+{% block page-subtitle %} : Members{% endblock %}
+{% block head-extras %}
+  <script src="{% static 'js/masonry.min.js' %}"></script>
+{% endblock %}
+
+
+{% block page-content %}
+<h1 property="schema:name">People associated with the Belfast Group</h1>
+
+<div id="bios">
+  {% for person in people %}
+  <div class="panel">
+    <div class="thumbnail text-center">
+          {% if person.picture %}
+          <a href="{{ person }}">
+            <figure>
+              <img src="{{ person.picture.image.get__thumbnail }}" alt="{{ person.picture.image.alt_text }}"
+                 title="{{ person.picture.image.title }}">
+            </figure>
+          </a>
+          {% endif %}
+          <div class="caption">
+            <a href="{{ person }}">
+            {% if person.lastname and person.firstname %}
+              {{ person.firstname }} {{ person.lastname }}
+            {% else %} {{ person.name }}
+            {% endif %}
+            </a>
+            {# NOTE: would be nice to include count of connections/groupsheet; currently very SLOW #}
+            {% comment %}
+            {% if person.connected_people %}
+              <p>{{ person.connected_people|length }} connected people</p>
+            {% endif %}
+            {% if person.connected_organizations %}
+              <p>{{ person.connected_organizations|length }} connected organizations</p>
+            {% endif %}
+            {% endcomment %}
+        </div> {# end caption #}
+    </div> {# end thumbnail #}
+  </div> {# end panel #}
+  {% endfor %}
+</div> {# end bios #}
+{% endblock %}
+
+{% block endbody %}
+  <script src="{% static 'js/belfast.js' %}"></script>
+{% endblock %}

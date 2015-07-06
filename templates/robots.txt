@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: http://belfastgroup.digitalscholarship.emory.edu/sitemap.xml

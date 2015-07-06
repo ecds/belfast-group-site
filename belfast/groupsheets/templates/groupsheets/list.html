@@ -1,0 +1,82 @@
+{% extends 'page_base.html' %}
+{% load tei %}
+
+{% block page-subtitle %} : Group Sheets{% endblock %}
+
+{% block page-content %}
+
+  <h1 property="schema:name">Group Sheets</h1>
+  {% if flatpage %}
+    {% include "flatpages/snippets/flatpage_content.html" %}
+  {% endif %}
+<div class="clearfix"></div>
+
+
+<div class="row">
+  <div class="col-md-3 col-sm-4 sidebar">
+    <h4>Filter Group sheets <a href="#" class="toggle-section btn btn-primary"><span class="glyphicon glyphicon-chevron-down dwn"></span><span class="glyphicon glyphicon-chevron-up up"></span></a></h4>
+    <div class="collaspe-section collasped" style="display:none;">
+        {% if filters %}{# display filters currently in effect, with link to remove #}
+          <ul class="active-filters">
+            {% for label, link in filters.iteritems %}
+            <li><a href="{{ link }}">{{ label }} <span class="small text-danger"><span class="glyphicon glyphicon-remove-sign"></span></span></a></li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <hr/>
+        {% if facets.digital %}
+        <ul>
+            <li><a href="?edition=digital{{ url_suffix }}">digital editions
+                <span class="text-muted">({{ facets.digital }})</span>  </a> </li>
+        </ul>
+        {% endif %}
+
+        {% if facets.time_periods %}
+        <p><b>Time Period</b></p>
+        <ul>
+            {% for f in facets.time_periods|dictsort:"time_period" %}
+            <li><a href="?dates={{ f.time_period|default:"undetermined" }}{{ url_suffix }}">{{ f.time_period|default:"Undetermined" }}
+                <span class="text-muted">({{ f.total }})</span></a> </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if facets.authors %}
+        <p><b>Author</b></p>
+        <ul>
+            {% for f in facets.authors|dictsortreversed:"total" %}
+            <li><a href="?author={{ f.author.slug }}{{ url_suffix }}">{{ f.author.lastname }}, {{ f.author.firstname }}
+                <span class="text-muted">({{ f.total }})</span></a></li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if facets.sources %}
+        <p><b>Source</b></p>
+        <ul>
+            {% for s in facets.sources|dictsortreversed:"total" %}  {# TODO: need to use short names here! #}
+            <li><a href="?source={{ s.source.identifier|urlencode }}{{ url_suffix }}">{{ s.source.name }}
+                <span class="text-muted">({{ s.total }})</span></a> </li>
+            {# NOTE: urlencode required since collection URIs include #anchors which otherwise get lost #}
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+  </div> {# end sidebar #}
+
+  <div class="col-md-9 col-sm-8">
+
+    <h2>Displaying {{ documents|length }} Group sheet{{ documents|pluralize }}.</h2>
+
+    <ul class="groupsheet-list list-group">
+        {% for doc in documents %}
+        <li class="list-group-item">
+            {% include 'groupsheets/snippets/list_groupsheet.html' %}
+        </li>
+        {% endfor %}
+    </ul>
+  </div>
+
+</div> {# end rows #}
+{% endblock %}

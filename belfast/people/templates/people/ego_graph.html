@@ -1,0 +1,74 @@
+{% load static %}
+{# structured for inclusion as a profile tab #}
+
+<p>Force-directed ego graph of people, places, and organizations directly connected to
+  <b>{{ person.fullname }}</b>.</p>
+
+{% comment %} {# this help text should be redundant now that there is help info included in graph controls #}
+<p>Nodes are colored by type.  Mouse over a label to see the text more clearly.
+  You can drag nodes to move them apart and investigate connections;
+  double-click a fixed node to return it back to automatic placement.</p>
+{% endcomment %}
+
+{% include 'network/snippets/graph_with_controls.html' %}
+
+  {# TODO: make ego-graph radius configurable / user-editable ? #}
+  {# <link href="{% static 'js/jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.min.css' %}" rel="stylesheet" media="screen"/> #}
+ <link href="{% static 'js/jquery-ui/css/redmond/jquery-ui.min.css' %}" rel="stylesheet" media="screen"/>
+  <script type="text/javascript" src="{% static 'js/jquery-ui/js/jquery-ui-1.10.3.custom.min.js' %}"></script>
+  <script src="{% static 'js/d3.min.js' %}" charset="utf-8"></script>
+  <link type="text/css" href="{% static 'css/d3.force.css' %}" rel="stylesheet" media="screen"/>
+   <script type="text/javascript" src="{% static 'js/d3.force.js' %}"></script>
+
+   <script type="text/javascript">
+    $(document).ready(function(){
+
+      //This function lets us delay the window resize event before running the drawCharts function.
+      jQuery.fn.resize_delayed = function ( func, duration ){
+          this.resize(function() {
+              clearTimeout( window.____resize_delayed );
+              window.____resize_delayed = setTimeout( func, duration);
+          });
+      };
+
+      //This is were we define the network graph
+      function drawGraph(options){
+        var setWidth = $("#network-graph").width();
+
+        //if the graph's parent container is hidden (not the active tab), we can't get the width
+        //take the tab-content width instead.
+
+        if(setWidth==null || setWidth<100){
+          setWidth = $(".tab-content").width();
+        }
+
+        ForceGraphControls({
+          target: "#graph-controls",
+          graph_options: {
+              url: "{% url 'people:egograph-js' id=person.slug %}",
+              target: "#network-graph",
+              width: setWidth,
+              height: 500,
+              highlight: ['{{ person.identifier }}'],
+              labels: true,
+              node_info_url: "{% url 'people:egograph-node'  id=person.slug %}",
+              gravity: 1.0,
+              link_distance: 75,
+              charge: -500
+          }
+        });
+      }
+
+      //Call drawChart on load
+      drawGraph();
+      
+      //When the window is resized, call the drawGraph function to redraw chart
+      $(window).resize_delayed(function(){
+        
+        drawGraph({setWidth:$("#network-graph").width()});
+        
+      },500);
+
+    });
+   </script>
+

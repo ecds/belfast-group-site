@@ -1,0 +1,23 @@
+<div class="node-info-detail"> {# node-info is container element #}
+<h4>{% firstof person.fullname node.label %}</h4>
+
+{% if person %}
+  {% if person.has_profile %}
+    <small><a href="{{ person.identifier }}">[view profile]</a></small>
+  {% endif %}
+
+  {% if person.groupsheets %}
+  <p>{{ person.groupsheets|length }} groupsheet{{ person.groupsheets|pluralize}}
+    <small><a href="{% url 'groupsheets:list' %}?author={{ person.slug }}">[view list]</a></small></p>
+  {% endif %}
+
+{% else %}
+{# display gexf node information as fallback/ minimum content? #}
+{# node stats? degree, connectedness? #}
+{% endif %}
+
+{% if poems %}
+<p>Mentioned in {% for p in poems %}
+ <a href="{{ p.identifier }}">{{ p.title }}</a>{% if not forloop.last %}; {% endif %}{% endfor %}.</p>
+{% endif %}
+</div>
