@@ -42,7 +42,7 @@
     <li><b>Generate Network Graphs</b>
         <p>For ease of processing, network analysis, and display on certain portions of the website, the RDF data is converted into network graph format using the <a href="https://networkx.github.io/">Python NetworkX library</a>.</p>
         <ol>
-            <li>full network: all triples in the RDF (with the exception of RDF sequences) are converted into a network where each subject and object is a node and each predicate is an edge between them, weighted based on some sense of the strength of that connection (see <a href="https://github.com/emory-libraries-ecds/belfast-group-site/blob/master/belfast/rdf/nx.py#L12">current weights used in the code</a>)</li>
+            <li>full network: all triples in the RDF (with the exception of RDF sequences) are converted into a network where each subject and object is a node and each predicate is an edge between them, weighted based on some sense of the strength of that connection (see <a href="https://github.com/emory-libraries-ecds/belfast-group-site/blob/master/belfast/rdf/nx.py#L12-42">current weights used in the code</a>)</li>
             <li>specialized network based on the Group sheets by time period: nodes are the Group in period one (1963&ndash;1966) and period two (1966&ndash;1972), and the authors and owners of Group sheets; edges are added between authors and owners of Group sheets that belong to the Group in one period or the other, and between co-authors, co-owners, and owners and authors of the same Group sheet, and edges are weighted based on the number of Group sheets.</li>
         </ol>
     </li>
