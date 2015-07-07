@@ -1,9 +1,8 @@
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.views.decorators.http import last_modified
 from django.contrib.flatpages.models import FlatPage
-from django.contrib.sites.models import get_current_site
 import json
 import logging
 import networkx as nx
@@ -287,6 +286,9 @@ def node_info(request):
     Expects a url parameter ``id`` with the node identifier.
     '''
     node_id = request.GET.get('id', None)
+    # if no id is specified, 404
+    if node_id is None:
+        raise Http404
     # TODO: better to get from gexf or rdf ?
     graph = gexf.read_gexf(settings.GEXF_DATA['full'])
     node = graph.node[node_id]
