@@ -92,8 +92,11 @@ def egograph_node_info(request, id):
 
     # NOTE: some overlap here with networks node_info view
 
-    # id param is the node we want information had to
+    # id param is the node we want information
     node_id = request.GET.get('id', None)
+    if node_id is None:
+        raise Http404
+
     node_uri = rdflib.URIRef(node_id)
     # TODO: better to get relations from gexf or rdf ?
     graph = gexf.read_gexf(settings.GEXF_DATA['full'])
