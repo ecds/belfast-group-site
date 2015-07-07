@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+1.0.1
+-----
+
+* Last copy editing changes on site text content.
+* bugfix: egograph node information view will now return 404 if
+  requested without an id instead of causing a 500.
+
 
 1.0 Initial Release
 -------------------
