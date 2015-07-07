@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+1.0.2
+-----
+
+* bugfix: ignore whitespace differences when generating Group sheet
+  table of contents
+
 1.0.1
 -----
 
