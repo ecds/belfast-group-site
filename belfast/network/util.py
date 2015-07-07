@@ -1,5 +1,8 @@
+import logging
 import networkx as nx
 
+
+logger = logging.getLogger(__name__)
 
 def annotate_graph(graph, fields=[]):
     '''Annotate a :mod:`networkx` graph with network information.
@@ -29,7 +32,18 @@ def annotate_graph(graph, fields=[]):
         elif isinstance(graph, nx.MultiGraph):
             use_g = nx.Graph(graph)
 
-        eigenv = nx.algorithms.centrality.eigenvector_centrality(use_g)
+        # NOTE: for a few graphs in production, eigenvector centrality fails:
+        # "power iteration failed to converge in %d iterations"
+        # (possibly an issue with something in the graph?)
+        # Catch the error and don't include eigenvector centrality in
+        # the graph
+        try:
+            eigenv = nx.algorithms.centrality.eigenvector_centrality(use_g)
+        except nx.NetworkXError as err:
+            logger.warn('Error generating eigenvector centrality: %s' % err)
+            # remove from the list of fields so it will
+            # be skipped below
+            del fields[fields.index('eigenvector_centrality')]
 
 
     for node in graph.nodes():

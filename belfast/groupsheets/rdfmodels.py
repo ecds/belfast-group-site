@@ -41,7 +41,7 @@ class Poem(teimap._TeiBase):
     #: back matter of the poem ``tei:back``
     back = xmlmap.NodeField('tei:back', xmlmap.XmlObject)
     #: byline from the back matter, usually used for author attribution on :class:`TeiGroupSheet`
-    byline = xmlmap.StringField('tei:back/tei:byline')
+    byline = xmlmap.StringField('tei:back/tei:byline', normalize=True)
 
 
 class IdNumber(teimap._TeiBase):
