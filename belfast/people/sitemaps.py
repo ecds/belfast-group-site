@@ -15,7 +15,7 @@ class ProfileSitemap(Sitemap):
 
     def items(self):
         people = profile_people()
-        return self.extra_pages + [p for p in people]
+        return self.extra_pages + [p for p in people if p.has_profile and p.picture]
 
     def location(self, item):
         if isinstance(item, basestring):
