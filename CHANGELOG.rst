@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+1.0.2
+-----
+
+* bugfix: ignore whitespace differences when generating Group sheet
+  table of contents
+* bugfix: handle eigenvector centrality failure to converge error for
+  some profile network graphs
+
 1.0.1
 -----
 
