@@ -198,6 +198,15 @@ class DBpediaEntity(RdfEntity):
     #: thumbnail image (owl:thumbnail)
     thumbnail = rdfmap.Value(rdfns.DBPEDIA_OWL.thumbnail)
 
+    def __unicode__(self):
+        return unicode(self.wikipedia_url) or unicode()
+
+    @property
+    def link(self):
+        if self.wikipedia_url is not None:
+            return self.wikipedia_url.identifier
+        else:
+            return self.identifier
 
 class RdfOrganization(RdfEntity):
     ''':class:`RdfEntity` for an organization.'''

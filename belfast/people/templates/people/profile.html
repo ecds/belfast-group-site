@@ -166,7 +166,7 @@
             {% endif %}
             {% if conn.dbpedia_uri %}
             {# link to wikipedia page if we can; if not, link to dbpedia #}
-            <a href="{% firstof conn.dbpedia.wikipedia_url conn.dbpedia %}">
+            <a href="{{ conn.dbpedia.link }}">
               <img src="{% static 'img/wikipedia.png' %}" alt="Wikipedia"/>
             </a>
             {% endif %}
