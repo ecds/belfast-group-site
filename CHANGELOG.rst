@@ -7,6 +7,8 @@ CHANGELOG
 * bugfix: correct wikipedia links on profile connections tab
 * bugfix: prevent admin editor from stripping out embeddded metadata
   in site content, including RDFa and COinS
+* bugfix: correct sitemap logic so people sitemap lists same urls
+  the website does
 
 1.0.2
 -----
