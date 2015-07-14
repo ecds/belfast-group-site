@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+1.0.3
+-----
+
+* bugfix: correct wikipedia links on profile connections tab
+* bugfix: prevent admin editor from stripping out embeddded metadata
+  in site content, including RDFa and COinS
+
 1.0.2
 -----
 
