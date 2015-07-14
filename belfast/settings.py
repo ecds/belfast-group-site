@@ -146,6 +146,10 @@ TINYMCE_DEFAULT_CONFIG = {
 
 EXISTDB_INDEX_CONFIGFILE = os.path.join(BASE_DIR, "exist_index.xconf")
 
+TINYMCE_DEFAULT_CONFIG = {
+    'extended_valid_elements': '*[*],span[property|typeof|resource|class|title],div[property|typeof|resource],meta[property|content]',
+}
+
 try:
     from localsettings import *
 except ImportError:
