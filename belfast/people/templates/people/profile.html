@@ -34,7 +34,7 @@
                   {% if pic.date %}<li property="schema:dateCreated">{{ pic.date }}</li>{% endif %}
                   {% if pic.creator %}<li property="schema:author">
                       {% if pic.creator_url %}
-                      <a href="{[ pic.creator_url ]}">{{ pic.creator }}</a>
+                      <a href="{{ pic.creator_url }}">{{ pic.creator }}</a>
                       {% else %}{{ pic.creator }}{% endif %}
                       </li>{% endif %}
                   {% if pic.publisher %}
