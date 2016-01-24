@@ -1,6 +1,9 @@
 README
 ======
 
+.. image:: https://zenodo.org/badge/20115/emory-libraries-ecds/belfast-group-site.svg
+   :target: https://zenodo.org/badge/latestdoi/20115/emory-libraries-ecds/belfast-group-site
+
 Overview
 --------
 
