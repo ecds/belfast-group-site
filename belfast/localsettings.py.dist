@@ -52,6 +52,18 @@ EXISTDB_SERVER_URL = "http://megaserver.example.com:8042/exist"
 EXISTDB_ROOT_COLLECTION = "/sample_collection"
 #EXISTDB_TEST_COLLECTION = "/test/sample"
 
+RDF_DATABASE = os.path.join(BASE_DIR, '..', 'belfastrdf.bdb')
+# path to network file generated from rdf data via networkx (temporary?)
+GEXF_DATA_DIR = os.path.join(BASE_DIR, '..', 'gexf')
+GEXF_DATA = {
+    'full': os.path.join(GEXF_DATA_DIR, 'belfastgroup.gexf'),
+    'bg1': os.path.join(GEXF_DATA_DIR, 'belfastgroup-groupsheets.gexf')
+}
+
+# override for development - by default, profile is not displayed if no
+# picture is loaded in django admin
+# REQUIRE_PROFILE_PICTURE = False
+
 
 # ** MEDIA_ROOT and MEDIA_URL used for profile pictures managed via django admin
 
