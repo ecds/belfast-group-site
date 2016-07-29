@@ -1,6 +1,20 @@
 Developer Notes
 ===============
 
+RDF database
+------------
+
+Occasionally the RDF database will run into memory errors in production,
+or you may see an error like this when running under Django runserver::
+
+    AttributeError: 'Sleepycat' object has no attribute '_Sleepycat__sync_thread'
+
+The simple solution that usually works is to delete the `__db.00[123]`
+files from the rdf database directory.  This doesn't remove any of the
+actual graph data, and should allow the database to be reloaded without
+memory errors.
+
+
 RDF and graph data
 ------------------
 
@@ -14,7 +28,7 @@ Download the GEXF files and belfastrdf_full.rdf.gz from
 The GEXF files should be placed in a `gexf` directory in the top level
 of your project (paths and filenames are configurable in settings).
 
-The belfast rdf dump should be unzipped and edited so that site URIs
+The GEXF and the the belfast rdf dump should be edited so that site URIs
 will be local to your project.  Replace
 **http://belfastgroup.digitalscholarship.emory.edu/** with
 **http://localhost:8000/** or whatever your development url will be.
