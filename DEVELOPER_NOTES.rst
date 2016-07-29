@@ -25,3 +25,12 @@ Use the **loadrdf** manage command to load the edited RDF data.
 Note that by default, profiles are not listed unless a photo is loaded
 in the django admin.  This can be overridden by setting
 **REQUIRE_PROFILE_PICTURE** to `False` in `localsettings.py`.
+
+
+Running tests
+-------------
+
+Unit tests shoud be run with the ``REUSE_DB=1`` environment variable set,
+so that Django does not to try recreate the RDF test database (this causes
+errors, since the RDF database does not support cursors, etc).  You can
+also use the ``fab test`` command, which includes this option.
