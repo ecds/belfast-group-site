@@ -1,10 +1,9 @@
 README
 ======
 
-
-.. image:: https://requires.io/github/emory-libraries-ecds/belfast-group-site/requirements.svg?branch=develop
-     :target: https://requires.io/github/emory-libraries-ecds/belfast-group-site/requirements/?branch=develop
-     :alt: Requirements Status
+    .. image:: https://requires.io/github/emory-libraries-ecds/belfast-group-site/  requirements.svg?branch=develop
+       :target: https://requires.io/github/emory-libraries-ecds/belfast-group-site/requirements/?branch=develop
+       :alt: Requirements Status
 
     .. image:: https://landscape.io/github/emory-libraries-ecds/belfast-group-site/master/landscape.svg?style=flat
        :target: https://landscape.io/github/emory-libraries-ecds/belfast-group-site/master
