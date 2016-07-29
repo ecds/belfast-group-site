@@ -69,3 +69,14 @@ Developer Notes
 
      env REUSE_DB=1 ./manage.py test
 
+
+
+1.1
+---
+
+* Run ``python manage.py migrate`` for up to date Django migrations.
+* Update configurations for eXist 2.2 in ``localsettings.py``; if loading
+  data to a brand new collection, you may need to load and reindex::
+
+    python existdb load-index
+    python existdb reindex
