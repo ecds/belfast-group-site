@@ -10,7 +10,7 @@ networkx>=1.9
 eulcommon
 html5lib
 progressbar
-djangotoolbox
+djangotoolbox>=1.8.0
 
 # NOTE: can't upgrade to django 1.8 yet because of djangtoolbox
 #https://github.com/django-nonrel/djangotoolbox/issues/61
