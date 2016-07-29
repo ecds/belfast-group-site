@@ -127,7 +127,7 @@ def list_groupsheets(request):
     sources = defaultdict(int)
     time_periods = defaultdict(int)
     for r in results:
-       # if not already filtered on digital, get a count
+        # if not already filtered on digital, get a count
         if filter_digital is None and r.url:
             digital_count += 1
         if filter_author is None:
@@ -136,7 +136,7 @@ def list_groupsheets(request):
                 authors[author] += 1
         if filter_source is None:
             for s in r.sources:
-                sources[s] +=1
+                sources[s] += 1
         if filter_time is None:
             time_periods[r.coverage] += 1
 

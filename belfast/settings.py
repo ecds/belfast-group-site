@@ -66,8 +66,6 @@ STATICFILES_FINDERS = (
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = '@4ns6q$@y6hxysrdwe!o*(*_l$!(3xu&jqs13zf*@v3+0%q0!&'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -180,5 +178,6 @@ if django_nose is not None:
     NOSE_ARGS = ['--with-existdbsetup', '--with-rdftestdatabase']
 
 
-#if DEBUG:
-   #MIDDLEWARE_CLASSES.append('belfast.profiling.ProfileMiddleware')
+# optional profiling middleware
+# if DEBUG:
+#     MIDDLEWARE_CLASSES.append('belfast.profiling.ProfileMiddleware')
