@@ -7,7 +7,7 @@ import os
 from django.conf import settings
 from django.contrib.flatpages.models import FlatPage
 from django.core.management import call_command
-from django.db import models, migrations
+from django.db import migrations
 
 logger = logging.getLogger(__name__)
 

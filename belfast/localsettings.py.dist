@@ -45,6 +45,9 @@ DATABASES = {
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = []
 
+# Make this unique, and don't share it with anybody.
+SECRET_KEY = ''
+
 # Exist DB Settings
 EXISTDB_SERVER_USER = 'user'
 EXISTDB_SERVER_PASSWORD = 'password'
