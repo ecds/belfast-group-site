@@ -80,3 +80,7 @@ Developer Notes
 
     python existdb load-index
     python existdb reindex
+
+* The **SECRET_KEY** setting was previously mistakenly included in
+  ``settings.py``, and has now been removed.  This configuration should
+  be added to ``localsettings.py`` if not already present.
