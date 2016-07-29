@@ -1,7 +1,7 @@
 # NOTE: django 1.9 causes an error with django-image-tools (south migrations)
 Django>=1.8,<1.9
 django-tinymce
-eulexistdb
+eulexistdb>=0.20.1
 rdflib>=4.2
 Pillow
 # for sleepycat/berkeleydb persistence
