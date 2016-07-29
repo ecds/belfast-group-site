@@ -16,6 +16,12 @@ from belfast.people.rdfmodels import RdfPerson
 logger = logging.getLogger(__name__)
 
 
+# teimap tei base class includes xml namespace declaration,
+# which exist is now complaining about (predefined namespace)
+# so override the root namespace to leave it out
+teimap._TeiBase.ROOT_NAMESPACES = {'tei': teimap.TEI_NAMESPACE}
+
+
 class Contents(teimap._TeiBase):
     ''':class:`~eulxml.xmlmap.XmlObject` for table of contents information,
     with a title and list of items, for a :class:`TeiGroupSheet`.'''
