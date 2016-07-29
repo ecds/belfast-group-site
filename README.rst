@@ -1,6 +1,19 @@
 README
 ======
 
+    .. image:: https://requires.io/github/emory-libraries-ecds/belfast/requirements.svg?branch=develop
+         :target: https://requires.io/github/emory-libraries-ecds/belfast/requirements/?branch=develop
+         :alt: Requirements Status
+
+    .. image:: https://landscape.io/github/emory-libraries-ecds/belfast-group-site/master/landscape.svg?style=flat
+       :target: https://landscape.io/github/emory-libraries-ecds/belfast-group-site/master
+       :alt: Code Health
+
+    .. image:: https://codeclimate.com/github/emory-libraries-ecds/belfast-group-site/badges/gpa.svg
+       :target: https://codeclimate.com/github/emory-libraries-ecds/belfast-group-site
+       :alt: Code Climate
+
+
 Overview
 --------
 
