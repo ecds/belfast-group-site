@@ -73,9 +73,9 @@ class IdentifyGroupSheets(object):
                    'belfast_group': rdfns.BELFAST_GROUP_URI
                    }
             )
-            # searching for all manuscript that 'mention' belfast group
-            # NOTE: schema:mentions NOT the right relation here;
-            # needs to be fixed in findingaids and then here
+        # searching for all manuscript that 'mention' belfast group
+        # NOTE: schema:mentions NOT the right relation here;
+        # needs to be fixed in findingaids and then here
 
         # if no matches, do a greedier search
         if len(res) == 0:
@@ -172,7 +172,6 @@ class SmushGroupSheets(object):
                     graph.set((uri, rdfns.DC.title, rdflib.Literal(normalized_title)))
                 titles.append(normalize_whitespace(title))
 
-
             # otherwise, assuming node is an rdf sequence
             else:
                 # convert from resource to standard blank node
@@ -246,7 +245,7 @@ class SmushGroupSheets(object):
                     last_name = name_parts.pop()
                     # remaning name(s) = first name
                     first_name = ' '.join(name_parts)
-                    author_name ='%s, %s' % (last_name, first_name)
+                    author_name = '%s, %s' % (last_name, first_name)
 
                 author = author_name
 

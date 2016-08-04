@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+1.1
+---
+
+* Updated for eXist-db 2.2 compatibility
+* Updated to Django 1.8 (cannot upgrade to Django 1.9 due to django-image-tools)
+* Updated to rdflib 4.2.x
+* Added developer documentation for loading data into a development site,
+  RDF database maintainenance, etc.
+
 1.0.3
 -----
 

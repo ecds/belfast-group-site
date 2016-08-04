@@ -69,3 +69,18 @@ Developer Notes
 
      env REUSE_DB=1 ./manage.py test
 
+
+
+1.1
+---
+
+* Run ``python manage.py migrate`` for up to date Django migrations.
+* Update configurations for eXist 2.2 in ``localsettings.py``; if loading
+  data to a brand new collection, you may need to load and reindex::
+
+    python existdb load-index
+    python existdb reindex
+
+* The **SECRET_KEY** setting was previously mistakenly included in
+  ``settings.py``, and has now been removed.  This configuration should
+  be added to ``localsettings.py`` if not already present.

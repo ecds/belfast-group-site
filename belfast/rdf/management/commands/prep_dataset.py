@@ -76,7 +76,7 @@ class Command(BaseCommand):
        os.path.join(rdf_fixture_dir, 'BelfastGroup_biographies.html'),
        os.path.join(rdf_fixture_dir, 'ednalongley_bio.html'),
        os.path.join(rdf_fixture_dir, 'pakenham_privatecoll.html'),
-      os.path.join(rdf_fixture_dir, 'hannahhobsbaum_bio.html'),
+       os.path.join(rdf_fixture_dir, 'hannahhobsbaum_bio.html'),
     ]
 
     QUB_input = os.path.join(settings.BASE_DIR, 'rdf', 'fixtures', 'QUB_ms1204.html')

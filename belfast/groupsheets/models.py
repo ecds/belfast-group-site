@@ -1,4 +1,1 @@
-from django.db import models
-import logging
-
-logger = logging.getLogger(__name__)
+# no db models for this app

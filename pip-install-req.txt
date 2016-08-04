@@ -1,7 +1,8 @@
-Django>=1.7,<1.8
+# NOTE: django 1.9 causes an error with django-image-tools (south migrations)
+Django>=1.8,<1.9
 django-tinymce
-eulexistdb
-rdflib<=4.1.0
+eulexistdb>=0.21.1
+rdflib>=4.2
 Pillow
 # for sleepycat/berkeleydb persistence
 bsddb3
@@ -9,7 +10,7 @@ networkx>=1.9
 eulcommon
 html5lib
 progressbar
-djangotoolbox
+djangotoolbox>=1.8.0
 
 # NOTE: can't upgrade to django 1.8 yet because of djangtoolbox
 #https://github.com/django-nonrel/djangotoolbox/issues/61

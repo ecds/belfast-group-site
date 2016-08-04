@@ -305,7 +305,7 @@ class Annotate(object):
             ''' % {'schema': rdfns.SCHEMA_ORG, 'rdf': rdflib.RDF,
                    'geo': rdfns.GEO}
         )
-                        # FILTER NOT EXISTS {?uri geo:lat ?lat}
+        # FILTER NOT EXISTS {?uri geo:lat ?lat}
         logger.info('Found %d places without lat/long in %s' % \
                     (len(res), datetime.now() - start))
 
@@ -414,14 +414,14 @@ class Annotate(object):
                        <%(uri)s> foaf:name ?name
                     }
                     ''' % {'foaf': rdfns.FOAF, 'uri': uri})
-                    # NOTE: viaf names don't seem to be tagged by language
-                    # (restricting to language returns nothing)
-                    #     FILTER (lang(?name) = 'en')
+                # NOTE: viaf names don't seem to be tagged by language
+                # (restricting to language returns nothing)
+                #     FILTER (lang(?name) = 'en')
 
-                    # NOTE: may need to restrict to names we know we need...
+                # NOTE: may need to restrict to names we know we need...
                 for n in names:
                     context.add((uri, rdfns.FOAF.name, n['name']))
-                    logger.debug('Adding name %s for %s',  n['name'], uri)
+                    logger.debug('Adding name %s for %s', n['name'], uri)
 
                 # VIAF now using schema.org/sameAs instead of owl:sameAs
                 same_as = list(tmpgraph.objects(uri, rdflib.OWL.sameAs))
@@ -501,10 +501,11 @@ class Annotate(object):
 
                 # convert to rdflib graph, then filter out any triples
                 # where our uri is not the subject
-                tmp_graph =  dbpedia_sparql.query().convert()
+                tmp_graph = dbpedia_sparql.query().convert()
 
-                for predicate in [rdfns.DBPEDIA_OWL.abstract, rdfns.FOAF.isPrimaryTopicOf]: #,
-                                  # rdfns.DBPEDIA_OWL.thumbnail]:
+                for predicate in [rdfns.DBPEDIA_OWL.abstract,
+                                  rdfns.FOAF.isPrimaryTopicOf]:
+                    # rdfns.DBPEDIA_OWL.thumbnail]:
                     objects = list(tmp_graph.objects(uriref, predicate))
                     if objects:
                         # if something returns multiple values (i.e. abstract)

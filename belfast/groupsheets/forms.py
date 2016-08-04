@@ -10,7 +10,6 @@ class KeywordSearchForm(forms.Form):
     keywords = forms.CharField(
         help_text=kw_help,
         widget=forms.TextInput(attrs={
-            'autocomplete': 'off',
             'class': 'searchform',
             'placeholder': 'Search digital editions...',
             'autocomplete': 'off',

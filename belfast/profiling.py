@@ -12,13 +12,14 @@ import StringIO
 from django.conf import settings
 
 
-words_re = re.compile( r'\s+' )
+words_re = re.compile(r'\s+')
 
 group_prefix_re = [
-    re.compile( "^.*/django/[^/]+" ),
-    re.compile( "^(.*)/[^/]+$" ), # extract module path
-    re.compile( ".*" ),           # catch strange entries
+    re.compile("^.*/django/[^/]+"),
+    re.compile("^(.*)/[^/]+$"),  # extract module path
+    re.compile(".*"),           # catch strange entries
 ]
+
 
 class ProfileMiddleware(object):
     """
@@ -33,29 +34,30 @@ class ProfileMiddleware(object):
     WARNING: It uses hotshot profiler which is not thread safe.
     """
     def process_request(self, request):
-        if (settings.DEBUG or request.user.is_superuser) and request.GET.has_key('prof'):
+        if (settings.DEBUG or request.user.is_superuser) and 'prof' in request.GET:
             self.tmpfile = tempfile.mktemp()
             self.prof = hotshot.Profile(self.tmpfile)
 
     def process_view(self, request, callback, callback_args, callback_kwargs):
-        if (settings.DEBUG or request.user.is_superuser) and request.GET.has_key('prof'):
+        if (settings.DEBUG or request.user.is_superuser) and 'prof' in request.GET:
             return self.prof.runcall(callback, request, *callback_args, **callback_kwargs)
 
-    def get_group(self, file):
+    def get_group(self, filename):
         for g in group_prefix_re:
-            name = g.findall( file )
+            name = g.findall(filename)
             if name:
                 return name[0]
 
-    def get_summary(self, results_dict, sum):
-        list = [ (item[1], item[0]) for item in results_dict.items() ]
-        list.sort( reverse = True )
-        list = list[:40]
+    def get_summary(self, results_dict, summary):
+        items = [(item[1], item[0]) for item in results_dict.items()]
+        items.sort(reverse=True)
+        items = items[:40]
 
         res = "      tottime\n"
-        for item in list:
-            res += "%4.1f%% %7.3f %s\n" % ( 100*item[0]/sum if sum else 0, item[0], item[1] )
-
+        for item in items:
+            res += "%4.1f%% %7.3f %s\n" % (100*item[0]/summary
+                                           if summary else 0, item[0],
+                                           item[1])
         return res
 
     def summary_for_files(self, stats_str):
@@ -64,27 +66,27 @@ class ProfileMiddleware(object):
         mystats = {}
         mygroups = {}
 
-        sum = 0
+        total = 0
 
         for s in stats_str:
-            fields = words_re.split(s);
+            fields = words_re.split(s)
             if len(fields) == 7:
                 time = float(fields[2])
-                sum += time
-                file = fields[6].split(":")[0]
+                total += time
+                filename = fields[6].split(":")[0]
 
-                if not file in mystats:
-                    mystats[file] = 0
-                mystats[file] += time
+                if filename not in mystats:
+                    mystats[filename] = 0
+                mystats[filename] += time
 
                 group = self.get_group(file)
-                if not group in mygroups:
-                    mygroups[ group ] = 0
-                mygroups[ group ] += time
+                if group not in mygroups:
+                    mygroups[group] = 0
+                mygroups[group] += time
 
         return "<pre>" + \
-               " ---- By file ----\n\n" + self.get_summary(mystats,sum) + "\n" + \
-               " ---- By group ---\n\n" + self.get_summary(mygroups,sum) + \
+               " ---- By file ----\n\n" + self.get_summary(mystats, total) + "\n" + \
+               " ---- By group ---\n\n" + self.get_summary(mygroups, total) + \
                "</pre>"
 
     def process_response(self, request, response):
