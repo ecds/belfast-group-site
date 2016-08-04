@@ -8,11 +8,16 @@ from fabric.colors import green, yellow
 from fabric.context_managers import cd, hide, settings
 from fabric.contrib import files
 from fabric.contrib.console import confirm
+from fabric.state import env
 import belfast
 
 ##
 # automated build/test tasks
 ##
+
+# set -H prefix for all sudo commands (sets home to match user)
+# (this is particularly important for pip install commands)
+env.sudo_prefix = 'sudo -H'
 
 
 def all_deps():
@@ -22,6 +27,7 @@ def all_deps():
     if os.path.exists('pip-local-req.txt'):
         local('pip install -r pip-local-req.txt')
 
+
 @task
 def test():
     '''Locally run all tests.'''
@@ -30,6 +36,7 @@ def test():
 
     local('env REUSE_DB=1 python manage.py test --noinput --with-coverage --cover-package=%(project)s --cover-xml --with-xunit' \
         % env)
+
 
 @task
 def doc():
@@ -58,6 +65,7 @@ env.remote_path = '/home/httpd/sites/belfast'
 env.url_prefix = None
 env.remote_proxy = None
 env.remote_acct = 'belfast'
+
 
 def configure(path=None, user=None, url_prefix=None, remote_proxy=None):
     'Configuration settings used internally for the build.'
