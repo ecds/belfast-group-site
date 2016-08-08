@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+1.1.1
+-----
+
+* Handle more database exceptions when opening RDF database.
+
 1.1
 ---
 
