@@ -1,6 +1,7 @@
 import logging
 import glob
 import os
+from bsddb3.db import DBRunRecoveryError, DBPageNotFoundError
 import rdflib
 from rdflib.store import NO_STORE, VALID_STORE
 from django.conf import settings
@@ -21,24 +22,30 @@ logger = logging.getLogger(__name__)
 class DatabaseCreation(NonrelDatabaseCreation):
     pass
 
+
 class DatabaseFeatures(NonrelDatabaseFeatures):
     can_return_id_from_insert = False
     supports_primary_key_on = set()
 
+
 class DatabaseOperations(NonrelDatabaseOperations):
     compiler_module = __name__.rsplit('.', 1)[0] + '.compiler'
+
 
 class DatabaseClient(NonrelDatabaseClient):
     pass
 
+
 class DatabaseValidation(NonrelDatabaseValidation):
     pass
+
 
 class DatabaseIntrospection(NonrelDatabaseIntrospection):
 
     # minimal instrospection to allow django to run tests
     def get_table_list(self, *args, **kwargs):
         return []
+
 
 class DatabaseWrapper(NonrelDatabaseWrapper):
     def __init__(self, *args, **kwds):
@@ -53,9 +60,10 @@ class DatabaseWrapper(NonrelDatabaseWrapper):
         logger.debug('opening Sleepycat RDF DB connection')
         self.db_connection = rdflib.ConjunctiveGraph('Sleepycat')
         try:
-            rval = self.db_connection.open(self.settings_dict['NAME'], create=False)
-        except MemoryError:
-            logger.warn('Sleepycat RDF DB MemoryError; clearing __db.00x files')
+            rval = self.db_connection.open(self.settings_dict['NAME'],
+                                           create=False)
+        except (MemoryError, DBRunRecoveryError, DBPageNotFoundError):
+            logger.warn('Sleepycat RDF DB Error; clearing __db.00x files')
             # if we got far enough to open the store, close it
             if self.db_connection.store.is_open():
                 self.db_connection.close()
