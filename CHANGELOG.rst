@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+1.1.4
+-----
+
+* Fix Google Maps API error.
+
 1.1.1
 -----
 
