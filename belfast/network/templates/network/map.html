@@ -4,14 +4,12 @@
 {% block page-subtitle %} : {{ flatpage.title }}{% endblock %}
 
 {% block head-extras %}
-<script type="text/javascript" src="//maps.google.com/maps/api/js?sensor=true"></script>
-{# <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script> #}
 <script type="text/javascript" src="{% static 'js/jquery.ui.map.full.min.js' %}"></script>
 {% endblock %}
 
 {% block page-content %}
 {% if flatpage %}
-  {% include "flatpages/snippets/flatpage_content.html" %}
+{% include "flatpages/snippets/flatpage_content.html" %}
 {% endif %}
 
 <div class="panel panel-default">
@@ -28,59 +26,97 @@
         </button>
         <ul class="dropdown-menu map-filter" role="menu">
           {% for id, name in people.iteritems %}
-            <li><a id="{{ id }}">{{ name }}</a></li>
+          <li><a id="{{ id }}">{{ name }}</a></li>
           {% endfor %}
-            <li class="divider"></li>
-            <li class="active"><a id="view_all">View All</a></li>
+          <li class="divider"></li>
+          <li class="active"><a id="view_all">View All</a></li>
         </ul>
       </div>
     </div>
-</div>
+  </div>
 
-{# FIXME: height % seems to be ignored entirely... #}
+  {# FIXME: height % seems to be ignored entirely... #}
   <div id="map_canvas" class="panel-body" style="height:90%;min-height:550px;">
-{# <div id="map_canvas" style="border:1px solid black;width:75%;height:80%;position:absolute"> #}
-<br/>
-</div>
+    {# <div id="map_canvas" style="border:1px solid black;width:75%;height:80%;position:absolute"> #}
+    <br />
+  </div>
 </div>
 
+<script type="text/javascript" src='https://maps.googleapis.com/maps/api/js?key={{ api_key }}'></script>
 <script type="text/javascript">
-$(document).ready(function(){
- $('#map_canvas').gmap().bind('init', function() {
-    // This URL won't work on your localhost, so you need to change it
-    // see http://en.wikipedia.org/wiki/Same_origin_policy
-    $.getJSON("{% url 'network:map-js' %}", function(data) {
-      $.each( data.markers, function(i, marker) {
-        $('#map_canvas').gmap('addMarker', {
-          'position': new google.maps.LatLng(marker.latitude, marker.longitude),
-          'bounds': true,
-          'tags': marker.tags,
-          'icon': "{% static 'img/' %}map_marker_" + marker.icon  + ".png"
-        }).click(function() {
-          $('#map_canvas').gmap('openInfoWindow', {
-           'content': marker.content,
-           'maxWidth': 250,
-         }, this);
+  function initMap() {
+
+  }
+
+  fetch('{% url '
+      network: map - js ' %}')
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      let openWindow = null;
+      let iconBase = '{% static '
+      img / ' %}map_marker_';
+      let bounds = new google.maps.LatLngBounds();
+      let map = new google.maps.Map(document.getElementById('map_canvas'), {
+        zoom: 4,
+        center: {
+          lat: 0,
+          lng: 0
+        },
+        disableDefaultUI: true,
+        zoomControl: true,
+        fullscreenControl: true
+      });
+      data.markers.forEach(marker => {
+        console.log(iconBase, marker.icon);
+        let mapMarker = new google.maps.Marker({
+          position: {
+            lat: parseFloat(marker.latitude),
+            lng: parseFloat(marker.longitude)
+          },
+          map: map,
+          title: marker.title,
+          icon: `${iconBase}${marker.icon}.png`
+        });
+        bounds.extend(mapMarker.position);
+        marker.mapMarker = mapMarker;
+
+        let infoWindow = new google.maps.InfoWindow({
+          content: marker.content
+        });
+        mapMarker.addListener('click', function () {
+          infoWindow.open(map, mapMarker);
+          if (openWindow && openWindow != infoWindow) {
+            openWindow.close()
+          }
+          openWindow = infoWindow;
         });
       });
-    });
-  });
- $('.map-filter a').click(function() {
-  var id = $(this).attr('id');
-    // show or hide map markers based on the selected filter
-    if (id == 'view_all') {
-      $.each($('#map_canvas').gmap('get', 'markers'), function(i, m) {
-        m.setVisible(true);
-      });
-    } else {
-      $('#map_canvas').gmap('find', 'markers', { 'property': 'tags', 'value': id }, function(marker, found) {
-        marker.setVisible(found);
+      map.fitBounds(bounds);
+      let mapFilter = document.getElementsByClassName('map-filter')[0];
+      let links = mapFilter.getElementsByTagName('a');
+      for (let link of links) {
+        link.addEventListener('click', function (event) {
+          for (let link of links) {
+            link.parentNode.classList.remove('active');
+          }
+          link.parentNode.classList.add('active');
+          data.markers.forEach(marker => {
+            if (event.target.id == 'view_all') {
+              marker.mapMarker.setVisible(true);
+              event.target.parentNode.classList.add('active');
 
-      });
-    }
-    $('.map-filter li').removeClass('active');
-    $(this).parent().addClass('active');
-  });
-});
+            } else if (marker.tags.includes(event.target.id)) {
+              marker.mapMarker.setVisible(true);
+              // event.target.parentNode.classList.add('active');
+            } else {
+              marker.mapMarker.setVisible(false);
+              // event.target.parentNode.classList.remove('active');
+            }
+          })
+        })
+      }
+    });
 </script>
 {% endblock %}
