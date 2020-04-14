@@ -310,7 +310,7 @@ def map(request):
     '''
 
     fpage = get_flatpage(request)
-
+    api_key = settings.GOOGLE_MAPS_API_KEY
     people = {}
     # semi-redundant with json view functionality, but easier to build filter
     for pl in find_places():
@@ -323,8 +323,15 @@ def map(request):
             if p.local_uri:
                 people[str(p.identifier)] = p.fullname
 
-    return render(request, 'network/map.html',
-                  {'people': people, 'flatpage': fpage})
+    return render(
+        request,
+        'network/map.html',
+        {
+            'people': people,
+            'flatpage': fpage,
+            'api_key': api_key
+        }
+    )
 
 
 @last_modified(rdf_lastmod)
